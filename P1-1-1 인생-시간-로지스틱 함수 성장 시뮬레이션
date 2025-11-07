@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 습관과 성장 곡선 시뮬레이션</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts - Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #22D3EE, #3B82F6, #A78BFA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* 아코디언 패널 숨김 기본값 */
+        .accordion-content {
+            display: none;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        /* 차트 컨테이너 */
+        .chart-container {
+            position: relative;
+            height: 50vh; /* 뷰포트 높이의 50% */
+            width: 100%; /* 너비 100% */
+            min-height: 400px; /* 최소 높이 */
+        }
+        /* 테이블 스타일 */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #374151; /* border-gray-700 */
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #1F2937; /* bg-gray-800 */
+            color: #E5E7EB; /* text-gray-200 */
+        }
+        tbody tr:nth-child(odd) {
+            background-color: #374151; /* bg-gray-700 */
+        }
+        tbody tr:nth-child(even) {
+            background-color: #1F2937; /* bg-gray-800 */
+        }
+        /* 수식 스타일 */
+        .formula {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            color: #D1D5DB; /* text-gray-300 */
+            background: #1F2937; /* bg-gray-800 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            border: 1px solid #4B5563;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <div class="container mx-auto max-w-7xl px-4 py-16">
+
+        <!-- 헤더 -->
+        <header class="text-center mb-20">
+            <h1 class="text-5xl md:text-6xl font-black mb-6 gradient-text">
+                학습 습관, 그 무서운 복리 효과
+            </h1>
+            <p class="text-2xl md:text-3xl font-bold text-gray-100 mb-8">성장 곡선 시뮬레이션으로 본 습관의 격차</p>
+        </header>
+
+        <!-- 시뮬레이션 1: 철수의 3년 -->
+        <section class="mb-24">
+            <h2 class="text-4xl font-extrabold text-left mb-8 pb-3 border-b border-gray-700">
+                시뮬레이션 1: "철수의 3년" <span class="text-2xl font-normal text-gray-400">(N=3, 1095일)</span>
+            </h2>
+            
+            <!-- 차트 1 -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 mb-8">
+                <div class="chart-container">
+                    <canvas id="chart1"></canvas>
+                </div>
+            </div>
+
+            <!-- 테이블 1 -->
+            <div class="overflow-x-auto mb-8">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>시나리오</th>
+                            <th>T_d (시간)</th>
+                            <th>F_p (몰입)</th>
+                            <th>T_c (연속)</th>
+                            <th>k (효율)</th>
+                            <th>50% (500) 도달일</th>
+                            <th>90% (900) 도달일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>철수</strong></td>
+                            <td>4.0</td>
+                            <td>20%</td>
+                            <td>0.8</td>
+                            <td><strong>0.0096</strong></td>
+                            <td><strong>723일</strong></td>
+                            <td><strong>951일</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>정신 차린 철수</strong></td>
+                            <td>8.0</td>
+                            <td>90%</td>
+                            <td>2.8</td>
+                            <td><strong>0.1224</strong></td>
+                            <td><strong>60일</strong></td>
+                            <td><strong>77일</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>방학 때 무서워진 철수</strong></td>
+                            <td>12.0</td>
+                            <td>95%</td>
+                            <td>2.8</td>
+                            <td><strong>0.1938</strong></td>
+                            <td><strong>39일</strong></td>
+                            <td><strong>50일</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 분석 1 -->
+            <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700">
+                <h3 class="text-2xl font-bold text-cyan-400 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    시뮬레이션 1 분석
+                </h3>
+                <p class="text-lg text-gray-300 leading-relaxed">
+                    시뮬레이션 기간을 3년(1095일)로 설정하자, 가장 비효율적인 습관(k=0.0096)을 가진 '철수'도 결국 목표 90%에 도달합니다. 하지만 도달 시간에서 극명한 차이가 드러납니다.
+                </p>
+                <ul class="list-disc list-outside pl-6 mt-4 space-y-2 text-lg">
+                    <li><strong>방학 때 무서워진 철수 (k=0.1938):</strong> 단 <strong>50일</strong> 만에 90% 달성</li>
+                    <li><strong>정신 차린 철수 (k=0.1224):</strong> <strong>77일</strong> 소요</li>
+                    <li><strong>철수 (k=0.0096):</strong> 무려 <strong>951일</strong> 소요</li>
+                </ul>
+                <p class="text-xl font-bold text-white mt-6">
+                    '방학 때 무서워진 철수'는 '철수'보다 <span class="text-cyan-400 text-3xl">19배</span> 더 빠르게 같은 목표를 달성합니다. 이것이 바로 학습 효율(k)의 무서운 복리 효과입니다.
+                </p>
+            </div>
+        </section>
+
+        <!-- 시뮬레이션 2: MJ의 2년 -->
+        <section class="mb-24">
+            <h2 class="text-4xl font-extrabold text-left mb-8 pb-3 border-b border-gray-700">
+                시뮬레이션 2: "MJ의 2년" <span class="text-2xl font-normal text-gray-400">(N=3, 720일)</span>
+            </h2>
+            
+            <!-- 차트 2 -->
+            <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 mb-8">
+                <div class="chart-container">
+                    <canvas id="chart2"></canvas>
+                </div>
+            </div>
+
+            <!-- 테이블 2 -->
+            <div class="overflow-x-auto mb-8">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>시나리오</th>
+                            <th>T_d (시간)</th>
+                            <th>F_p (몰입)</th>
+                            <th>T_c (연속)</th>
+                            <th>k (효율)</th>
+                            <th>50% (500) 도달일</th>
+                            <th>90% (900) 도달일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>MJ1</strong></td>
+                            <td>4</td>
+                            <td>90%</td>
+                            <td>2</td>
+                            <td><strong>0.0540</strong></td>
+                            <td><strong>131일</strong></td>
+                            <td><strong>171일</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>MJ2</strong></td>
+                            <td>6</td>
+                            <td>90%</td>
+                            <td>2</td>
+                            <td><strong>0.0810</strong></td>
+                            <td><strong>89일</strong></td>
+                            <td><strong>115일</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>MJ3</strong></td>
+                            <td>2</td>
+                            <td>20%</td>
+                            <td>0.8</td>
+                            <td><strong>0.0048</strong></td>
+                            <td><strong>도달 못함</strong></td>
+                            <td><strong>도달 못함</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 분석 2 -->
+            <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700">
+                <h3 class="text-2xl font-bold text-purple-400 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    시뮬레이션 2 분석
+                </h3>
+                <p class="text-lg text-gray-300 leading-relaxed">
+                    이 시뮬레이션은 2년(720일)간 진행되었습니다. 'MJ2'는 약 4개월(115일) 만에 90%에 도달하는 빠른 성장을 보였습니다. 'MJ1'은 약 5.7개월(171일)이 소요되었습니다.
+                </p>
+                <p class="text-xl font-bold text-red-500 mt-6">
+                    가장 주목할 점은 'MJ3'입니다. 학습 효율(k=0.0048)이 너무 낮아 2년 내내 50%는커녕 100(10%)에도 도달하지 못합니다. (장기 시뮬레이션 결과, 90% 도달까지 약 5.2년(1899일)이 소요됩니다.)
+                </p>
+                <p class="text-xl font-bold text-white mt-6">
+                    'MJ2'와 'MJ3'가 같은 목표(90%)에 도달하는 데는 <span class="text-purple-400 text-3xl">16배</span> 이상의 시간 차이가 필요합니다. 낮은 학습 시간(2시간)과 낮은 몰입도(20%)의 조합이 성장을 거의 불가능하게 만듭니다.
+                </p>
+            </div>
+        </section>
+
+        <!-- 시뮬레이션 원리 (아코디언) -->
+        <section>
+            <h2 class="text-4xl font-extrabold text-center mb-12 gradient-text">
+                시뮬레이션 작동 원리 (The Math)
+            </h2>
+            <div class="max-w-4xl mx-auto space-y-4">
+                
+                <!-- 아코디언 1: k (학습 효율) -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">1. k (학습 효율)가 모든 것을 결정합니다</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            모든 성장 곡선은 '일일 성장률(k)'이라는 단 하나의 값으로 결정됩니다. 이 값은 사용자의 학습 습관(시간, 몰입, 연속)을 통해 계산됩니다.
+                        </p>
+                        <div class="formula">
+                            $k_{scenario} = B \cdot (T_d \cdot F_p) \cdot (1 + w_c \cdot T_c)$
+                        </div>
+                        <ul class="list-disc list-outside pl-6 mt-4 space-y-2">
+                            <li>$k_{scenario}$: 일일 성장률 (그래프의 가파름)</li>
+                            <li>$B$: 기본 성장 계수 (시뮬레이션 상수, 0.01)</li>
+                            <li>$T_d$: (Daily) 총 학습 시간</li>
+                            <li>$F_p$: (Focus) 평균 몰입도 (0.0 ~ 1.0)</li>
+                            <li>$w_c$: (Weight for Continuity) 연속 학습 가중치 (0.25)</li>
+                            <li>$T_c$: (Continuous) 1회 평균 연속 학습 시간</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 아코디언 2: S-Curve의 두 얼굴 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">2. S-Curve의 두 얼굴: 연속형 vs 이산형</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            로지스틱 성장은 '완성된 모양'을 설명하는 연속형 함수와 '매일의 변화'를 계산하는 이산형 모델, 두 가지 방식으로 표현할 수 있습니다.
+                        </p>
+                        <h4 class="text-lg font-bold text-white mb-2">모델 1: 연속형 함수 (완성된 S-커브)</h4>
+                        <div class="formula">
+                            $A(t) = \frac{L}{1 + e^{-k(t - t_0)}}$
+                        </div>
+                        <p class="text-gray-400 mt-2">수학적으로 완벽하고 '매끄러운' 곡선 자체를 설명합니다.</p>
+                        
+                        <h4 class="text-lg font-bold text-white mb-2 mt-6">모델 2: 이산형 재귀 함수 (시뮬레이터)</h4>
+                        <div class="formula">
+                            $\Delta A(t) = k_{scenario} \times A(t-1) \times \left(1 - \frac{A(t-1)}{L}\right)$
+                            <br>
+                            $A(t) = A(t-1) + \Delta A(t)$
+                        </div>
+                        <p class="text-gray-400 mt-2">
+                            '오늘의 성장량($\Delta A$)'을 계산하여 '어제의 능력치($A(t-1)$)'에 더하는 방식입니다. 컴퓨터가 매일 점을 찍어 S-커브를 '그려내는' 원리이며, 이 인포그래픽이 사용하는 방식입니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 아코디언 3: A = f(x) -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">3. 총괄 함수 A = f(x) 정의하기</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            $A$ (Ability)를 $f(x)$ ($x$ = 일차) 형태의 함수로 표현하면 다음과 같은 '재귀 함수'가 됩니다. $f(x)$를 알려면 $f(x-1)$을 알아야 합니다.
+                        </p>
+                        <div class="formula">
+$f(x) = \begin{cases}
+A_0 & \text{if } x = 0 \\
+f(x-1) + \left[ k_{scenario} \cdot f(x-1) \cdot \left(1 - \frac{f(x-1)}{L}\right) \right] & \text{if } x \ge 1
+\end{cases}$
+                        </div>
+                        <p class="text-gray-400 mt-4">
+                            $f(100)$을 알려면 $f(99)$가, $f(99)$를 알려면 $f(98)$이... 결국 $f(0)$에서부터 100번을 순서대로 계산해야만 답을 알 수 있습니다. 이것이 이 시뮬레이터가 하는 일입니다.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 아코디언 4: 몰입도와 인지 흐름 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">4. (심화) 몰입도(I)와 인지 흐름 F(x, I)</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            더 복잡한 모델에서는 $k$값뿐만 아니라 몰입의 '깊이'와 '패턴' 자체를 모델링할 수 있습니다. 몰입도 $I$ ($0.0 \sim 1.0$)를 입력받아 내부 변수 $A$ (몰입 깊이)로 변환하는 함수를 사용할 수 있습니다.
+                        </p>
+                        <div class="formula">
+                            $A(I) = -I \cdot A_{scale}$
+                        </div>
+                        <p class="text-gray-300 leading-relaxed my-4">
+                            이 $A(I)$ 값을 기반으로 인지 흐름 $F(x, I)$의 모든 하위 함수(상승 높이 $\alpha$, 하강 폭 $\sigma_{dip}$ 등)가 연쇄적으로 결정됩니다.
+                        </p>
+                        <div class="formula">
+                            $F(x, I) = \alpha(I) \cdot\tanh(\beta(I) \cdot (x -x_{peak}(I))) + A(I) \cdot e^{\frac{(x - x_{dip}(I))^2}{2(\sigma_{dip}(I))^2}}$
+                        </div>
+                        <p class="text-gray-400 mt-4">
+                            결국, 직관적인 '몰입도($I$)' 입력 하나로 곡선의 모든 복잡한 특성을 동시에 제어하는 고차원 모델을 설계할 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+    (function() { // <-- IIFE 래퍼 추가 시작
+        // --- 시뮬레이션 로직 (Python -> JS) ---
+        // 상수 정의 (시뮬레이션 파라미터)
+        const L = 1000;  // 최대 능력치
+        const A0 = 1;    // 초기 능력치
+
+        /**
+         * 일일 성장량을 계산합니다 (로지스틱 모델)
+         * @param {number} k - 일일 성장률 (학습 효율)
+         * @param {number} yesterdayAbility - 어제 누적 능력치
+         * @param {number} maxAbility - 최대 능력치 (L)
+         * @returns {number} - 오늘 성장량 (Delta A)
+         */
+        function calculateDailyGrowth(k, yesterdayAbility, maxAbility) {
+            if (yesterdayAbility <= 0) return 0;
+            if (yesterdayAbility >= maxAbility) return 0;
+            const logisticFactor = yesterdayAbility * (1 - (yesterdayAbility / maxAbility));
+            const deltaA = k * logisticFactor;
+            return deltaA;
+        }
+
+        /**
+         * 전체 기간의 성장 곡선을 시뮬레이션합니다.
+         * @param {number} k - 일일 성장률 (k_scenario)
+         * @param {number} startAbility - 초기 능력치 (A0)
+         * @param {number} maxAbility - 최대 능력치 (L)
+         * @param {number} simDays - 시뮬레이션 일수
+         * @returns {number[]} - 일별 누적 능력치 배열
+         */
+        function runFullSimulation(k, startAbility, maxAbility, simDays) {
+            const abilityHistory = [startAbility];
+            let currentAbility = startAbility;
+            for (let day = 0; day < simDays; day++) {
+                const growth = calculateDailyGrowth(k, currentAbility, maxAbility);
+                currentAbility += growth;
+                currentAbility = Math.min(currentAbility, maxAbility); // 최대값 초과 방지
+                abilityHistory.push(currentAbility);
+            }
+            return abilityHistory;
+        }
+
+        // --- 차트 생성 로직 ---
+        window.onload = function() {
+            const ctx1 = document.getElementById('chart1').getContext('2d');
+            const ctx2 = document.getElementById('chart2').getContext('2d');
+
+            // --- 차트 1 데이터 생성: 철수의 3년 (1095일) ---
+            const k_cheolsu = 0.0096;
+            const k_motivated = 0.1224;
+            const k_beast = 0.1938;
+            const days1 = 1095;
+            
+            const data_cheolsu = runFullSimulation(k_cheolsu, A0, L, days1);
+            const data_motivated = runFullSimulation(k_motivated, A0, L, days1);
+            const data_beast = runFullSimulation(k_beast, A0, L, days1);
+            
+            const labels1 = Array.from({ length: days1 + 1 }, (_, i) => i); // 0일부터 1095일까지
+
+            // --- 차트 2 데이터 생성: MJ의 2년 (720일) ---
+            const k_mj1 = 0.0540;
+            const k_mj2 = 0.0810;
+            const k_mj3 = 0.0048;
+            const days2 = 720;
+            
+            const data_mj1 = runFullSimulation(k_mj1, A0, L, days2);
+            const data_mj2 = runFullSimulation(k_mj2, A0, L, days2);
+            const data_mj3 = runFullSimulation(k_mj3, A0, L, days2);
+
+            const labels2 = Array.from({ length: days2 + 1 }, (_, i) => i); // 0일부터 720일까지
+
+            // --- 공통 차트 옵션 ---
+            const chartOptions = (title, maxDays) => ({
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { color: '#E5E7EB', font: { size: 14 } }
+                    },
+                    title: {
+                        display: true,
+                        text: title,
+                        color: '#FFFFFF',
+                        font: { size: 18, weight: 'bold' }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            title: (tooltipItems) => `Day ${tooltipItems[0].label}`,
+                            label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: `일 (Days)`, color: '#9CA3AF' },
+                        ticks: { color: '#9CA3AF' },
+                        grid: { color: '#374151' },
+                        max: maxDays // X축 최대값 설정
+                    },
+                    y: {
+                        title: { display: true, text: `누적 능력치 (Ability)`, color: '#9CA3AF' },
+                        ticks: { color: '#9CA3AF', callback: (value) => value.toLocaleString() },
+                        grid: { color: '#374151' },
+                        min: 0,
+                        max: L + 50 // Y축 최대값 (L + 50)
+                    }
+                },
+                elements: {
+                    point: { radius: 0, hitRadius: 10, hoverRadius: 5 },
+                    line: { tension: 0.1 }
+                }
+            });
+            
+            // --- 차트 1 생성 ---
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: labels1,
+                    datasets: [
+                        {
+                            label: '방학 때 무서워진 철수 (k=0.1938)',
+                            data: data_beast,
+                            borderColor: '#22D3EE', // Cyan
+                            backgroundColor: '#22D3EE80',
+                            borderWidth: 3
+                        },
+                        {
+                            label: '정신 차린 철수 (k=0.1224)',
+                            data: data_motivated,
+                            borderColor: '#A78BFA', // Purple
+                            backgroundColor: '#A78BFA80',
+                            borderWidth: 3
+                        },
+                        {
+                            label: '철수 (k=0.0096)',
+                            data: data_cheolsu,
+                            borderColor: '#F87171', // Red
+                            backgroundColor: '#F8717180',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: chartOptions('시뮬레이션 1: "철수의 3년"', days1)
+            });
+
+            // --- 차트 2 생성 ---
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: labels2,
+                    datasets: [
+                        {
+                            label: 'MJ2 (k=0.0810)',
+                            data: data_mj2,
+                            borderColor: '#34D399', // Emerald
+                            backgroundColor: '#34D39980',
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'MJ1 (k=0.0540)',
+                            data: data_mj1,
+                            borderColor: '#FBBF24', // Amber
+                            backgroundColor: '#FBBF2480',
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'MJ3 (k=0.0048)',
+                            data: data_mj3,
+                            borderColor: '#F87171', // Red
+                            backgroundColor: '#F8717180',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: chartOptions('시뮬레이션 2: "MJ의 2년"', days2)
+            });
+        };
+
+        // --- 아코디언 스크립트 ---
+        document.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                const icon = button.querySelector('svg');
+
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    content.style.display = 'block';
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+    })(); // <-- IIFE 래퍼 추가 끝
+    </script>
+</body>
+</html>
