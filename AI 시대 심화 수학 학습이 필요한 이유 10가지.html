@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 기술의 심장, 수학</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter 폰트 (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 기본 폰트 설정 */
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* 그라데이션 텍스트 */
+        .gradient-text {
+            background-image: linear-gradient(to right, #818cf8, #d8437f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* 스크롤 애니메이션 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Q&A 아코디언 화살표 */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details > summary::after {
+            content: '+';
+            float: right;
+            font-size: 1.5em;
+            font-weight: 300;
+            transition: transform 0.2s;
+        }
+        details[open] > summary::after {
+            content: '−';
+            transform: rotate(180deg);
+        }
+        details[open] {
+            background-color: #1f2937; /* gray-800 */
+        }
+        
+        /* 탭 UI */
+        [role="tabpanel"] {
+            display: none;
+        }
+        [role="tab"][aria-selected="true"] {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+        }
+        [role="tabpanel"][aria-hidden="false"] {
+            display: block;
+        }
+
+        /* CSS 다이어그램: 신경망 */
+        .neural-network {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 2rem;
+            background: #1f2937;
+            border-radius: 0.5rem;
+            min-height: 200px;
+        }
+        .nn-layer {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .nn-neuron {
+            width: 40px;
+            height: 40px;
+            background: #818cf8;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 10px #818cf8;
+        }
+        .nn-layer:nth-child(2) .nn-neuron {
+            background: #c084fc;
+            box-shadow: 0 0 10px #c084fc;
+        }
+        .nn-layer:nth-child(3) .nn-neuron {
+            background: #f472b6;
+            box-shadow: 0 0 10px #f472b6;
+        }
+        .nn-connections {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        /* CSS 다이어그램: AI 교육 피라미드 */
+        .pyramid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+        .pyramid-level {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #111827;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: center;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+            transition: transform 0.3s ease;
+        }
+        .pyramid-level:hover {
+            transform: scale(1.05);
+        }
+        .pyramid-level-1 {
+            width: 80%;
+            background: #60a5fa; /* blue-400 */
+            clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 20% 100%);
+            z-index: 3;
+        }
+        .pyramid-level-2 {
+            width: 90%;
+            background: #3b82f6; /* blue-500 */
+            clip-path: polygon(10% 0%, 90% 0%, 80% 100%, 20% 100%);
+            margin-top: -1.5rem;
+            z-index: 2;
+        }
+        .pyramid-level-3 {
+            width: 100%;
+            background: #2563eb; /* blue-600 */
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+            margin-top: -1.5rem;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 antialiased">
+
+    <!-- 헤더 -->
+    <header class="container mx-auto px-6 py-20 text-center">
+        <h1 class="text-4xl md:text-6xl font-extrabold mb-4 reveal">
+            <span class="gradient-text">AI 기술의 심장, 수학</span>
+        </h1>
+        <h2 class="text-xl md:text-2xl text-gray-400 font-light reveal">
+            머스크가 교육 강화를 외친 까닭
+        </h2>
+        <div class="mt-8 max-w-3xl mx-auto text-left text-gray-300 space-y-4 reveal">
+            <p>2024년 3월, 일론 머스크와 샘 올트먼이 '매스 매터스 AI(Math Matters AI)' 캠페인에 서명했습니다. 이들은 AI 산업의 최전선에서 왜 중고등학교 수학 교육을 강조했을까요?</p>
+            <p class="font-semibold text-indigo-300">이유는 명확합니다. AI의 핵심은 대수, 미적분, 확률 같은 수학 개념으로 구성됐기 때문입니다. 딥러닝은 미적분을 기반으로 작동하고, 벡터와 행렬은 AI 내부에서 데이터를 변환하는 언어입니다. 코딩 기술만으로는 AI를 진정으로 이해하거나 개발할 수 없으며, 수학적 사고와 개념이 AI 학습의 기초체력이 됩니다.</p>
+        </div>
+    </header>
+
+    <!-- 본문 컨테이너 -->
+    <main class="container mx-auto px-6 py-12">
+
+        <!-- 제1장: AI 시대 심화 수학이 중요한 10가지 이유 -->
+        <section class="mb-20 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">제1장: AI 시대, 심화 수학이 중요한 10가지 이유</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- 이유 1 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3m0 0l3-3m-3 3v6m0-13a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h3 class="text-xl font-semibold">1. AI의 핵심 언어는 수학이다</h3>
+                    </div>
+                    <p class="text-gray-300">딥러닝 모델의 내부는 행렬 곱셈, 활성화 함수, 미분의 반복입니다. 트랜스포머의 어텐션, CNN의 합성곱 모두 수학 연산에 기반합니다. 생성형 AI는 확률 분포와 통계적 추론 없이는 작동 불가능합니다.</p>
+                </div>
+
+                <!-- 이유 2 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <h3 class="text-xl font-semibold">2. 수학은 AI 학습의 기초체력이다</h3>
+                    </div>
+                    <p class="text-gray-300">알고리즘을 이해하려면 선형대수와 미적분이, 모델을 개선하려면 최적화 이론이 필요합니다. 신경망 학습은 손실 함수의 기울기(편미분)를 계산하는 과정이며, 역전파는 연쇄 법칙(Chain Rule)의 응용입니다.</p>
+                </div>
+
+                <!-- 이유 3 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        <h3 class="text-xl font-semibold">3. 코딩만으로는 AI를 이해할 수 없다</h3>
+                    </div>
+                    <p class="text-gray-300">AI 교육 결과, 수학 기초가 없는 학생은 모델의 작동 원리를 파악하지 못했습니다. 구글 딥마인드와 OpenAI는 채용 시 수학적 배경과 직관을 가장 중시합니다. 코딩은 수학을 컴퓨터에 번역하는 도구일 뿐입니다.</p>
+                </div>
+
+                <!-- 이유 4 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-1.657-1.343-3-3-3H7m10 0v-2c0-1.657-1.343-3-3-3h-1m-6 3a3 3 0 100-6 3 3 0 000 6zM7 10a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+                        <h3 class="text-xl font-semibold">4. 테크 리더들이 수학 교육을 강조한다</h3>
+                    </div>
+                    <p class="text-gray-300">일론 머스크와 샘 올트먼은 '매스 매터스 AI' 캠페인을 통해 "수학을 모르면 AI를 사용만 할 뿐 창조하지 못한다"고 강조했습니다. 2025년 MIT 보고서는 AI 최고 성과자의 94%가 수학/기초과학 배경을 가졌다고 밝혔습니다.</p>
+                </div>
+
+                <!-- 이유 5 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.707.707M12 21v-1"></path></svg>
+                        <h3 class="text-xl font-semibold">5. 심화 수학은 다변수 사고력을 키운다</h3>
+                    </div>
+                    <p class="text-gray-300">딥러닝은 수백만, 수천억 개의 매개변수를 동시에 최적화하는 과정입니다. 고교 과정에서 다변수 환경을 경험하지 못하면 AI 시대 핵심 역량을 놓칩니다. 고차원 공간에서의 최적화는 수학적 사고를 요구합니다.</p>
+                </div>
+
+                <!-- 이유 6 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z"></path></svg>
+                        <h3 class="text-xl font-semibold">6. 선형대수는 AI 블랙박스의 열쇠다</h3>
+                    </div>
+                    <p class="text-gray-300">신경망의 층은 행렬 곱셈, 데이터는 벡터로 표현됩니다. 트랜스포머의 어텐션 메커니즘(쿼리, 키, 밸류)과 CNN의 합성곱(필터 행렬)은 모두 선형대수 연산입니다. 이를 모르면 AI는 영원히 블랙박스로 남습니다.</p>
+                </div>
+
+                <!-- 이유 7 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15v4m0 0h4m-4 0l4-4m15-4v-4m0 0h-4m4 0l-4 4M3 9V5m0 0h4M3 5l4 4M21 15v4m0 0h-4m4 0l-4-4"></path></svg>
+                        <h3 class="text-xl font-semibold">7. 미적분은 AI 최적화의 핵심이다</h3>
+                    </div>
+                    <p class="text-gray-300">"경사하강법 없이는 딥러닝도 없다." 신경망 학습은 손실 함수의 기울기(편미분)를 계산해 가중치를 조정하는 과정입니다. 역전파 알고리즘은 연쇄 법칙의 예술이며, Adam 같은 최신 최적화 기법도 미적분에 기반합니다.</p>
+                </div>
+                
+                <!-- 이유 8 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m.001-1.043a3.452 3.452 0 011.12-1.615l.51-1.021a3.452 3.452 0 011.616-1.12l1.02-.509a3.452 3.452 0 001.121-1.616l.51-1.02a3.452 3.452 0 00-1.615-4.59L16.48 3.09a3.452 3.452 0 00-4.59 1.615l-1.02.509a3.452 3.452 0 01-1.616 1.12l-1.02.51a3.452 3.452 0 01-1.12 1.615l-.51 1.021a3.452 3.452 0 01-1.616 1.12l-1.02.509a3.452 3.452 0 00-1.121 1.616l-.51 1.02a3.452 3.452 0 001.615 4.59l4.59 2.295a3.452 3.452 0 004.59-1.615l1.02-.509a3.452 3.452 0 011.616-1.12l1.02-.51a3.452 3.452 0 011.12-1.615l.51-1.021a3.452 3.452 0 00-1.615-4.59L16.48 3.09a3.452 3.452 0 00-4.59 1.615l-1.02.509a3.452 3.452 0 01-1.616 1.12l-1.02.51a3.452 3.452 0 01-1.12 1.615l-.51 1.021a3.452 3.452 0 01-1.616 1.12l-1.02.509a3.452 3.452 0 00-1.121 1.616l-.51 1.02a3.452 3.452 0 001.615 4.59l4.59 2.295a3.452 3.452 0 004.59-1.615l1.02-.509a3.452 3.452 0 011.616-1.12l1.02-.51a3.452 3.452 0 011.12-1.615l.51-1.021a3.452 3.452 0 00-1.615-4.59L16.48 3.09" />
+                        </svg>
+                        <h3 class="text-xl font-semibold">8. 확률과 통계는 불확실성의 과학이다</h3>
+                    </div>
+                    <p class="text-gray-300">AI는 불확실성 속에서 가장 그럴듯한 답을 찾습니다. 생성형 AI는 확률 분포에서 이미지를 생성하고, 다음 단어의 조건부 확률을 계산합니다. 베이즈 정리는 스팸 필터부터 자율주행차의 센서 융합까지 추론의 엔진으로 쓰입니다.</p>
+                </div>
+
+                <!-- 이유 9 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <h3 class="text-xl font-semibold">9. 수학적 사고는 AI 시대 생존 역량이다</h3>
+                    </div>
+                    <p class="text-gray-300">AI 교육 피라미드의 정점은 수학적 사고입니다. 챗GPT 사용법을 익히는 것보다 그 이면의 토큰화, 임베딩, 어텐션 메커니즘을 이해하는 것이 중요합니다. IB 수학처럼 원리 이해, 과정 중심, 다각도 해석으로 전환이 필요합니다.</p>
+                </div>
+                
+                <!-- 이유 10 -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal hover:shadow-indigo-500/30 transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-8 h-8 text-indigo-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        <h3 class="text-xl font-semibold">10. 수학 교육은 창의력과 문제해결력을 키운다</h3>
+                    </div>
+                    <p class="text-gray-300">AI는 패턴을 찾지만, 수학자는 패턴 너머의 구조를 봅니다. 수학적 사고는 복잡한 문제를 분해하고 공통 원리를 찾아내는 능력입니다. 삼성전자가 신입 공채에서 수학 문제 비중을 늘린 이유도 여기에 있습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 제2장: AI 알고리즘 속 수학의 실체 -->
+        <section class="mb-20 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">제2장: AI 알고리즘 속 수학의 실체</h2>
+            
+            <div class="bg-gray-800 rounded-lg shadow-lg p-6 md:p-8" id="chapter2-tabs">
+                <!-- 탭 버튼 -->
+                <div class="flex flex-wrap border-b border-gray-700 mb-6" role="tablist" aria-label="AI 알고리즘 속 수학">
+                    <button role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1" class="tab-button px-4 py-3 font-semibold text-gray-300 rounded-t-lg -mb-px border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-400 focus:outline-none">딥러닝의 수학적 구조</button>
+                    <button role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2" class="tab-button px-4 py-3 font-semibold text-gray-400 rounded-t-lg -mb-px border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-400 focus:outline-none">선형대수의 역할</button>
+                    <button role="tab" aria-selected="false" aria-controls="panel-3" id="tab-3" class="tab-button px-4 py-3 font-semibold text-gray-400 rounded-t-lg -mb-px border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-400 focus:outline-none">미적분의 응용</button>
+                    <button role="tab" aria-selected="false" aria-controls="panel-4" id="tab-4" class="tab-button px-4 py-3 font-semibold text-gray-400 rounded-t-lg -mb-px border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-400 focus:outline-none">확률과 통계</button>
+                </div>
+
+                <!-- 탭 패널 1: 딥러닝 구조 -->
+                <div id="panel-1" role="tabpanel" tabindex="0" aria-labelledby="tab-1" aria-hidden="false" class="space-y-6">
+                    <h3 class="text-2xl font-semibold text-indigo-300">딥러닝의 수학적 구조: 신경망, 가중치, 활성화 함수</h3>
+                    <p>신경망은 수학적 함수의 연속입니다. 기본 단위인 퍼셉트론은 입력 벡터(x)와 가중치 벡터(w)의 내적(w·x)에 편향(b)을 더한 뒤, 활성화 함수(f)를 적용합니다: <code class="bg-gray-700 px-2 py-1 rounded">y = f(w·x + b)</code></p>
+                    <p>딥러닝은 이 층을 여러 개 쌓은 것입니다. 각 층은 행렬 곱셈으로 표현됩니다: <code class="bg-gray-700 px-2 py-1 rounded">h₁ = f₁(W₁x + b₁)</code>, <code class="bg-gray-700 px-2 py-1 rounded">h₂ = f₂(W₂h₁ + b₂)</code> ...</p>
+                    <p>활성화 함수(ReLU, Sigmoid 등)는 비선형성을 도입하여 모델이 복잡한 패턴을 학습하게 합니다. 이것이 없다면 아무리 층을 깊게 쌓아도 하나의 선형 변환과 같습니다.</p>
+                    <!-- CSS 신경망 다이어그램 -->
+                    <div class="neural-network relative overflow-hidden">
+                        <div class="nn-layer" title="입력층">
+                            <div class="nn-neuron"></div>
+                            <div class="nn-neuron"></div>
+                            <div class="nn-neuron"></div>
+                        </div>
+                        <div class="nn-layer" title="은닉층">
+                            <div class="nn-neuron"></div>
+                            <div class="nn-neuron"></div>
+                            <div class="nn-neuron"></div>
+                            <div class="nn-neuron"></div>
+                        </div>
+                        <div class="nn-layer" title="출력층">
+                            <div class="nn-neuron"></div>
+                            <div class="nn-neuron"></div>
+                        </div>
+                    </div>
+                    <p class="text-center text-sm text-gray-400">CSS로 구현한 간단한 신경망 구조</p>
+                </div>
+
+                <!-- 탭 패널 2: 선형대수 -->
+                <div id="panel-2" role="tabpanel" tabindex="0" aria-labelledby="tab-2" aria-hidden="true" class="space-y-6">
+                    <h3 class="text-2xl font-semibold text-indigo-300">선형대수의 역할: 벡터 공간, 행렬 연산, 차원 축소</h3>
+                    <p>선형대수는 AI의 언어입니다. 모든 데이터(이미지, 텍스트, 음성)는 벡터 또는 텐서(다차원 배열)로 표현됩니다.</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-300">
+                        <li><strong>벡터 공간:</strong> 벡터 간의 관계(예: 코사인 유사도)를 기하학적으로 해석하게 해줍니다. "왕 - 남자 + 여자 = 여왕" 같은 단어 임베딩 연산이 대표적입니다.</li>
+                        <li><strong>행렬 연산:</strong> 신경망의 핵심 연산입니다. <code class="bg-gray-700 px-2 py-1 rounded">Y = XW + b</code> 형태의 행렬 곱셈은 GPU 병렬 처리에 최적화되어 딥러닝을 가능하게 했습니다.</li>
+                        <li><strong>차원 축소:</strong> PCA(주성분 분석)는 공분산 행렬의 고유벡터를 찾아 데이터를 저차원으로 압축합니다. 오토인코더는 신경망을 이용해 인코더와 디코더로 차원 축소를 학습합니다.</li>
+                    </ul>
+                </div>
+
+                <!-- 탭 패널 3: 미적분 -->
+                <div id="panel-3" role="tabpanel" tabindex="0" aria-labelledby="tab-3" aria-hidden="true" class="space-y-6">
+                    <h3 class="text-2xl font-semibold text-indigo-300">미적분의 응용: 경사하강법, 역전파 알고리즘</h3>
+                    <p>신경망 학습은 손실 함수(Loss Function)를 최소화하는 매개변수를 찾는 최적화 문제입니다. 미적분은 이 최적화의 핵심 도구입니다.</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-300">
+                        <li><strong>경사하강법 (Gradient Descent):</strong> 손실 함수의 기울기(그래디언트)를 계산하고, 기울기의 반대 방향으로 매개변수를 조금씩 이동시키는 기법입니다. <code class="bg-gray-700 px-2 py-1 rounded">W ← W - η(∂L/∂W)</code> (η: 학습률)</li>
+                        <li><strong>역전파 (Backpropagation):</strong> 신경망처럼 복잡한 합성 함수의 기울기를 효율적으로 계산하기 위해 미적분의 연쇄 법칙(Chain Rule)을 재귀적으로 적용하는 알고리즘입니다. <code class="bg-gray-700 px-2 py-1 rounded">dz/dx = (dz/dy)(dy/dx)</code></li>
+                    </ul>
+                    <!-- CSS 경사하강법 다이어그램 -->
+                    <div class="w-full h-48 bg-gray-700 rounded-lg flex items-end justify-center p-4 relative overflow-hidden">
+                        <div class="w-full h-40 border-b-4 border-l-4 border-indigo-400 rounded-bl-full" style="transform: scaleX(2);"></div>
+                        <div class="absolute bottom-6 left-1/2 w-4 h-4 bg-pink-500 rounded-full animate-bounce"></div>
+                        <p class="absolute top-4 text-sm text-gray-300">손실 함수의 최솟값을 찾아가는 경사하강법 (시각화)</p>
+                    </div>
+                </div>
+
+                <!-- 탭 패널 4: 확률과 통계 -->
+                <div id="panel-4" role="tabpanel" tabindex="0" aria-labelledby="tab-4" aria-hidden="true" class="space-y-6">
+                    <h3 class="text-2xl font-semibold text-indigo-300">확률과 통계: 베이즈 정리, 확률 분포, 통계적 추론</h3>
+                    <p>AI는 불확실성을 다루는 학문이며, 확률과 통계는 이 불확실성을 정량화하는 언어입니다.</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-300">
+                        <li><strong>베이즈 정리:</strong> <code class="bg-gray-700 px-2 py-1 rounded">P(A|B) = P(B|A)P(A) / P(B)</code>. 사전 확률(Prior)과 우도(Likelihood)를 결합해 사후 확률(Posterior)을 계산합니다. 스팸 필터, 베이즈 필터 등 AI 추론의 기초입니다.</li>
+                        <li><strong>확률 분포:</strong> AI 모델의 출력을 표현합니다. 소프트맥스 함수는 확률 분포를, 생성 모델(GAN, VAE, 디퓨전)은 데이터의 확률 분포 P(x) 자체를 학습합니다.</li>
+                        <li><strong>통계적 추론:</strong> 교차 검증(과적합 방지), 신뢰 구간(예측 불확실성 정량화), 가설 검정(모델 성능 비교) 등 AI 모델의 성능을 객관적으로 평가하는 데 필수적입니다.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 제3장: 전통 수학 교육 vs AI 시대 수학 교육 -->
+        <section class="mb-20 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">제3장: 전통 수학 교육 vs AI 시대 수학 교육</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-pink-400">전통 수학 교육 (Before)</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-start"><span class="text-pink-400 mr-2">✖</span> <strong>암기 중심:</strong> 공식 암기, 반복 연습</li>
+                        <li class="flex items-start"><span class="text-pink-400 mr-2">✖</span> <strong>답 중심:</strong> 최종 답만 맞으면 만점</li>
+                        <li class="flex items-start"><span class="text-pink-400 mr-2">✖</span> <strong>단일 해법:</strong> "정해진 풀이" 강조</li>
+                    </ul>
+                </div>
+                
+                <div class="flex items-center justify-center reveal">
+                    <svg class="w-16 h-16 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg reveal">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-green-400">AI 시대 수학 교육 (After)</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-start"><span class="text-green-400 mr-2">✔</span> <strong>원리 이해 중심:</strong> 공식 유도, 개념 탐구</li>
+                        <li class="flex items-start"><span class="text-green-400 mr-2">✔</span> <strong>과정 중심:</strong> 전략, 실행, 검증 평가 (IB 수학)</li>
+                        <li class="flex items-start"><span class="text-green-400 mr-2">✔</span> <strong>다각도 해석:</strong> 대수, 기하, 수치적 접근</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 bg-gray-800 p-6 rounded-lg shadow-lg reveal">
+                <h3 class="text-2xl font-semibold mb-4 text-indigo-300">사례: IB 수학 및 국내 교육과정</h3>
+                <p class="mb-4">IB 수학은 'Internal Assessment'를 통해 학생이 주제를 정해 탐구 보고서를 작성하게 합니다. 이는 암기를 불가능하게 하고 진짜 수학적 사고를 요구합니다.</p>
+                <p>한국에서도 <strong>서울시교육청 'AI 융합 수학'</strong>, <strong>충청북도교육청 '인공지능 수학'</strong> 과목이 도입되어, 선형대수, 미적분을 AI 응용과 연결하고 프로젝트 기반 학습으로 "수학의 쓸모"를 가르치고 있습니다.</p>
+            </div>
+        </section>
+
+        <!-- 제4장: 심화 수학 논쟁과 교육 정책 -->
+        <section class="mb-20 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">제4장: 심화 수학 논쟁과 교육 정책</h2>
+            
+            <div class="bg-gray-800 p-6 md:p-8 rounded-lg shadow-lg space-y-8">
+                <!-- 수능 논란 -->
+                <div class="reveal">
+                    <h3 class="text-2xl font-semibold text-pink-400 mb-4">수능 심화 수학 배제 논란 (한국)</h3>
+                    <p class="mb-2">2028학년도 수능부터 미적분II, 기하가 제외됩니다. 교육부는 '학습 부담 경감, 흥미 제고'를 이유로 들었으나, 학계와 산업계에서는 '자해 행위, 하향 평준화'라는 비판이 거셉니다.</p>
+                    <p class="text-gray-400"><strong>우려:</strong> 일반고의 심화 수학 기피 → 사교육 의존도 증가 → 대학 이공계 교육 차질 → 국가 경쟁력 약화</p>
+                </div>
+                
+                <!-- 국제 정책 비교 -->
+                <div class="reveal">
+                    <h3 class="text-2xl font-semibold text-green-400 mb-4">세계는 수학 교육 강화 중 (국제 비교)</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-bold text-lg">🇺🇸 미국</h4>
+                            <p>'매스 매터스 AI' 캠페인 영향으로 캘리포니아주부터 AI 수학 모듈(선형대수, 미적분 기초)을 고교 과정에 포함.</p>
+                        </div>
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-bold text-lg">🇬🇧 영국</h4>
+                            <p>'수학 18세까지 의무화' 정책 시행. "AI 시대에 수학은 읽기/쓰기만큼 기본 소양"</p>
+                        </div>
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-bold text-lg">🇸🇬 싱가포르</h4>
+                            <p>'컴퓨팅 사고와 수학 통합 교육과정'을 초등학교부터 도입. 수학 개념과 알고리즘을 함께 학습.</p>
+                        </div>
+                        <div class="bg-gray-700 p-4 rounded-lg">
+                            <h4 class="font-bold text-lg">🇨🇳 중국</h4>
+                            <p>'수학 강국 건설 계획' 발표. 수학 수업 시수와 대학 정원을 늘리고 국가 전략 산업으로 격상.</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-center text-yellow-400 font-semibold">"AI 경쟁은 결국 수학 경쟁"이라는 인식 하에 주요국들은 수학 교육을 강화하는 추세이며, 한국은 이와 역행하고 있다는 지적이 나옵니다.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 제5장: 미래 인재를 위한 수학 교육 로드맵 -->
+        <section class="mb-20 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">제5장: 미래 인재를 위한 수학 교육 로드맵</h2>
+            
+            <div class="bg-gray-800 rounded-lg shadow-lg p-6 md:p-8" id="chapter5-tabs">
+                <!-- 탭 버튼 -->
+                <div class="flex flex-wrap border-b border-gray-700 mb-6" role="tablist" aria-label="수학 교육 로드맵">
+                    <button role="tab" aria-selected="true" aria-controls="panel-5-1" id="tab-5-1" class="tab-button px-4 py-3 font-semibold text-gray-300 rounded-t-lg -mb-px border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-400 focus:outline-none">연령별 전략</button>
+                    <button role="tab" aria-selected="false" aria-controls="panel-5-2" id="tab-5-2" class="tab-button px-4 py-3 font-semibold text-gray-400 rounded-t-lg -mb-px border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-400 focus:outline-none">사고력 함양 방법론</button>
+                    <button role="tab" aria-selected="false" aria-controls="panel-5-3" id="tab-5-3" class="tab-button px-4 py-3 font-semibold text-gray-400 rounded-t-lg -mb-px border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-400 focus:outline-none">실천 가이드</button>
+                    <button role="tab" aria-selected="false" aria-controls="panel-5-4" id="tab-5-4" class="tab-button px-4 py-3 font-semibold text-gray-400 rounded-t-lg -mb-px border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-400 focus:outline-none">디지털 리터러시 통합</button>
+                </div>
+
+                <!-- 탭 패널 1: 연령별 전략 -->
+                <div id="panel-5-1" role="tabpanel" tabindex="0" aria-labelledby="tab-5-1" aria-hidden="false" class="space-y-6">
+                    <h3 class="text-2xl font-semibold text-indigo-300">연령별 수학 교육 전략</h3>
+                    <ul class="space-y-4">
+                        <li><strong>초등 저학년 (1~3):</strong> 수 감각과 공간 지각 (블록 놀이, 보드게임).</li>
+                        <li><strong>초등 고학년 (4~6):</strong> 논리적 사고와 패턴 인식 (규칙 찾기, 스크래치 코딩, 그래프 이론 기초).</li>
+                        <li><strong>중학생:</strong> 대수와 함수의 기초 (일차함수-선형회귀, 이차함수-손실함수, 확률과 통계).</li>
+                        <li><strong>고등학생:</strong> 미적분, 선형대수, 확률론 (경사하강법 구현, 벡터-유사도, 베이즈 정리-스팸 필터).</li>
+                    </ul>
+                </div>
+
+                <!-- 탭 패널 2: 사고력 함양 -->
+                <div id="panel-5-2" role="tabpanel" tabindex="0" aria-labelledby="tab-5-2" aria-hidden="true" class="space-y-6">
+                    <h3 class="text-2xl font-semibold text-indigo-300">수학적 사고력 함양 방법론</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-300">
+                        <li><strong>문제 분해 (Decomposition):</strong> 복잡한 문제를 단순한 하위 문제로 쪼개는 능력.</li>
+                        <li><strong>추상화 (Abstraction):</strong> 구체적 사례에서 본질을 추출(특징 추출)하고 일반화하는 능력.</li>
+                        <li><strong>패턴 인식 (Pattern Recognition):</strong> 데이터에서 규칙성을 찾고 수학적 모델로 표현하는 능력.</li>
+                    </ul>
+                </div>
+
+                <!-- 탭 패널 3: 실천 가이드 -->
+                <div id="panel-5-3" role="tabpanel" tabindex="0" aria-labelledby="tab-5-3" aria-hidden="true" class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-xl font-semibold text-green-400 mb-3">학부모가 할 수 있는 것</h4>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>긍정적 태도 보이기 ("수학은 연습하면 돼")</li>
+                                <li>일상에서 수학 찾기 (할인 계산, 요리 레시피)</li>
+                                <li>답보다 과정을 칭찬하기</li>
+                                <li>AI를 학습 파트너로 활용 (풀이 검토)</li>
+                                <li>수학 시각화 콘텐츠 함께 보기 (3Blue1Brown)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-blue-400 mb-3">교육자가 할 수 있는 것</h4>
+                            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                <li>맥락 제공하기 ("왜 배우는가")</li>
+                                <li>시각화 도구 활용 (GeoGebra, Desmos)</li>
+                                <li>협력 학습 장려 (팀 프로젝트)</li>
+                                <li>오픈엔디드 문제 출제 (창의적 해법)</li>
+                                <li>AI를 교육 보조 도구로 활용</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탭 패널 4: 디지털 리터러시 -->
+                <div id="panel-5-4" role="tabpanel" tabindex="0" aria-labelledby="tab-5-4" aria-hidden="true" class="space-y-6">
+                    <h3 class="text-2xl font-semibold text-indigo-300">디지털 리터러시와 수학 교육의 통합</h3>
+                    <p class="mb-4">'AI 교육 피라미드'는 3층 구조로 이루어집니다. 이들을 분리하는 것은 비효율적이며, 수학을 배울 때 도구를, 도구를 배울 때 수학 원리를 함께 익혀야 합니다.</p>
+                    <!-- CSS 피라미드 다이어그램 -->
+                    <div class="pyramid">
+                        <div class="pyramid-level pyramid-level-1 reveal">정점: 수학적 사고</div>
+                        <div class="pyramid-level pyramid-level-2 reveal">중간: AI 도구 활용</div>
+                        <div class="pyramid-level pyramid-level-3 reveal">기반: 디지털 리터러시</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 인사이트 및 Q&A -->
+        <section class="mb-20 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">인사이트 및 Q&A</h2>
+            
+            <!-- 의사 결정을 위한 인사이트! -->
+            <div class="bg-indigo-900 border border-indigo-700 p-6 rounded-lg shadow-lg text-center mb-12 reveal">
+                <h3 class="text-2xl font-bold mb-4">💡 의사 결정을 위한 인사이트!</h3>
+                <p class="text-lg text-indigo-100">AI 시대의 핵심 역설: 기계가 인간을 대체할수록, 기계를 이해하고 설계할 <strong class="text-yellow-300">수학적 사고</strong>는 더욱 희소하고 귀한 역량이 됩니다. 코딩은 AI가 자동화하지만, 문제를 수학적으로 정식화하는 판단은 여전히 인간의 몫입니다. <strong class="text-yellow-300">심화 수학은 선택이 아니라 생존 전략이며, 수학적 사고는 AI 시대를 항해할 나침반입니다.</strong></p>
+            </div>
+
+            <!-- Q&A 10선 -->
+            <div class="space-y-4 reveal">
+                <h3 class="text-2xl font-semibold text-center mb-6">?! 인사이트 포커스 Q&A 10선</h3>
+                
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q1. AI가 수학 문제를 풀어주는데 왜 수학을 배워야 하나요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>AI는 도구일 뿐, 문제를 정의하고 전략을 선택하는 것은 인간입니다. 챗GPT는 명확한 미적분 문제는 풀지만, 실생활 문제를 수학으로 모델링하는 능력은 거의 없습니다.</p>
+                        <p>더 중요한 것은 AI 자체가 수학(미적분, 선형대수, 확률)으로 만들어졌다는 사실입니다. 앤드류 응 교수는 "AI가 번역기라면 수학은 원어"라고 말했습니다. 2025년 MIT 보고서에 따르면 AI 최고 성과자의 94%가 수학/물리학 배경을 가졌습니다.</p>
+                    </div>
+                </details>
+
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q2. 코딩을 잘하면 AI 분야에서 성공할 수 있지 않나요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>코딩은 필요조건이지만 충분조건이 아닙니다. 수학 기초 없이는 AI 모델의 원리를 이해할 수 없습니다. 구글 딥마인드 채용 공고는 "필수: 선형대수, 미적분 / 우대: 파이썬"입니다. 샘 올트먼 역시 "수학적 직관"을 가장 중요한 자질로 꼽았습니다.</p>
+                        <p>AI 프레임워크(TensorFlow, PyTorch)는 계속 변하지만, 그 기반이 되는 경사하강법, 역전파 같은 수학 원리는 변하지 않습니다.</p>
+                    </div>
+                </details>
+
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q3. 수학이 어려워서 AI 분야를 포기해야 할까요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>아닙니다. 수학이 어려운 것은 대부분 '어디에 쓰이는지' 모른 채 공식만 외우는 잘못된 학습법 때문입니다. 충북교육청의 '인공지능 수학' 시범 운영에서 학생들의 수학 흥미도가 3.2점에서 4.1점으로 상승했습니다.</p>
+                        <p>단계적으로 (중학 수학 → 고교 미적분 → 대학 선형대수) 쌓아가면 됩니다. 핵심은 "완벽한 이해"가 아니라 문제를 정식화하고 논리적으로 추론하는 "수학적 사고방식"을 키우는 것입니다.</p>
+                    </div>
+                </details>
+
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q4. 문과 출신도 AI 분야에 진입할 수 있나요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>가능합니다. AI 윤리, 공정성, 자연어 처리(언어학) 등 인문사회학적 통찰이 필요한 분야가 많습니다. 부족한 수학 기초는 '수학 부트캠프'나 온라인 강좌(인강)를 통해 충분히 메울 수 있습니다. 중요한 것은 포기하지 않는 것입니다.</p>
+                    </div>
+                </details>
+
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q5. 심화 수학을 배우지 않으면 정말 불리한가요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>대학 이공계, 특히 AI 전공에서는 확실히 불리합니다. KAIST/서울대생 67%가 "고교 때 심화 수학을 안 배워 대학 수업 적응에 어려움을 겪었다"고 답했습니다. 딥러닝의 다변수 환경을 이해하려면 미적분II와 기하가 필수적입니다. 나중에 보충할 수 있지만, 고교 때 배워두는 것이 훨씬 유리합니다.</p>
+                    </div>
+                </details>
+
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q6. 수학 교사가 AI를 잘 모르는데 어떻게 AI 수학을 가르치나요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>교사 재교육이 시급한 문제입니다. 서울시교육청은 'AI 수학 교사 연수 프로그램'을 운영 중입니다. 단, 교사가 모든 것을 알 필요는 없습니다. IB 철학처럼 교사는 '학습 촉진자(Facilitator)'가 되어, 온라인 자원을 안내하고 학생 토론을 이끌며, 현장 전문가 특강(산학 협력)을 활용할 수 있습니다.</p>
+                    </div>
+                </details>
+
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q7. AI 시대에도 수학 올림피아드 같은 경시대회가 의미 있나요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>의미는 있지만, 방향 전환이 필요합니다. 전통적 올림피아드(빠른 문제 풀이)보다 '응용 수학 경진대회(MCM/ICM)'나 'AI 수학 챌린지'처럼 실세계 문제를 수학적으로 모델링하고 팀이 협력해 해결하는 대회가 더 중요해지고 있습니다. 이는 AI 연구자의 실제 작업과 유사합니다.</p>
+                    </div>
+                </details>
+
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q8. 학원에서 AI 수학을 가르친다는데, 꼭 다녀야 하나요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>필수는 아닙니다. 칸 아카데미, 3블루원브라운, 코세라 등 훌륭한 온라인 자원이 많아 자기주도 학습이 가능합니다. 학원이 '문제 풀이 스킬'이 아닌 '원리 이해와 응용'을 강조하는지 확인해야 합니다. 삼성전자 인사팀장은 "학원 기술보다 원리를 깊이 이해한 지원자가 인상적"이라고 말했습니다.</p>
+                    </div>
+                </details>
+
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q9. 대학에서 수학과를 가야 AI를 잘할 수 있나요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>유리하지만 필수는 아닙니다. 2025년 MIT 보고서에 따르면 AI 최고 성과자의 47%가 수학/통계학, 32%가 물리학/공학, 15%만이 컴퓨터공학이었습니다. 수학과의 추상적 사고와 증명 능력이 AI 연구의 기초가 되기 때문입니다. 이상적인 것은 수학과 컴퓨터공학을 복수전공하거나 '수학-AI 융합 프로그램'을 선택하는 것입니다.</p>
+                    </div>
+                </details>
+
+                <details class="bg-gray-800 rounded-lg shadow-md transition-all duration-300 overflow-hidden">
+                    <summary class="p-5 font-semibold text-lg cursor-pointer">Q10. 수학을 잘하면 AI 외에 다른 분야에서도 유리한가요?</summary>
+                    <div class="p-5 border-t border-gray-700 text-gray-300 space-y-3">
+                        <p>당연합니다. 수학은 범용 도구입니다. 금융(파생상품), 생명과학(유전자 분석), 경제학(게임 이론) 등 모든 분야에서 수학적 모델링이 쓰입니다. WEF는 "수학적 추론 능력"을 2030년 가장 중요한 역량 2위로 선정했습니다. 수학 전공자의 임금과 취업률은 항상 최상위권입니다.</p>
+                    </div>
+                </details>
+
+            </div>
+        </section>
+
+        <!-- 마인드맵 -->
+        <section class="mb-20 reveal">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 gradient-text">Text Mindmap</h2>
+            <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-lg">
+                <pre class="text-sm text-gray-300 overflow-x-auto whitespace-pre-wrap">textAI 시대 심화 수학 교육의 중요성 │
+├─ 제1장: 10가지 중요한 이유
+│   ├─ 1. AI의 핵심 언어는 수학
+│   │   └─ 신경망·활성화함수·학습과정이 수학적 표현
+│   ├─ 2. AI 학습의 기초체력
+│   │   └─ 알고리즘 이해와 모델 개선의 토대
+│   ├─ 3. 코딩만으로는 불충분
+│   │   └─ 수학적 사고와 개념이 핵심
+│   ├─ 4. 테크 리더들의 강조
+│   │   └─ 머스크·올트먼의 Math Matters AI
+│   ├─ 5. 다변수 사고력
+│   │   └─ 딥러닝의 수많은 변수 처리 능력
+│   ├─ 6. 선형대수의 역할
+│   │   └─ 벡터·행렬로 AI 내부 이해
+│   ├─ 7. 미적분의 핵심
+│   │   └─ 경사하강법과 최적화
+│   ├─ 8. 확률과 통계
+│   │   └─ 불확실성 속 의사결정
+│   ├─ 9. 수학적 사고 = 생존 역량
+│   │   └─ 원리 이해와 응용 능력
+│   └─ 10. 창의력과 문제해결력
+│       └─ 패턴 너머의 구조 발견
+├─ 제2장: AI 알고리즘 속 수학의 실체
+│   ├─ 딥러닝 구조
+│   │   ├─ 신경망: 퍼셉트론부터 다층 구조
+│   │   ├─ 가중치: 행렬 곱셈과 학습
+│   │   └─ 활성화 함수: 비선형성 도입
+│   ├─ 선형대수의 역할
+│   │   ├─ 벡터 공간: 데이터 표현
+│   │   ├─ 행렬 연산: 신경망 계산
+│   │   └─ 차원 축소: PCA·t-SNE·오토인코더
+│   ├─ 미적분의 응용
+│   │   ├─ 경사하강법: 손실 최소화
+│   │   ├─ 역전파: 연쇄 법칙 활용
+│   │   └─ 최적화 알고리즘: Adam·RMSprop
+│   └─ 확률과 통계
+│       ├─ 베이즈 정리: 사후 확률 추론
+│       ├─ 확률 분포: 가우스·이항·지수
+│       └─ 통계적 추론: 교차검증·신뢰구간
+├─ 제3장: 전통 vs AI 시대 수학 교육
+│   ├─ 암기 중심 → 원리 이해 중심
+│   │   └─ 공식 유도와 개념 탐구
+│   ├─ 답 중심 → 과정 중심
+│   │   └─ IB 평가 방식: 전략·실행·검증
+│   ├─ 단일 해법 → 다각도 해석
+│   │   └─ 대수·기하·수치적 접근 비교
+│   ├─ IB 수학 교육 모델
+│   │   ├─ 탐구와 모델링 중심
+│   │   ├─ Internal Assessment 프로젝트
+│   │   └─ 5가지 평가 기준
+│   └─ 국내 사례
+│       ├─ 서울시교육청: AI 융합 수학
+│       └─ 충청북도교육청: 인공지능 수학
+├─ 제4장: 심화 수학 논쟁과 교육 정책
+│   ├─ 수능 심화 수학 배제 논란
+│   │   ├─ 교육부: 흥미 제고·부담 경감
+│   │   └─ 비판: 하향 평준화·경쟁력 약화
+│   ├─ 하향 평준화와 사교육
+│   │   ├─ 일반고 이수율 격차 심화
+│   │   └─ 학원 의존도 증가
+│   ├─ 흥미 vs 깊이의 균형
+│   │   ├─ PISA 성적 3위, 즐거움 42위
+│   │   └─ 맥락 제공으로 흥미와 깊이 동시 확보
+│   └─ 국제 정책 비교
+│       ├─ 미국: 수학 교육 재건 이니셔티브
+│       ├─ 영국: 수학 18세까지 의무화
+│       ├─ 싱가포르: 컴퓨팅사고 통합
+│       ├─ 일본: 수학-AI 이중전공 장려
+│       └─ 중국: 수학 강국 건설 계획
+└─ 제5장: 미래 인재 수학 교육 로드맵
+    ├─ 연령별 전략
+    │   ├─ 초등 저학년: 수 감각·공감 지각
+    │   ├─ 초등 고학년: 논리·패턴 인식
+    │   ├─ 중학생: 대수·함수 기초
+    │   └─ 고등학생: 미적분·선형대수·확률론
+    ├─ 수학적 사고력 함양
+    │   ├─ 문제 분해 전략
+    │   ├─ 추상화와 일반화
+    │   └─ 패턴 인식과 모델링
+    ├─ AI 수학 교육 프로그램
+    │   ├─ 서울시교육청: 고교 AI 융합 수학
+    │   ├─ KAIST: 수학-AI 융합 트랙
+    │   └─ 충청북도: 중학교 인공지능 수학
+    ├─ 실천 가이드
+    │   ├─ 학부모: 긍정적 태도·일상 속 수학·과정 칭찬
+    │   └─ 교육자: 맥락 제공·시각화·협력학습·오픈엔디드 문제
+    └─ 디지털 리터러시 통합
+        ├─ AI 교육 피라미드: 3층 구조
+        ├─ 기반: 디지털 리터러시
+        ├─ 중간: AI 도구 활용
+        └─ 정점: 수학적 사고</pre>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="bg-gray-800 py-12">
+        <div class="container mx-auto px-6 text-gray-400">
+            <!-- 핵심 키워드 -->
+            <div class="mb-8 reveal">
+                <h3 class="text-lg font-semibold text-gray-200 mb-4">핵심 키워드</h3>
+                <div class="flex flex-wrap gap-2">
+                    {[
+                        '#AI시대수학교육', '#심화수학', '#딥러닝', '#선형대수학', '#미적분', '#확률과통계', 
+                        '#벡터', '#행렬', '#수학적사고력', '#문제해결역량', '#일론머스크', '#샘올트먼', 
+                        '#MathMattersAI캠페인', '#젤라니넬슨교수', '#캘리포니아대학교', '#심층기계학습', 
+                        '#경사하강법', '#역전파', '#신경망', '#최적화', '#데이터변환', '#수학적개념', 
+                        '#기초수학교육', '#IB수학교육', '#과정중심학습', '#원리이해', '#다변수사고', 
+                        '#수능심화수학논란', '#디지털리터러시', '#AI교육피라미드'
+                    ].map(keyword => (
+                        <span key={keyword} class="bg-gray-700 text-indigo-300 px-3 py-1 rounded-full text-sm font-medium">{keyword}</span>
+                    ))}
+                </div>
+            </div>
+            
+            <!-- 참고 자료 -->
+            <div class="reveal">
+                <h3 class="text-lg font-semibold text-gray-200 mb-4">참고 자료</h3>
+                <ul class="space-y-2 text-sm">
+                    <li>・ 1 샘 올트먼·머스크도 동조했다… "AI 시대일수록 수학 교육 강화해야"(조선일보・2024.03.08)</li>
+                    <li>・ 2 [테크토크]AI 시대, 수학 중요하다 vs 쓸모없다(아시아경제・2024.03.15)</li>
+                    <li>・ 3 AI시대 수학 교육과정이 코딩보다 중요한 이유!(네이버블로그・2024.06.03)</li>
+                    <li>・ 4 수능서 심화수학 배제는 자해 행위, 하향 평준화 막아야(중앙일보・2024.01.05)</li>
+                    <li>・ 5 "AI 시대, 중고등학생의 진로 선택과 준비 전략: 수학이 더 중요한 이유"(네이버블로그・2024.11.07)</li>
+                    <li>・ 6 [김정호의 AI시대의 전략] AI 시대, 수학 실력이 최고의 경쟁력(네이버블로그・2024.03.31)</li>
+                    <li>・ 7 AI시대 생존 좌우할 수학적 사고(문화일보・2024.03.18)</li>
+                    <li>・ 8 AI에서 수학이 중요한 이유(사이언스타임즈・2022.03.08)</li>
+                    <li>・ 9 인공지능 시대와 수학교육(남해타임즈・2024.04.26)</li>
+                    <li>・ 10 AI 시대에 아이의 수학/과학 교육이 중요한 이유(브런치・2024.09.20)</li>
+                    <li>・ 11 수능 심화수학 뺀 이유…"AI 시대, 흥미 상실, 사교육 유발"(뉴시스・2023.12.27)</li>
+                    <li>・ 12 AI 수학 왜 중요할까요? (선형대수학, 확률과 통계, 미적분)(모두의연구소・2023.06.21)</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 스크롤 애니메이션
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // 탭 UI 스크립트
+        function setupTabs(tabContainerId) {
+            const container = document.getElementById(tabContainerId);
+            if (!container) return;
+
+            const tabButtons = container.querySelectorAll('[role="tab"]');
+            const tabPanels = container.querySelectorAll('[role="tabpanel"]');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 모든 버튼과 패널 비활성화
+                    tabButtons.forEach(btn => {
+                        btn.setAttribute('aria-selected', 'false');
+                        btn.classList.remove('text-indigo-400', 'border-indigo-500');
+                        btn.classList.add('text-gray-400', 'border-transparent');
+                    });
+                    tabPanels.forEach(panel => {
+                        panel.setAttribute('aria-hidden', 'true');
+                    });
+
+                    // 클릭된 버튼과 패널 활성화
+                    button.setAttribute('aria-selected', 'true');
+                    button.classList.add('text-indigo-400', 'border-indigo-500');
+                    button.classList.remove('text-gray-400', 'border-transparent');
+                    
+                    const panelId = button.getAttribute('aria-controls');
+                    const panel = document.getElementById(panelId);
+                    if (panel) {
+                        panel.setAttribute('aria-hidden', 'false');
+                    }
+                });
+            });
+        }
+
+        // 탭 초기화
+        setupTabs('chapter2-tabs');
+        setupTabs('chapter5-tabs');
+
+    </script>
+</body>
+</html>
