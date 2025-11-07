@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도파민 중독과 치료: 뇌의 납치와 회복의 신경과학</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #000000;
+            color: #e0e0e0;
+        }
+        .poster-container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 2.5rem 2rem;
+        }
+        .poster-title {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 900;
+            font-size: 4.5rem; /* 72px */
+            line-height: 1.1;
+            text-align: center;
+            background: linear-gradient(120deg, #f87171, #ef4444, #fde047);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+        }
+        .poster-subtitle {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1.75rem; /* 28px */
+            font-weight: 500;
+            text-align: center;
+            color: #a3a3a3; /* text-neutral-400 */
+            margin-bottom: 4rem;
+        }
+        .section-title {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 2.75rem; /* 44px */
+            font-weight: 700;
+            padding-bottom: 1rem;
+            margin-top: 5rem;
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+        .section-title-danger {
+            color: #f87171; /* text-red-400 */
+            border-bottom: 3px solid #ef4444; /* border-red-500 */
+        }
+        .section-title-recovery {
+            color: #4ade80; /* text-green-400 */
+            border-bottom: 3px solid #22c55e; /* border-green-500 */
+        }
+        .card {
+            background-color: #1c1917; /* bg-stone-900 */
+            border-radius: 0.75rem; /* rounded-xl */
+            padding: 2rem;
+            border: 1px solid #44403c; /* border-stone-700 */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        .card-title {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1.75rem; /* text-3xl */
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        .card-text {
+            font-size: 1.1rem; /* text-lg */
+            color: #d6d3d1; /* text-stone-300 */
+            line-height: 1.75;
+        }
+        .icon-red { color: #f87171; }
+        .icon-green { color: #4ade80; }
+        .icon-yellow { color: #fde047; }
+        .icon-blue { color: #60a5fa; }
+        
+        /* 1. Liking vs Wanting 그래프 */
+        .graph-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            background: #292524; /* bg-stone-800 */
+            border-radius: 0.5rem;
+            padding: 2rem;
+            border: 1px solid #44403c;
+        }
+        .graph-line {
+            position: absolute;
+            width: 100%;
+            height: 250px;
+            bottom: 2rem;
+            left: 0;
+            border-left: 3px solid #78716c;
+            border-bottom: 3px solid #78716c;
+        }
+        .line-label-y {
+            position: absolute;
+            left: -2rem;
+            top: 50%;
+            transform: rotate(-90deg) translateX(-50%);
+            color: #a8a29e;
+            font-weight: 600;
+        }
+        .line-label-x {
+            position: absolute;
+            bottom: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #a8a29e;
+            font-weight: 600;
+        }
+        .line-liking {
+            position: absolute;
+            width: 95%;
+            height: 100px;
+            left: 5%;
+            top: 20%;
+            border: 4px solid #60a5fa; /* blue-400 */
+            border-color: #60a5fa transparent transparent transparent;
+            border-radius: 50% / 100%;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            transform: rotate(-5deg);
+        }
+        .line-wanting {
+            position: absolute;
+            width: 95%;
+            height: 200px;
+            left: 3%;
+            bottom: 0%;
+            border: 5px solid #fde047; /* yellow-300 */
+            border-color: #fde047 transparent transparent transparent;
+            border-radius: 50% / 100%;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            transform: rotate(10deg);
+        }
+        .graph-text {
+            position: absolute;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        
+        /* 2. 뇌 회로도 */
+        .brain-diagram {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .brain-panel {
+            border: 2px solid #44403c;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        .brain-panel-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .brain-nodes {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .brain-node {
+            width: 90%;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 1px solid;
+        }
+        .node-pfc { background-color: #1d4ed8; border-color: #3b82f6; color: white; } /* blue */
+        .node-nac { background-color: #facc15; border-color: #fde047; color: #422006; } /* yellow */
+        .node-vta { background-color: #7c2d12; border-color: #c2410c; color: white; } /* orange */
+        .node-pfc-broken { background-color: #4b5563; border-color: #6b7280; color: #d1d5db; text-decoration: line-through; } /* gray */
+        
+        .arrow {
+            font-size: 2rem;
+            font-weight: 900;
+            text-align: center;
+            margin: -0.5rem 0;
+        }
+
+        /* 4. 3단계 중독 사이클 */
+        .cycle-container {
+            display: grid;
+            grid-template-areas:
+                "stage1 . stage2"
+                ". arrow1 ."
+                "arrow3 . arrow2"
+                ". stage3 .";
+            grid-template-columns: 1fr auto 1fr;
+            grid-template-rows: auto auto auto auto;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .cycle-stage {
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 2px solid;
+        }
+        .stage-1 { grid-area: stage1; border-color: #f87171; background: #450a0a; }
+        .stage-2 { grid-area: stage2; border-color: #60a5fa; background: #1e3a8a; }
+        .stage-3 { grid-area: stage3; border-color: #fde047; background: #713f12; }
+        .cycle-arrow { font-size: 4rem; font-weight: 900; text-align: center; }
+        .arrow-1 { grid-area: arrow1; color: #f87171; transform: rotate(45deg); }
+        .arrow-2 { grid-area: arrow2; color: #60a5fa; transform: rotate(135deg); }
+        .arrow-3 { grid-area: arrow3; color: #fde047; transform: rotate(-135deg); }
+        .stage-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        .stage-text {
+            font-size: 1rem;
+            color: #d6d3d1;
+        }
+        
+        /* 5. Go vs Stop 스케일 */
+        .scale-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #292524;
+            padding: 2rem;
+            border-radius: 0.5rem;
+        }
+        .scale-side {
+            width: 40%;
+            text-align: center;
+        }
+        .scale-title {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+        .scale-bar {
+            width: 100%;
+            height: 3rem;
+            border-radius: 0.5rem;
+            transition: all 0.5s ease;
+        }
+        .scale-vs {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #78716c;
+        }
+        
+        /* 6. 치료 로드맵 */
+        .roadmap-container {
+            position: relative;
+            padding: 2rem 0;
+            border-left: 4px dashed #4ade80; /* green-400 */
+        }
+        .roadmap-stop {
+            position: relative;
+            margin-left: 2rem;
+            margin-bottom: 3rem;
+            padding: 1.5rem;
+            background: #1e293b; /* bg-slate-800 */
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+        }
+        .roadmap-dot {
+            position: absolute;
+            left: -2.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1.75rem;
+            height: 1.75rem;
+            background-color: #4ade80;
+            border: 4px solid #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #000;
+            font-size: 1rem;
+        }
+        .roadmap-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #86efac; /* green-300 */
+            margin-bottom: 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-black">
+
+    <div class="poster-container">
+        <!-- ====================================================== -->
+        <!-- 헤더 -->
+        <!-- ====================================================== -->
+        <header>
+            <h1 class="poster-title">도파민 중독: 뇌의 납치</h1>
+            <h2 class="poster-subtitle">보상 회로의 붕괴와 회복의 신경과학</h2>
+        </header>
+
+        <main>
+            <!-- ====================================================== -->
+            <!-- 1. 중독의 비극: Liking vs Wanting -->
+            <!-- ====================================================== -->
+            <section id="section-tragedy">
+                <h3 class="section-title section-title-danger">
+                    <svg class="icon-red" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" x2="12" y1="9" y2="13"></line><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>
+                    <span>섹션 1: 중독의 핵심 비극 | '좋아함'과 '원함'의 병적인 분리</span>
+                </h3>
+                <div class="card">
+                    <h4 class="card-title" style="color: #a3a3a3;">중독은 '쾌락'을 좇는 병이 아니라, '갈망'에 갇히는 병입니다.</h4>
+                    <p class="card-text mb-6">정상적인 뇌는 '좋아하는(Liking)' 것을 '원하게(Wanting)' 됩니다. 하지만 중독은 뇌의 '학습' 회로가 약물에 납치되어, 이 두 시스템이 치명적으로 분리되는 현상입니다. 뇌는 '쾌락'을 더 이상 느끼지 못함에도 불구하고(내성), '갈망'만 비정상적으로 증폭(감작)됩니다.</p>
+                    
+                    <div class="graph-container">
+                        <div class="graph-line">
+                            <span class="line-label-y">강도 (Intensity)</span>
+                            <span class="line-label-x">시간 (만성적 사용) →</span>
+                        </div>
+                        
+                        <!-- Liking Line -->
+                        <div class="line-liking"></div>
+                        <span class="graph-text" style="color: #60a5fa; top: 22%; left: 65%;">↓ '좋아함' (쾌락/Liking)</span>
+                        <span class="graph-text text-sm" style="color: #a5b4fc; top: 32%; left: 65%;">(오피오이드 시스템 | 내성 발생)</span>
+                        
+                        <!-- Wanting Line -->
+                        <div class="line-wanting"></div>
+                        <span class="graph-text" style="color: #fde047; top: 30%; left: 10%;">↑ '원함' (갈망/Wanting)</span>
+                        <span class="graph-text text-sm" style="color: #fef08a; top: 40%; left: 10%;">(도파민 시스템 | 감작 발생)</span>
+
+                        <!-- 비극의 갭 -->
+                        <div style="position: absolute; top: 60%; left: 80%; text-align: right;">
+                            <span class="text-4xl font-black text-red-500">THE GAP</span>
+                            <p class="text-red-400 font-bold">"좋지는 않지만, 미치도록 원한다."</p>
+                            <p class="text-red-400 font-bold">이것이 중독의 비극입니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====================================================== -->
+            <!-- 2. 보상 회로: 정상 vs 납치 -->
+            <!-- ====================================================== -->
+            <section id="section-hijack">
+                <h3 class="section-title section-title-danger">
+                    <svg class="icon-red" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.2 6.8a1 1 0 0 0-1-1h-2.4a1 1 0 0 0-1 1v2.4a1 1 0 0 0 1 1h2.4a1 1 0 0 0 1-1Z"></path><path d="M19 11.2a1 1 0 0 0-1-1h-2.4a1 1 0 0 0-1 1v2.4a1 1 0 0 0 1 1h2.4a1 1 0 0 0 1-1Z"></path><path d="m15 13-3-3 3-3"></path><path d="M9.2 17.2a1 1 0 0 0-1 1v2.4a1 1 0 0 0 1 1h2.4a1 1 0 0 0 1-1v-2.4a1 1 0 0 0-1-1Z"></path><path d="M5 11.2a1 1 0 0 0-1-1h-2.4a1 1 0 0 0-1 1v2.4a1 1 0 0 0 1 1h2.4a1 1 0 0 0 1-1Z"></path><path d="m9 11 3 3-3 3"></path></svg>
+                    <span>섹션 2: 보상 회로 | 뇌는 어떻게 '납치'되는가?</span>
+                </h3>
+                <div class="brain-diagram">
+                    <!-- 정상 뇌 -->
+                    <div class="brain-panel border-green-500">
+                        <h4 class="brain-panel-title text-green-400">정상적인 뇌 (자연적 보상)</h4>
+                        <div class="brain-nodes">
+                            <div class="brain-node node-pfc">
+                                <span class="text-2xl">🛡️</span><br>전두엽 피질 (PFC)<br>('브레이크' / 통제 / 계획)
+                            </div>
+                            <div class="arrow text-green-400">↓ <span class="text-sm">"Go/Stop 조절"</span></div>
+                            <div class="brain-node node-nac">
+                                <span class="text-2xl">🎯</span><br>측좌핵 (NAc)<br>('엔진' / 동기 부여)
+                            </div>
+                            <div class="arrow text-green-400">↑ <span class="text-sm">"이것을 원한다!"</span></div>
+                            <div class="brain-node node-vta">
+                                <span class="text-2xl">🔥</span><br>복측 피개 영역 (VTA)<br>(도파민 공장)
+                            </div>
+                            <p class="text-center text-green-400 mt-4 font-bold">음식, 성취, 관계 등 '자연적 보상'에 반응 → 적절한 도파민 방출 → 'Go'와 'Stop'의 균형</p>
+                        </div>
+                    </div>
+                    <!-- 중독된 뇌 -->
+                    <div class="brain-panel border-red-500">
+                        <h4 class="brain-panel-title text-red-400">납치된 뇌 (약물 중독)</h4>
+                        <div class="brain-nodes">
+                            <div class="brain-node node-pfc-broken">
+                                <span class="text-2xl">💔</span><br>전두엽 피질 (PFC)<br>('브레이크 고장' / 통제력 상실)
+                            </div>
+                            <div class="arrow text-gray-500">↓ <span class="text-sm">"통제 신호 마비"</span></div>
+                            <div class="brain-node node-nac border-red-500 bg-red-900">
+                                <span class="text-2xl">🚨</span><br>측좌핵 (NAc)<br>('엔진 과열' / 강박적 갈망)
+                            </div>
+                            <div class="arrow text-red-400">↑↑↑<br><span class="text-lg font-black">"도파민 대홍수"</span><br>↑↑↑</div>
+                            <div class="brain-node node-vta border-red-500 bg-red-900">
+                                <span class="text-2xl">💥</span><br>복측 피개 영역 (VTA)<br>(약물에 의해 강제 점화)
+                            </div>
+                            <p class="text-center text-red-400 mt-4 font-bold">'약물'이 VTA를 강제 점화 → '도파민 홍수' 발생 → NAc가 '감작'되고 PFC '브레이크'가 파괴됨</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====================================================== -->
+            <!-- 3. 약물별 침투 전략 -->
+            <!-- ====================================================== -->
+            <section id="section-mechanisms">
+                <h3 class="section-title section-title-danger">
+                    <svg class="icon-red" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 2.1a.5.5 0 0 0-1 0v11.8a.5.5 0 0 0 .5.5h8.4a.5.5 0 0 0 .5-.5V7.9a.5.5 0 0 0-.5-.5h-2.9a.5.5 0 0 0-.5-.5H13a.5.5 0 0 0-.5-.5Z"></path><path d="M8.5 2.1a.5.5 0 0 1 1 0v11.8a.5.5 0 0 1-.5.5H.6a.5.5 0 0 1-.5-.5V7.9a.5.5 0 0 1 .5-.5h2.9a.5.5 0 0 1 .5-.5H8a.5.5 0 0 1 .5-.5Z"></path><path d="M12 14.9v3.6a.5.5 0 0 1-.5.5h-2.9a.5.5 0 0 1-.5-.5v-3.6a.5.5 0 0 1 .5-.5h2.9a.5.5 0 0 1 .5.5Z"></path><path d="M12 14.9v3.6a.5.5 0 0 0 .5.5h2.9a.5.5 0 0 0 .5-.5v-3.6a.5.5 0 0 0-.5-.5h-2.9a.5.5 0 0 0-.5.5Z"></path></svg>
+                    <span>섹션 3: 침투 전략 | 약물은 어떻게 도파민을 조작하는가?</span>
+                </h3>
+                <div class="card">
+                    <table class="styled-table" style="background-color: #1c1917;">
+                        <thead style="background-color: #44403c;">
+                            <tr>
+                                <th style="width: 25%;">약물 계열</th>
+                                <th style="width: 40%;">핵심 조작 메커니즘</th>
+                                <th style="width: 35%;">비유: 뇌의 수돗물 시스템</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-bold text-lg highlight-red">코카인<br>정신자극제 (일부)</td>
+                                <td class="text-lg">도파민 '재흡수 펌프(DAT)'를 <span class="font-bold highlight-red">물리적으로 '차단' (Block)</span>. 도파민이 시냅스에 계속 쌓이게 만듦.</td>
+                                <td class="text-lg font-bold">"배수구를 꽉 막아버리기"</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-lg highlight-red">메스암페타민<br>(필로폰)</td>
+                                <td class="text-lg">1. DAT '차단'<br>2. DAT '역류' (도파민 강제 배출)<br>3. '소포체(VMAT2)' 파괴 (저장고 방출)</td>
+                                <td class="text-lg font-bold">"배수구를 막고, 수도꼭지를 역류시키며, 저수조를 터뜨리기"</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-lg highlight-yellow">오피오이드<br>(헤로인, 펜타닐)</td>
+                                <td class="text-lg">도파민 뉴런의 '브레이크' 역할을 하는 <span class="font-bold highlight-blue">'GABA 뉴런'</span>을 '마취'시킴 (탈억제).</td>
+                                <td class="text-lg font-bold">"수도꼭지 감시원을 잠재우기"</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-lg highlight-blue">알코올 / 대마초</td>
+                                <td class="text-lg">뇌의 주 '브레이크' 시스템(GABA/CB1)을 조작하여, 결과적으로 도파민 뉴런의 '브레이크'(GABA)를 억제. (복잡한 탈억제)</td>
+                                <td class="text-lg font-bold">"감시원에게 잘못된 명령 내리기"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="card-text text-center mt-6 font-bold text-xl text-yellow-300">결과는 모두 동일합니다: VTA → NAc 경로의 <span class="highlight-red text-3xl">비정상적인 도파민 '대홍수'</span></p>
+                </div>
+            </section>
+            
+            <!-- ====================================================== -->
+            <!-- 4. 중독의 3단계 사이클 -->
+            <!-- ====================================================== -->
+            <section id="section-cycle">
+                <h3 class="section-title section-title-danger">
+                    <svg class="icon-red" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M21 21v-5h-5"></path></svg>
+                    <span>섹션 4: 중독의 3단계 사이클 (NIDA 모델)</span>
+                </h3>
+                <div class="card">
+                    <div class="cycle-container">
+                        <!-- 1. Binge -->
+                        <div class="cycle-stage stage-1">
+                            <h4 class="stage-title text-red-300">1. 폭음/중독 (Binge/Intoxication)</h4>
+                            <p class="stage-text">
+                                • <span class="font-bold highlight-red">약물 사용 → 도파민 홍수</span><br>
+                                • 뇌의 보상 회로(NAc)가 '납치'됨.<br>
+                                • RPE 시스템이 "이것이 최고의 보상"이라고 '잘못 학습' 시작.<br>
+                                • <span class="font-bold">기전:</span> 긍정적 강화 (쾌락 추구)
+                            </p>
+                        </div>
+                        <div class="cycle-arrow arrow-1">→</div>
+                        <!-- 2. Withdrawal -->
+                        <div class="cycle-stage stage-2">
+                            <h4 class="stage-title text-blue-300">2. 금단/부정적 감정 (Withdrawal)</h4>
+                            <p class="stage-text">
+                                • <span class="font-bold highlight-blue">도파민 기준선 '대폭락' (내성)</span><br>
+                                • '좋아함(Liking)'이 사라지고, 자연적 보상에 무감각해짐 (무쾌감증).<br>
+                                • 스트레스 회로(편도체) '과열'.<br>
+                                • <span class="font-bold">기전:</span> 부정적 강화 (고통 회피)
+                            </p>
+                        </div>
+                        <div class="cycle-arrow arrow-2">→</div>
+                        <!-- 3. Craving -->
+                        <div class="cycle-stage stage-3">
+                            <h4 class="stage-title text-yellow-300">3. 갈망/집착 (Craving)</h4>
+                            <p class="stage-text">
+                                • <span class="font-bold highlight-yellow">'원함(Wanting)' 시스템 '병적 감작'</span><br>
+                                • '단서'(장소, 스트레스)만 봐도 갈망 폭발.<br>
+                                • '브레이크(PFC)' 기능 마비로 통제력 상실.<br>
+                                • <span class="font-bold">기전:</span> 조건화된 갈망 (회로 재편)
+                            </p>
+                        </div>
+                        <div class="cycle-arrow arrow-3">→</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====================================================== -->
+            <!-- 5. 뇌의 불균형: GO vs STOP -->
+            <!-- ====================================================== -->
+            <section id="section-balance">
+                <h3 class="section-title section-title-danger">
+                    <svg class="icon-red" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3a1 1 0 0 1 1 1v3"></path><path d="M8 4H5a1 1 0 0 0-1 1v3"></path><path d="M16 20h3a1 1 0 0 0 1-1v-3"></path><path d="M8 20H5a1 1 0 0 1-1-1v-3"></path></svg>
+                    <span>섹션 5: 갈망의 실체 | 'Go' 엔진의 폭주와 'Stop' 브레이크의 파괴</span>
+                </h3>
+                <div class="card">
+                    <p class="card-text mb-6">갈망(Craving)은 '선택'이 아닙니다. 뇌의 'Go' 신호가 'Stop' 신호를 압도하는 '생물학적' 상태입니다.</p>
+                    <div class="scale-container">
+                        <!-- GO (NAc) -->
+                        <div class="scale-side">
+                            <h4 class="scale-title text-red-400">GO (가속 페달)</h4>
+                            <p class="card-text mb-4">'원함'의 엔진 (측좌핵, NAc)<br>약물 단서에 '감작'되어 폭주</p>
+                            <div class="scale-bar bg-red-600" style="height: 12rem; box-shadow: 0 0 20px #ef4444;"></div>
+                        </div>
+                        
+                        <div class="scale-vs">&gt;</div>
+
+                        <!-- STOP (PFC) -->
+                        <div class="scale-side">
+                            <h4 class="scale-title text-gray-500">STOP (브레이크)</h4>
+                            <p class="card-text mb-4">'통제'의 사령부 (전두엽 피질, PFC)<br>만성적 약물 사용으로 '손상'됨</p>
+                            <div class="scale-bar bg-gray-700" style="height: 3rem;"></div>
+                        </div>
+                    </div>
+                    <p class="card-text text-center mt-6 font-bold text-2xl text-red-400">결과: 'Go' 신호(갈망)가 'Stop' 신호(이성)를 압도하여 <span class="underline">'강박적 사용(재발)'</span> 발생</p>
+                </div>
+            </section>
+            
+            <!-- ====================================================== -->
+            <!-- 6. 치료 로드맵 -->
+            <!-- ====================================================== -->
+            <section id="section-recovery">
+                <h3 class="section-title section-title-recovery">
+                    <svg class="icon-green" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12s2.5-4 7-4 7 4 7 4-2.5 4-7 4-7-4-7-4z"></path><path d="M12 12a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"></path></svg>
+                    <span>섹션 6: 회복의 로드맵 | 뇌 회로 '재활'의 과정</span>
+                </h3>
+                <div class="card bg-gray-900 border-green-500">
+                    <p class="card-text mb-6">중독은 '완치(Cure)'가 아닌 '관리(Management)'가 필요한 만성 뇌 질환입니다. 치료는 이 병든 회로를 '재훈련'하고 '수리'하는 평생의 과정입니다.</p>
+                    <div class="roadmap-container">
+                        <!-- Stop 1: 안정화 -->
+                        <div class="roadmap-stop">
+                            <div class="roadmap-dot">1</div>
+                            <h4 class="roadmap-title">1단계: 해독 및 안정화 (금단 극복)</h4>
+                            <p class="card-text">
+                                <span class="highlight-yellow font-bold">표적:</span> '금단/부정적 감정' (2단계 사이클)<br>
+                                <span class="highlight-green font-bold">치료 (약물):</span> '대체 요법' (예: 메사돈, 부프레노르핀). 오피오이드 수용체를 '안정적'으로 채워 금단 증상을 막고, 환자가 재활에 집중할 기반을 마련합니다.
+                            </p>
+                        </div>
+                        <!-- Stop 2: 재활 -->
+                        <div class="roadmap-stop">
+                            <div class="roadmap-dot">2</div>
+                            <h4 class="roadmap-title">2단계: 재활 및 회로 수리 (갈망/통제)</h4>
+                            <p class="card-text">
+                                <span class="highlight-yellow font-bold">표적 1: 'Go' 엔진 (갈망)</span><br>
+                                <span class="highlight-green font-bold">치료 (약물):</span> '길항제' (예: 날트렉손). 약물의 '보상' 효과를 '차단'하여 "약물=가치 없음"을 뇌에 '재학습(LTD)'시킵니다.<br><br>
+                                
+                                <span class="highlight-yellow font-bold">표적 2: 'Stop' 브레이크 (PFC 통제력)</span><br>
+                                <span class="highlight-green font-bold">치료 (행동):</span> '인지행동치료(CBT)'. 고장 난 '브레이크(PFC)'를 '훈련'시켜 단서 대처 기술과 충동 억제력을 강화합니다.<br>
+                                <span class="highlight-green font-bold">치료 (신경조절):</span> 'rTMS'. '자기장'으로 '손상된 PFC'를 직접 자극하여 '브레이크' 회로를 물리적으로 '수리'합니다.
+                            </p>
+                        </div>
+                        <!-- Stop 3: 관리 -->
+                        <div class="roadmap-stop" style="margin-bottom: 0;">
+                            <div class="roadmap-dot">3</div>
+                            <h4 class="roadmap-title">3단계: 장기 관리 (재발 방지)</h4>
+                            <p class="card-text">
+                                <span class="highlight-yellow font-bold">표적:</span> '감작'된 뇌의 평생 관리<br>
+                                <span class="highlight-green font-bold">치료 (생활):</span> '단서'가 되는 환경을 '재설계'합니다. 11.3의 전략(운동, 수면, 사회적 관계)을 통해 '자연적 보상'으로 도파민 민감도를 '회복'하고, '후성유전학'적으로 각인된 '갈망'을 '관리'합니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center text-stone-600 mt-16 py-8 border-t border-stone-800">
+            본 인포그래픽은 Dr. Humanized Writing (Ver 1.3)이 제공한 11개 챕터의 상세 기획안과 100개 이상의 학술 자료를 기반으로 생성한 '완결판' 요약입니다.
+        </footer>
+    </div>
+
+</body>
+</html>
