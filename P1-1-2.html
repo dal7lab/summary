@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사랑의 미분 방정식 시뮬레이터</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts - Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #F472B6, #EC4899, #D946EF); /* Pink to Fuchsia to Purple */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* 아코디언 패널 숨김 기본값 */
+        .accordion-content {
+            display: none;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        /* 차트 컨테이너 */
+        .chart-container {
+            position: relative;
+            height: 60vh; /* 뷰포트 높이의 60% */
+            width: 100%;
+            min-height: 450px;
+        }
+        /* 수식 스타일 */
+        .formula {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.25rem;
+            color: #D1D5DB; /* text-gray-300 */
+            background: #1F2937; /* bg-gray-800 */
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            border: 1px solid #4B5563;
+        }
+        /* 커스텀 슬라이더 스타일 */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #374151; /* bg-gray-700 */
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #EC4899; /* accent-pink-600 */
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #EC4899;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        input[type="range"]:hover::-webkit-slider-thumb {
+            background: #F472B6; /* hover:accent-pink-500 */
+        }
+        input[type="range"]:hover::-moz-range-thumb {
+            background: #F472B6;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <div class="container mx-auto max-w-7xl px-4 py-16">
+
+        <!-- 헤더 -->
+        <header class="text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-black mb-6 gradient-text">
+                사랑의 미분 방정식
+            </h1>
+            <p class="text-2xl md:text-3xl font-bold text-gray-100">
+                영희(x)와 철수(y)의 감정 변화 시뮬레이션
+            </p>
+        </header>
+
+        <!-- 시뮬레이션 메인 (그리드) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- 1. 컨트롤 패널 (L) -->
+            <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 h-fit">
+                <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.835 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.835 2.942-.734 2.106-2.106a1.532 1.532 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01.947-2.287c.835-1.372-.734-2.942-2.106-2.106A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                    매개변수 조작
+                </h2>
+                
+                <div class="space-y-6">
+                    <!-- 초기 감정 -->
+                    <div>
+                        <label for="param-x0" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>영희(x) 초기 감정 (x₀)</span>
+                            <span id="val-x0" class="font-bold text-pink-400 text-base">1.0</span>
+                        </label>
+                        <input type="range" id="param-x0" min="-2" max="2" value="1.0" step="0.1" class="w-full mt-2">
+                    </div>
+                    <div>
+                        <label for="param-y0" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>철수(y) 초기 감정 (y₀)</span>
+                            <span id="val-y0" class="font-bold text-blue-400 text-base">0.5</span>
+                        </label>
+                        <input type="range" id="param-y0" min="-2" max="2" value="0.5" step="0.1" class="w-full mt-2" style="accent-color: #3B82F6;">
+                    </div>
+
+                    <!-- 상호작용 계수 -->
+                    <div class="pt-4 border-t border-gray-600">
+                        <label for="param-a" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>a (영희 자기 영향)</span>
+                            <span id="val-a" class="font-bold text-white text-base">-0.1</span>
+                        </label>
+                        <input type="range" id="param-a" min="-1" max="1" value="-0.1" step="0.05" class="w-full mt-2">
+                    </div>
+                    <div>
+                        <label for="param-b" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>b (철수 → 영희)</span>
+                            <span id="val-b" class="font-bold text-white text-base">0.8</span>
+                        </label>
+                        <input type="range" id="param-b" min="-1" max="1" value="0.8" step="0.05" class="w-full mt-2">
+                    </div>
+                    <div>
+                        <label for="param-e" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>e (영희 → 철수)</span>
+                            <span id="val-e" class="font-bold text-white text-base">-0.6</span>
+                        </label>
+                        <input type="range" id="param-e" min="-1" max="1" value="-0.6" step="0.05" class="w-full mt-2">
+                    </div>
+                    <div>
+                        <label for="param-d" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>d (철수 자기 영향)</span>
+                            <span id="val-d" class="font-bold text-white text-base">-0.2</span>
+                        </label>
+                        <input type="range" id="param-d" min="-1" max="1" value="-0.2" step="0.05" class="w-full mt-2">
+                    </div>
+                </div>
+
+                <!-- 프리셋 버튼 -->
+                <div class="mt-8 pt-6 border-t border-gray-600">
+                    <h3 class="text-lg font-semibold text-white mb-3">관계 프리셋 (수정됨)</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="preset-destructive" class="w-full px-3 py-2 bg-pink-600 text-white rounded-lg shadow hover:bg-pink-700 transition text-sm font-medium">파멸적 관계</button>
+                        <button id="preset-stable" class="w-full px-3 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition text-sm font-medium">안정적 커플</button>
+                        <button id="preset-hesitation" class="w-full px-3 py-2 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700 transition text-sm font-medium">망설이는 커플</button>
+                        <button id="preset-explosive" class="w-full px-3 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition text-sm font-medium">열정적 사랑</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 그래프 및 해석 (R) -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- 차트 -->
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-4">📈 감정 변화 추이 (t=50)</h2>
+                    <div class="chart-container">
+                        <canvas id="loveChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 해석 -->
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15v4a1 1 0 001 1h12a1 1 0 001-1v-4a1 1 0 00-.293-.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
+                        현재 관계 해석 (동적 분석)
+                    </h2>
+                    <div id="interpretation-text" class="text-lg text-gray-300 leading-relaxed space-y-3">
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 시뮬레이션 원리 (아코디언) -->
+        <section class="mt-24">
+            <h2 class="text-4xl font-extrabold text-center mb-12 gradient-text">
+                시뮬레이션 작동 원리
+            </h2>
+            <div class="max-w-4xl mx-auto space-y-4">
+                
+                <!-- 아코디언 1: 미분 방정식 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">1. 사랑의 미분 방정식이란?</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            이 시뮬레이션은 두 사람의 감정 '변화율'($dx/dt, dy/dt$)이 두 사람의 '현재 감정'($x, y$)에 의해 결정된다고 가정하는 선형 미분 방정식 시스템을 기반으로 합니다.
+                        </p>
+                        <div class="formula">
+                            $\frac{dx}{dt} = a \cdot x + b \cdot y + c$
+                            <br>
+                            $\frac{dy}{dt} = e \cdot x + d \cdot y + f$
+                        </div>
+                        <ul class="list-disc list-outside pl-6 mt-4 space-y-2">
+                            <li>$x$: 영희(A)의 감정 수준</li>
+                            <li>$y$: 철수(B)의 감정 수준</li>
+                            <li>$dx/dt$: 영희(A)의 감정 변화 속도</li>
+                            <li>$dy/dt$: 철수(B)의 감정 변화 속도</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 아코디언 2: 매개변수의 의미 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">2. 6가지 핵심 매개변수의 의미</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            이 모델의 모든 역학은 6개의 상수에 의해 결정됩니다. (이 시뮬레이터에서는 $c$와 $f$를 0으로 고정합니다.)
+                        </p>
+                        <ul class="list-disc list-outside pl-6 mt-4 space-y-2">
+                            <li><strong>$a$ (영희 자기 영향):</strong> 영희가 자신의 감정에 미치는 영향
+                                <ul class="list-circle list-outside pl-6 text-gray-400">
+                                    <li>$a > 0$: 자기애 (감정이 스스로 증폭)</li>
+                                    <li>$a < 0$: 자가 억제 (감정이 스스로 식음)</li>
+                                </ul>
+                            </li>
+                            <li><strong>$b$ (철수 → 영희):</strong> 철수의 감정이 영희에게 미치는 영향
+                                <ul class="list-circle list-outside pl-6 text-gray-400">
+                                    <li>$b > 0$: 철수가 영희를 긍정적으로 만듦</li>
+                                    <li>$b < 0$: 철수가 영희를 부정적으로 만듦</li>
+                                </ul>
+                            </li>
+                             <li><strong>$e$ (영희 → 철수):</strong> 영희의 감정이 철수에게 미치는 영향
+                                <ul class="list-circle list-outside pl-6 text-gray-400">
+                                    <li>$e > 0$: 영희가 철수를 긍정적으로 만듦</li>
+                                    <li>$e < 0$: 영희가 철수를 부정적으로 만듦</li>
+                                </ul>
+                            </li>
+                            <li><strong>$d$ (철수 자기 영향):</strong> 철수가 자신의 감정에 미치는 영향
+                                <ul class="list-circle list-outside pl-6 text-gray-400">
+                                    <li>$d > 0$: 자기애 (감정이 스스로 증폭)</li>
+                                    <li>$d < 0$: 자가 억제 (감정이 스스로 식음)</li>
+                                </ul>
+                            </li>
+                            <li><strong>$c, f$ (외부 영향):</strong> 날씨, 이벤트 등 외부 요인 (본 시뮬레이션에서는 0)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 아코디언 3: 시뮬레이션 원리 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">3. 시뮬레이션 원리: 오일러 방법 (Euler Method)</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            컴퓨터는 이 방정식을 $dt$라는 아주 작은 시간 간격으로 쪼개서 계산합니다. '다음 시점의 감정'은 '현재 감정'에 '현재 계산된 감정 변화율($dx/dt$) $\times$ $dt$'를 더하여 근사합니다.
+                        </p>
+                        <div class="formula">
+                            $x(t + dt) = x(t) + (a \cdot x(t) + b \cdot y(t)) \cdot dt$
+                            <br>
+                            $y(t + dt) = y(t) + (e \cdot x(t) + d \cdot y(t)) \cdot dt$
+                        </div>
+                        <p class="text-gray-400 mt-4">
+                            이 과정을 0초부터 50초까지 수백 번 반복하여 미래의 감정 변화 곡선을 그려냅니다.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+    (function() {
+        let loveChart; // 차트 인스턴스를 저장할 변수
+        const chartCanvas = document.getElementById('loveChart').getContext('2d');
+        const interpretationText = document.getElementById('interpretation-text');
+
+        // --- 시뮬레이션 로직 ---
+        /**
+         * @param {object} params - {a, b, e, d, x0, y0, c, f}
+         * @param {number} t_max - 시뮬레이션 총 시간
+         * @param {number} dt - 시간 간격
+         * @returns {object} - { t_labels, x_history, y_history }
+         */
+        function runSimulation(params, t_max = 50, dt = 0.05) {
+            let x = params.x0;
+            let y = params.y0;
+            const { a, b, e, d, c, f } = params;
+
+            const t_labels = [];
+            const x_history = [];
+            const y_history = [];
+
+            for (let t = 0; t <= t_max; t += dt) {
+                t_labels.push(t.toFixed(1));
+                x_history.push(x);
+                y_history.push(y);
+
+                const dx_dt = a * x + b * y + c;
+                const dy_dt = e * x + d * y + f;
+
+                x = x + dx_dt * dt;
+                y = y + dy_dt * dt;
+            }
+            return { t_labels, x_history, y_history };
+        }
+
+        // --- 차트 업데이트 ---
+        function updateChart(data) {
+            if (loveChart) {
+                loveChart.data.labels = data.t_labels;
+                loveChart.data.datasets[0].data = data.x_history;
+                loveChart.data.datasets[1].data = data.y_history;
+                loveChart.update();
+            } else {
+                loveChart = new Chart(chartCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: data.t_labels,
+                        datasets: [
+                            {
+                                label: '영희 (x) 감정',
+                                data: data.x_history,
+                                borderColor: '#EC4899', // Pink
+                                backgroundColor: '#EC489930',
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.1
+                            },
+                            {
+                                label: '철수 (y) 감정',
+                                data: data.y_history,
+                                borderColor: '#3B82F6', // Blue
+                                backgroundColor: '#3B82F630',
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { color: '#E5E7EB', font: { size: 14 } }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    title: (tooltipItems) => `Time: ${tooltipItems[0].label}s`,
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: '시간 (Time)', color: '#9CA3AF' },
+                                ticks: { color: '#9CA3AF' },
+                                grid: { color: '#374151' }
+                            },
+                            y: {
+                                title: { display: true, text: '감정 수준 (Emotional Level)', color: '#9CA3AF' },
+                                ticks: { color: '#9CA3AF' },
+                                grid: { color: '#374151' }
+                            }
+                        },
+                        elements: {
+                            point: { radius: 0, hitRadius: 10, hoverRadius: 5 }
+                        }
+                    }
+                });
+            }
+        }
+
+        // --- [수정됨] 해석 업데이트 ---
+        function updateInterpretation(params) {
+            let html = "";
+            const { a, b, e, d } = params;
+
+            // 1. 자기 영향 (a, d)
+            if (a < -0.05) {
+                html += `<p><strong>영희(x)</strong>는 <span class="text-blue-400">자가 억제적 (a=${a.toFixed(2)})</span>입니다. 혼자 있으면 감정이 식는 경향이 있습니다.</p>`;
+            } else if (a > 0.05) {
+                html += `<p><strong>영희(x)</strong>는 <span class="text-pink-400">자기 증폭적 (a=${a.toFixed(2)})</span>입니다. 혼자 있어도 감정이 커지는 경향이 있습니다.</p>`;
+            } else {
+                html += `<p><strong>영희(x)</strong>는 감정적으로 <span class="text-gray-400">독립적 (a=${a.toFixed(2)})</span>입니다.</p>`;
+            }
+            
+            if (d < -0.05) {
+                html += `<p><strong>철수(y)</strong>는 <span class="text-blue-400">자가 억제적 (d=${d.toFixed(2)})</span>입니다. 혼자 있으면 감정이 식는 경향이 있습니다.</p>`;
+            } else if (d > 0.05) {
+                html += `<p><strong>철수(y)</strong>는 <span class="text-pink-400">자기 증폭적 (d=${d.toFixed(2)})</span>입니다. 혼자 있어도 감정이 커지는 경향이 있습니다.</p>`;
+            } else {
+                html += `<p><strong>철수(y)</strong>는 감정적으로 <span class="text-gray-400">독립적 (d=${d.toFixed(2)})</span>입니다.</p>`;
+            }
+
+            // 2. 상호 영향 (b, e)
+            if (b > 0.05) {
+                html += `<p>철수(y)의 감정은 영희(x)에게 <span class="text-green-400">긍정적 영향 (b=${b.toFixed(2)})</span>을 줍니다.</p>`;
+            } else if (b < -0.05) {
+                html += `<p>철수(y)의 감정은 영희(x)에게 <span class="text-red-400">부정적인 영향 (b=${b.toFixed(2)})</span>을 줍니다.</p>`;
+            } else {
+                html += `<p>철수(y)는 영희(x)에게 <span class="text-gray-400">별다른 영향을 주지 않습니다 (b=${b.toFixed(2)}).</span></p>`;
+            }
+
+            if (e > 0.05) {
+                html += `<p>영희(x)의 감정은 철수(y)에게 <span class="text-green-400">긍정적 영향 (e=${e.toFixed(2)})</span>을 줍니다.</p>`;
+            } else if (e < -0.05) {
+                html += `<p>영희(x)의 감정은 철수(y)에게 <span class="text-red-400">부정적인 영향 (e=${e.toFixed(2)})</span>을 줍니다.</p>`;
+            } else {
+                html += `<p>영희(x)는 철수(y)에게 <span class="text-gray-400">별다른 영향을 주지 않습니다 (e=${e.toFixed(2)}).</span></p>`;
+            }
+
+            // 3. [수정됨] 동적 종합 분석 (Trace & Determinant)
+            const T = a + d; // Trace
+            const D = a * d - b * e; // Determinant
+            const D_sqrt = T * T - 4 * D; // 판별식 (Discriminant)
+            
+            let conclusion = "";
+
+            if (D < 0) {
+                conclusion = "이 조합은 <strong>'망설이는 커플 (Saddle Point)'</strong> 유형입니다. (D < 0)<br>두 사람의 감정은 초기 조건에 따라 극명하게 갈립니다. 한쪽은 긍정으로, 다른 쪽은 부정으로 발산하기 쉬운 불안정한 상태입니다.";
+            } else { // D >= 0
+                if (T < -0.01) { // 0보다 확실히 작을 때
+                    if (D_sqrt >= 0) {
+                        conclusion = "이 조합은 <strong>'안정적인 커플 (Stable Node)'</strong> 유형입니다. (T < 0, D > 0)<br>감정의 진동 없이, 두 사람의 감정은 시간이 지남에 따라 안정적인 0 (무관심)으로 점차 수렴합니다.";
+                    } else {
+                        conclusion = "이 조합은 <strong>'안정적인 커플 (Stable Spiral)'</strong> 유형입니다. (T < 0, D > 0)<br>약간의 감정 기복(진동)을 겪으며, 두 사람의 감정은 결국 안정적인 0 (무관심)으로 수렴합니다.";
+                    }
+                } else if (T > 0.01) { // 0보다 확실히 클 때
+                    if (D_sqrt >= 0) {
+                        conclusion = "이 조합은 <strong>'열정적/폭발적 사랑 (Unstable Node)'</strong> 유형입니다. (T > 0, D > 0)<br>감정의 진동 없이, 두 사람의 감정은 서로를 증폭시키며 시간이 지남에 따라 긍정적(또는 부정적)으로 무한히 발산합니다.";
+                    } else {
+                        conclusion = "이 조합은 <strong>'파멸적/격정적 관계 (Unstable Spiral)'</strong> 유형입니다. (T > 0, D > 0)<br>두 사람의 감정은 격렬한 기복(진동)을 겪으며, 그 진폭이 점점 커지면서 극단적으로 발산합니다.";
+                    }
+                } else { // T가 0에 가까울 때
+                    conclusion = "이 조합은 <strong>'중립적 궤도 (Center)'</strong> 유형입니다. (T ≈ 0, D > 0)<br>감정이 안정되거나 발산하지 않고, 초기 조건에 따라 일정한 주기를 그리며 영원히 진동합니다.";
+                }
+            }
+
+            html += `<p class="mt-6 pt-4 border-t border-gray-600 text-base"><strong>[종합 해석]</strong> ${conclusion}</p>`;
+            html += `<p class="text-sm text-gray-400 mt-2">(Trace T = ${T.toFixed(3)}, Determinant D = ${D.toFixed(3)})</p>`;
+            
+            interpretationText.innerHTML = html;
+        }
+
+        // --- 컨트롤러 ---
+        const inputs = {
+            a: document.getElementById('param-a'),
+            b: document.getElementById('param-b'),
+            e: document.getElementById('param-e'),
+            d: document.getElementById('param-d'),
+            x0: document.getElementById('param-x0'),
+            y0: document.getElementById('param-y0'),
+        };
+
+        const values = {
+            a: document.getElementById('val-a'),
+            b: document.getElementById('val-b'),
+            e: document.getElementById('val-e'),
+            d: document.getElementById('val-d'),
+            x0: document.getElementById('val-x0'),
+            y0: document.getElementById('val-y0'),
+        };
+
+        // 슬라이더 값 표시 업데이트
+        for (const key in inputs) {
+            inputs[key].addEventListener('input', (event) => {
+                values[key].textContent = parseFloat(event.target.value).toFixed(2);
+                runFullSimulation(); // 슬라이더 조작 시 실시간으로 다시 실행
+            });
+        }
+        
+        // 현재 슬라이더 값으로 시뮬레이션 실행
+        function runFullSimulation() {
+            const params = {
+                a: parseFloat(inputs.a.value),
+                b: parseFloat(inputs.b.value),
+                e: parseFloat(inputs.e.value),
+                d: parseFloat(inputs.d.value),
+                x0: parseFloat(inputs.x0.value),
+                y0: parseFloat(inputs.y0.value),
+                c: 0, // 외부 요인 c, f는 0으로 고정
+                f: 0
+            };
+            
+            const data = runSimulation(params);
+            updateChart(data);
+            updateInterpretation(params); // 해석도 동적으로 업데이트
+        }
+        
+        // [수정됨] 프리셋 버튼 로직 (수학적으로 올바른 값)
+        function setParams(p) {
+            Object.keys(p).forEach(key => {
+                if(inputs[key]) {
+                    inputs[key].value = p[key];
+                    values[key].textContent = p[key].toFixed(2);
+                }
+            });
+            runFullSimulation();
+        }
+
+        document.getElementById('preset-destructive').addEventListener('click', () => {
+            // "파멸적 관계" (Unstable Spiral: T > 0, D > 0, T²-4D < 0)
+            setParams({ a: 0.1, b: 0.8, e: -0.6, d: 0.1, x0: 1.0, y0: 0.5 });
+        });
+        
+        document.getElementById('preset-stable').addEventListener('click', () => {
+            // "안정적 커플" (Stable Node: T < 0, D > 0, T²-4D > 0)
+            setParams({ a: -0.5, b: 0.2, e: 0.2, d: -0.5, x0: 1.0, y0: 1.0 });
+        });
+
+        document.getElementById('preset-hesitation').addEventListener('click', () => {
+            // "망설이는 커플" (Saddle Point: D < 0)
+            setParams({ a: -0.2, b: 0.8, e: 0.3, d: 0.1, x0: 1.0, y0: 0.5 });
+        });
+        
+        document.getElementById('preset-explosive').addEventListener('click', () => {
+            // "열정적 사랑" (Unstable Node: T > 0, D > 0, T²-4D > 0)
+            setParams({ a: 0.3, b: 0.2, e: 0.2, d: 0.3, x0: 0.5, y0: 0.5 });
+        });
+
+
+        // --- 아코디언 스크립트 ---
+        document.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                const icon = button.querySelector('svg');
+                const isOpening = content.style.display !== 'block';
+                
+                if (isOpening) {
+                    content.style.display = 'block';
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    content.style.display = 'none';
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+
+        // --- [수정됨] 초기 실행 ---
+        // 페이지 로드 시 수정된 '파멸적인 관계' 프리셋으로 초기화
+        setParams({ a: 0.1, b: 0.8, e: -0.6, d: 0.1, x0: 1.0, y0: 0.5 });
+
+    })();
+    </script>
+</body>
+</html>
