@@ -58,323 +58,329 @@
     </div>
     <div class="tooltip"></div>
 <script>
-// ✅ FIX: Wait for the DOM to be fully loaded before running D3 scripts
+// ✅ FIX: Wait for the DOM to be fully loaded
 document.addEventListener("DOMContentLoaded", function() {
 
-    const tooltip = d3.select(".tooltip");
-    
-    // ===================================================================
-    // STATUS COLOR AND ICON DEFINITIONS (DO NOT MODIFY)
-    // ===================================================================
-    const statusColors = {
-        '검증 완료': '#2ECC71',
-        '맥락상 사실': '#3498DB',
-        '일부 확인됨': '#F1C40F',
-        '부정확함': '#E74C3C',
-        '확인 불가': '#95A5A6'
-    };
-    
-    const statusIcons = {
-        '검증 완료': '🟢',
-        '맥락상 사실': '🔵',
-        '일부 확인됨': '🟡',
-        '부정확함': '🔴',
-        '확인 불가': '🟣'
-    };
-    
-    const statusOrder = ['검증 완료', '맥락상 사실', '일부 확인됨', '부정확함', '확인 불가'];
-    
-    // All 12 valid categories
-    const validCategories = ['개념', '통계', '주장', '인용', '사례', '사실', '목표', '분석', '전략', '가설', '비유', '용어'];
-    
-    // ==================================================================
-    // ✅ PHASE 4: Inject your SSoT-derived analysis data into the three variables below.
-    // ==================================================================
-    
-    // 100% SSoT-derived analysis data (N=8)
-    const donutData = [
-        { status: '검증 완료', count: 4 },
-        { status: '맥락상 사실', count: 3 },
-        { status: '일부 확인됨', count: 0 },
-        { status: '부정확함', count: 0 },
-        { status: '확인 불가', count: 1 }
-    ];
-    
-    const barData = [
-        { 
-            level: '고위험 (80+)', 
-            '검증 완료': 2, 
-            '맥락상 사실': 0, 
-            '일부 확인됨': 0, 
-            '부정확함': 0, 
-            '확인 불가': 0, 
-            total: 2,
-            example: '2025년 상반기 36.4%' 
-          },
-          { 
-            level: '중위험 (50-79)', 
-            '검증 완료': 2, 
-            '맥락상 사실': 1, 
-            '일부 확인됨': 0, 
-            '부정확함': 0, 
-            '확인 불가': 0, 
-            total: 3,
-            example: '중소기업으로 확산' 
-          },
-          { 
-            level: '저위험 (<50)', 
-            '검증 완료': 0, 
-            '맥락상 사실': 2, 
-            '일부 확인됨': 0, 
-            '부정확함': 0, 
-            '확인 불가': 1, 
-            total: 3,
-            example: "'부모의 공부력' 전제 조건" 
-          }
-    ];
-    
-    const bubbleData = [
-        {no: 1, category: '통계', risk: 95, fact: '2025년 상반기 남성 육아휴직자 비율은 36.4%에 육박.', status: '검증 완료'},
-        {no: 2, category: '통계', risk: 92, fact: '(2025년 상반기 남성 육아휴직자 비율은) 전년 동기 대비 54.2% 증가.', status: '검증 완료'},
-        {no: 3, category: '분석', risk: 78, fact: '남성 육아휴직이 중소기업(우선지원대상기업)으로 확산되고 있다.', status: '검증 완료'},
-        {no: 4, category: '분석', risk: 75, fact: '정부의 \'부모함께 육아휴직제\'가 강력한 제도적 드라이브가 됨.', status: '검증 완료'},
-        {no: 5, category: '주장', risk: 60, fact: '(남성 육아휴직 증가) 추세는 2025년 들어 더욱 가속화되고 있다.', status: '맥락상 사실'},
-        {no: 6, category: '가설', risk: 45, fact: '(\'무관심\'했던 아빠들의 물리적 가정 복귀가) \'부모의 공부력\' 시대를 연 첫 번째 전제 조건이다.', status: '확인 불가'},
-        {no: 7, category: '비유', risk: 30, fact: '\'무관심\'했던 아빠들이 물리적으로 가정으로 돌아오기 시작했다.', status: '맥락상 사실'},
-        {no: 8, category: '주장', risk: 25, fact: '(남성 육아휴직 증가는) 단순히 몇몇 \'깨어있는\' 아빠들의 선택이 아니다.', status: '맥락상 사실'}
-    ];
-
-    // ==================================================================
-    // DATA VALIDATION AND ERROR CHECKING
-    // ==================================================================
-    
-    // Validate status names
-    if (donutData && donutData.length > 0) {
-        donutData.forEach(item => {
-            if (!statusColors[item.status]) {
-                console.error(`Invalid status name in donutData: \"${item.status}\". Must be one of: ${statusOrder.join(', ')}`);
-            }
-        });
-    }
-    
-    if (bubbleData && bubbleData.length > 0) {
-        bubbleData.forEach(item => {
-            if (!statusColors[item.status]) {
-                console.error(`Invalid status name in bubbleData item ${item.no}: \"${item.status}\". Must be one of: ${statusOrder.join(', ')}`);
-            }
-            if (!validCategories.includes(item.category)) {
-                console.error(`Invalid category in bubbleData item ${item.no}: \"${item.category}\". Must be one of: ${validCategories.join(', ')}`);
-            }
-        });
-    }
-
-    // ==================================================================
-    // CHART RENDERING CODE (DO NOT MODIFY BELOW)
-    // ==================================================================
-
-    // DONUT CHART
-    (() => {
-        if (!donutData || donutData.length === 0) {
-            console.error('❌ Donut chart data is empty. Please inject actual data into the donutData array.');
-            return;
-        }
-        const svg = d3.select("#donut-chart").append("svg").attr("width", "100%").attr("height", "100%").attr("viewBox", `0 0 320 320`).append("g").attr("transform", `translate(160, 160)`);
-        const pie = d3.pie().value(d => d.count).sort(null);
-        const arc = d3.arc().innerRadius(80).outerRadius(140);
-        const total = d3.sum(donutData, d => d.count);
-        svg.selectAll("path").data(pie(donutData)).enter().append("path")
-            .attr("fill", d => statusColors[d.data.status] || '#95A5A6')
-            .attr("d", arc).attr("stroke", "#1a2233").attr("stroke-width", "4px")
-            .on("mouseover", (event, d) => { 
-                const icon = statusIcons[d.data.status] || '';
-                tooltip.style("opacity", 1).html(`<strong>${icon} ${d.data.status}</strong><br>${d.data.count}개 (${(d.data.count / total * 100).toFixed(1)}%)`); 
-                d3.select(event.currentTarget).transition().duration(200).attr("transform", "scale(1.05)"); 
-            })
-            .on("mousemove", (event) => tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px"))
-            .on("mouseout", (event) => { tooltip.style("opacity", 0); d3.select(event.currentTarget).transition().duration(200).attr("transform", "scale(1)"); });
-        svg.append("text").attr("text-anchor", "middle").attr("dy", "-0.5em").style("font-size", "2.5rem").style("font-weight", "bold").style("fill", "white").text(total);
-        svg.append("text").attr("text-anchor", "middle").attr("dy", "1.0em").style("font-size", "1rem").style("fill", "#9ca3af").text("총 항목");
-        const legendContainer = d3.select("#donut-legend");
-        donutData.forEach(({status}) => { 
-            const li = legendContainer.append("div").attr("class", "legend-item"); 
-            li.append("div").attr("class", "legend-color").style("background-color", statusColors[status] || '#95A5A6'); 
-            li.append("span").text(status); 
-        });
-    })();
-    
-    // BAR CHART
-    (() => {
-        if (!barData || barData.length === 0) {
-            console.error('❌ Bar chart data is empty. Please inject actual data into the barData array.');
-            return;
-        }
-        const margin = { top: 20, right: 20, bottom: 40, left: 60 };
-        const container = d3.select("#bar-chart");
+    // ✅ FIX: Add a short delay (100ms) to allow Tailwind CSS to apply all styles (especially width)
+    // This resolves the race condition.
+    setTimeout(function() {
         
-        // Ensure container node is available
-        const containerNode = container.node();
-        if (!containerNode) {
-            console.error('❌ Bar chart container #bar-chart not found.');
-            return;
+        const tooltip = d3.select(".tooltip");
+        
+        // ===================================================================
+        // STATUS COLOR AND ICON DEFINITIONS (DO NOT MODIFY)
+        // ===================================================================
+        const statusColors = {
+            '검증 완료': '#2ECC71',
+            '맥락상 사실': '#3498DB',
+            '일부 확인됨': '#F1C40F',
+            '부정확함': '#E74C3C',
+            '확인 불가': '#95A5A6'
+        };
+        
+        const statusIcons = {
+            '검증 완료': '🟢',
+            '맥락상 사실': '🔵',
+            '일부 확인됨': '🟡',
+            '부정확함': '🔴',
+            '확인 불가': '🟣'
+        };
+        
+        const statusOrder = ['검증 완료', '맥락상 사실', '일부 확인됨', '부정확함', '확인 불가'];
+        
+        // All 12 valid categories
+        const validCategories = ['개념', '통계', '주장', '인용', '사례', '사실', '목표', '분석', '전략', '가설', '비유', '용어'];
+        
+        // ==================================================================
+        // ✅ PHASE 4: Inject your SSoT-derived analysis data into the three variables below.
+        // ==================================================================
+        
+        // 100% SSoT-derived analysis data (N=8)
+        const donutData = [
+            { status: '검증 완료', count: 4 },
+            { status: '맥락상 사실', count: 3 },
+            { status: '일부 확인됨', count: 0 },
+            { status: '부정확함', count: 0 },
+            { status: '확인 불가', count: 1 }
+        ];
+        
+        const barData = [
+            { 
+                level: '고위험 (80+)', 
+                '검증 완료': 2, 
+                '맥락상 사실': 0, 
+                '일부 확인됨': 0, 
+                '부정확함': 0, 
+                '확인 불가': 0, 
+                total: 2,
+                example: '2025년 상반기 36.4%' 
+              },
+              { 
+                level: '중위험 (50-79)', 
+                '검증 완료': 2, 
+                '맥락상 사실': 1, 
+                '일부 확인됨': 0, 
+                '부정확함': 0, 
+                '확인 불가': 0, 
+                total: 3,
+                example: '중소기업으로 확산' 
+              },
+              { 
+                level: '저위험 (<50)', 
+                '검증 완료': 0, 
+                '맥락상 사실': 2, 
+                '일부 확인됨': 0, 
+                '부정확함': 0, 
+                '확인 불가': 1, 
+                total: 3,
+                example: "'부모의 공부력' 전제 조건" 
+              }
+        ];
+        
+        const bubbleData = [
+            {no: 1, category: '통계', risk: 95, fact: '2025년 상반기 남성 육아휴직자 비율은 36.4%에 육박.', status: '검증 완료'},
+            {no: 2, category: '통계', risk: 92, fact: '(2025년 상반기 남성 육아휴직자 비율은) 전년 동기 대비 54.2% 증가.', status: '검증 완료'},
+            {no: 3, category: '분석', risk: 78, fact: '남성 육아휴직이 중소기업(우선지원대상기업)으로 확산되고 있다.', status: '검증 완료'},
+            {no: 4, category: '분석', risk: 75, fact: '정부의 \'부모함께 육아휴직제\'가 강력한 제도적 드라이브가 됨.', status: '검증 완료'},
+            {no: 5, category: '주장', risk: 60, fact: '(남성 육아휴직 증가) 추세는 2025년 들어 더욱 가속화되고 있다.', status: '맥락상 사실'},
+            {no: 6, category: '가설', risk: 45, fact: '(\'무관심\'했던 아빠들의 물리적 가정 복귀가) \'부모의 공부력\' 시대를 연 첫 번째 전제 조건이다.', status: '확인 불가'},
+            {no: 7, category: '비유', risk: 30, fact: '\'무관심\'했던 아빠들이 물리적으로 가정으로 돌아오기 시작했다.', status: '맥락상 사실'},
+            {no: 8, category: '주장', risk: 25, fact: '(남성 육아휴직 증가는) 단순히 몇몇 \'깨어있는\' 아빠들의 선택이 아니다.', status: '맥락상 사실'}
+        ];
+
+        // ==================================================================
+        // DATA VALIDATION AND ERROR CHECKING
+        // ==================================================================
+        
+        // Validate status names
+        if (donutData && donutData.length > 0) {
+            donutData.forEach(item => {
+                if (!statusColors[item.status]) {
+                    console.error(`Invalid status name in donutData: \"${item.status}\". Must be one of: ${statusOrder.join(', ')}`);
+                }
+            });
         }
         
-        const width = containerNode.getBoundingClientRect().width - margin.left - margin.right;
-        const height = containerNode.getBoundingClientRect().height - margin.top - margin.bottom;
-
-        if (width <= 0 || height <= 0) {
-            console.warn(`Bar chart container has zero or negative dimensions (W: ${width}, H: ${height}). Chart rendering skipped. Ensure container is visible and has a defined height.`);
-            return;
+        if (bubbleData && bubbleData.length > 0) {
+            bubbleData.forEach(item => {
+                if (!statusColors[item.status]) {
+                    console.error(`Invalid status name in bubbleData item ${item.no}: \"${item.status}\". Must be one of: ${statusOrder.join(', ')}`);
+                }
+                if (!validCategories.includes(item.category)) {
+                    console.error(`Invalid category in bubbleData item ${item.no}: \"${item.category}\". Must be one of: ${validCategories.join(', ')}`);
+                }
+            });
         }
 
-        const svg = container.append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-        
-        // Remove duplicate risk levels
-        const uniqueBarData = [];
-        const seenLevels = new Set();
-        barData.forEach(item => {
-            if (!seenLevels.has(item.level)) {
-                seenLevels.add(item.level);
-                uniqueBarData.push(item);
-            } else {
-                console.warn(`⚠️ Duplicate risk level detected and removed: \"${item.level}\"`);
-            }
-        });
-        
-        const stack = d3.stack().keys(statusOrder.filter(key => uniqueBarData.some(d => d[key] > 0)));
-        const series = stack(uniqueBarData);
-        const x = d3.scaleBand().domain(uniqueBarData.map(d => d.level)).range([0, width]).padding(0.3);
-        const y = d3.scaleLinear().domain([0, d3.max(uniqueBarData, d => d.total)]).nice().range([height, 0]);
-        
-        svg.append("g").selectAll("g").data(series).join("g")
-            .attr("fill", d => statusColors[d.key] || '#95A5A6')
-            .selectAll("rect").data(d => d).join("rect")
-            .attr("x", d => x(d.data.level))
-            .attr("y", d => y(d[1]))
-            .attr("height", d => Math.max(0, y(d[0]) - y(d[1])))
-            .attr("width", x.bandwidth())
-            .on("mouseover", (event, d) => { 
-                const key = d3.select(event.currentTarget.parentNode).datum().key;
-                const icon = statusIcons[key] || '';
-                tooltip.style("opacity", 1).html(`<strong>${d.data.level}</strong><br>${icon} ${key}: ${d.data[key]}개`); 
-            })
-            .on("mousemove", (event) => tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px"))
-            .on("mouseout", () => tooltip.style("opacity", 0));
-        
-        svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x)).call(g => g.select(".domain").remove()).selectAll("text").attr("class", "axis-label");
-        svg.append("g").call(d3.axisLeft(y).ticks(5)).call(g => g.select(".domain").remove()).call(g => g.selectAll(".tick line").clone().attr("x2", width).attr("stroke", "#374151").attr("stroke-opacity", 0.5)).selectAll("text").attr("class", "axis-label");
-        svg.append("text").attr("x", -10).attr("y", -10).attr("class", "axis-label").style("font-size", "0.875rem").style("font-weight", "500").attr("text-anchor", "start").text("항목 수");
-        
-        // Add examples below the chart
-        const examplesContainer = d3.select("#bar-examples");
-        uniqueBarData.forEach(item => {
-            if (item.example) {
-                examplesContainer.append("div").html(`<strong>${item.level}</strong> 예시: ${item.example}`);
-            }
-        });
-    })();
-    
-    // BUBBLE CHART
-    (() => {
-        if (!bubbleData || bubbleData.length === 0) {
-            console.error('❌ Bubble chart data is empty. Please inject actual data into the bubbleData array.');
-            return;
-        }
-        const margin = {top: 50, right: 30, bottom: 60, left: 80};
-        const container = d3.select("#bubble-chart");
+        // ==================================================================
+        // CHART RENDERING CODE (DO NOT MODIFY BELOW)
+        // ==================================================================
 
-        // Ensure container node is available
-        const containerNode = container.node();
-        if (!containerNode) {
-            console.error('❌ Bubble chart container #bubble-chart not found.');
-            return;
-        }
-        
-        const width = containerNode.getBoundingClientRect().width - margin.left - margin.right;
-        const height = containerNode.getBoundingClientRect().height - margin.top - margin.bottom;
-
-        if (width <= 0 || height <= 0) {
-            console.warn(`Bubble chart container has zero or negative dimensions (W: ${width}, H: ${height}). Chart rendering skipped. Ensure container is visible and has a defined height.`);
-            return;
-        }
-
-        const svg = container.append("svg").attr("width", "100%").attr("height", "100%").attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-        
-        // Calculate average risk per category for center-weighted ordering
-        const categoryRiskMap = {};
-        bubbleData.forEach(d => {
-            if (!categoryRiskMap[d.category]) {
-                categoryRiskMap[d.category] = { total: 0, count: 0 };
+        // DONUT CHART
+        (() => {
+            if (!donutData || donutData.length === 0) {
+                console.error('❌ Donut chart data is empty. Please inject actual data into the donutData array.');
+                return;
             }
-            categoryRiskMap[d.category].total += d.risk;
-            categoryRiskMap[d.category].count += 1;
-        });
+            const svg = d3.select("#donut-chart").append("svg").attr("width", "100%").attr("height", "100%").attr("viewBox", `0 0 320 320`).append("g").attr("transform", `translate(160, 160)`);
+            const pie = d3.pie().value(d => d.count).sort(null);
+            const arc = d3.arc().innerRadius(80).outerRadius(140);
+            const total = d3.sum(donutData, d => d.count);
+            svg.selectAll("path").data(pie(donutData)).enter().append("path")
+                .attr("fill", d => statusColors[d.data.status] || '#95A5A6')
+                .attr("d", arc).attr("stroke", "#1a2233").attr("stroke-width", "4px")
+                .on("mouseover", (event, d) => { 
+                    const icon = statusIcons[d.data.status] || '';
+                    tooltip.style("opacity", 1).html(`<strong>${icon} ${d.data.status}</strong><br>${d.data.count}개 (${(d.data.count / total * 100).toFixed(1)}%)`); 
+                    d3.select(event.currentTarget).transition().duration(200).attr("transform", "scale(1.05)"); 
+                })
+                .on("mousemove", (event) => tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px"))
+                .on("mouseout", (event) => { tooltip.style("opacity", 0); d3.select(event.currentTarget).transition().duration(200).attr("transform", "scale(1)"); });
+            svg.append("text").attr("text-anchor", "middle").attr("dy", "-0.5em").style("font-size", "2.5rem").style("font-weight", "bold").style("fill", "white").text(total);
+            svg.append("text").attr("text-anchor", "middle").attr("dy", "1.0em").style("font-size", "1rem").style("fill", "#9ca3af").text("총 항목");
+            const legendContainer = d3.select("#donut-legend");
+            donutData.forEach(({status}) => { 
+                const li = legendContainer.append("div").attr("class", "legend-item"); 
+                li.append("div").attr("class", "legend-color").style("background-color", statusColors[status] || '#95A5A6'); 
+                li.append("span").text(status); 
+            });
+        })();
         
-        const categoryAvgRisk = Object.keys(categoryRiskMap).map(cat => ({
-            category: cat,
-            avgRisk: categoryRiskMap[cat].total / categoryRiskMap[cat].count
-        })).sort((a, b) => b.avgRisk - a.avgRisk);
-        
-        console.log(`✅ Categories found in data: ${categoryAvgRisk.length}`, categoryAvgRisk.map(c => c.category));
-        
-        // Arrange categories with highest risk in center
-        const arrangedCategories = [];
-        const leftSide = [];
-        const rightSide = [];
-        categoryAvgRisk.forEach((item, idx) => {
-            if (idx === 0) {
-                arrangedCategories.push(item.category);
-            } else if (idx % 2 === 1) {
-                leftSide.unshift(item.category);
-            } else {
-                rightSide.push(item.category);
+        // BAR CHART
+        (() => {
+            if (!barData || barData.length === 0) {
+                console.error('❌ Bar chart data is empty. Please inject actual data into the barData array.');
+                return;
             }
-        });
-        const categories = [...leftSide, ...arrangedCategories, ...rightSide];
+            const margin = { top: 20, right: 20, bottom: 40, left: 60 };
+            const container = d3.select("#bar-chart");
+            
+            // Ensure container node is available
+            const containerNode = container.node();
+            if (!containerNode) {
+                console.error('❌ Bar chart container #bar-chart not found.');
+                return;
+            }
+            
+            const width = containerNode.getBoundingClientRect().width - margin.left - margin.right;
+            const height = containerNode.getBoundingClientRect().height - margin.top - margin.bottom;
+
+            if (width <= 0 || height <= 0) {
+                console.error(`❌ Bar chart container has zero or negative dimensions (W: ${width}, H: ${height}). Chart rendering failed.`);
+                return;
+            }
+
+            const svg = container.append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+            
+            // Remove duplicate risk levels
+            const uniqueBarData = [];
+            const seenLevels = new Set();
+            barData.forEach(item => {
+                if (!seenLevels.has(item.level)) {
+                    seenLevels.add(item.level);
+                    uniqueBarData.push(item);
+                } else {
+                    console.warn(`⚠️ Duplicate risk level detected and removed: \"${item.level}\"`);
+                }
+            });
+            
+            const stack = d3.stack().keys(statusOrder.filter(key => uniqueBarData.some(d => d[key] > 0)));
+            const series = stack(uniqueBarData);
+            const x = d3.scaleBand().domain(uniqueBarData.map(d => d.level)).range([0, width]).padding(0.3);
+            const y = d3.scaleLinear().domain([0, d3.max(uniqueBarData, d => d.total)]).nice().range([height, 0]);
+            
+            svg.append("g").selectAll("g").data(series).join("g")
+                .attr("fill", d => statusColors[d.key] || '#95A5A6')
+                .selectAll("rect").data(d => d).join("rect")
+                .attr("x", d => x(d.data.level))
+                .attr("y", d => y(d[1]))
+                .attr("height", d => Math.max(0, y(d[0]) - y(d[1])))
+                .attr("width", x.bandwidth())
+                .on("mouseover", (event, d) => { 
+                    const key = d3.select(event.currentTarget.parentNode).datum().key;
+                    const icon = statusIcons[key] || '';
+                    tooltip.style("opacity", 1).html(`<strong>${d.data.level}</strong><br>${icon} ${key}: ${d.data[key]}개`); 
+                })
+                .on("mousemove", (event) => tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px"))
+                .on("mouseout", () => tooltip.style("opacity", 0));
+            
+            svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x)).call(g => g.select(".domain").remove()).selectAll("text").attr("class", "axis-label");
+            svg.append("g").call(d3.axisLeft(y).ticks(5)).call(g => g.select(".domain").remove()).call(g => g.selectAll(".tick line").clone().attr("x2", width).attr("stroke", "#374151").attr("stroke-opacity", 0.5)).selectAll("text").attr("class", "axis-label");
+            svg.append("text").attr("x", -10).attr("y", -10).attr("class", "axis-label").style("font-size", "0.875rem").style("font-weight", "500").attr("text-anchor", "start").text("항목 수");
+            
+            // Add examples below the chart
+            const examplesContainer = d3.select("#bar-examples");
+            uniqueBarData.forEach(item => {
+                if (item.example) {
+                    examplesContainer.append("div").html(`<strong>${item.level}</strong> 예시: ${item.example}`);
+                }
+            });
+        })();
         
-        const statuses = statusOrder.slice().reverse();
-        const x = d3.scalePoint().domain(categories).range([0, width]).padding(0.5);
-        const y = d3.scalePoint().domain(statuses).range([height, 0]).padding(0.5);
-        const radius = d3.scaleSqrt().domain(d3.extent(bubbleData, d => d.risk)).range([4, 32]);
-        
-        svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x)).call(g => g.select(".domain").remove()).selectAll("text").attr("class", "axis-label").style("font-size", "0.875rem");
-        svg.selectAll("yGrid").data(statuses).enter().append("line").attr("x1", 0).attr("x2", width).attr("y1", d => y(d)).attr("y2", d => y(d)).attr("stroke", "#374151").attr("stroke-dasharray", "2,2");
-        svg.append("g").call(d3.axisLeft(y).tickSize(0).tickPadding(10)).select(".domain").remove();
-        svg.selectAll(".tick text").attr("class", "axis-label").style("font-size", "0.875rem");
-        
-        const nodes = svg.selectAll(".node").data(bubbleData).enter().append("circle").attr("class", "node")
-            .attr("r", d => radius(d.risk))\
-            .style("fill", d => statusColors[d.status] || '#95A5A6')
-            .style("fill-opacity", 0.7)\
-            .style("stroke", d => statusColors[d.status] || '#95A5A6')
-            .style("stroke-width", 2)\
-            .on("mouseover", (event, d) => { 
-                const icon = statusIcons[d.status] || '';
-                tooltip.style("opacity", 1).html(`<strong>[No.${d.no}] [${d.category}]</strong><br>${d.fact}<br><span class="tooltip-risk">Risk: ${d.risk}</span><br>${icon} ${d.status}`); 
-                d3.select(event.currentTarget).style("fill-opacity", 1).style("stroke-width", 3); 
-            })\
-            .on("mousemove", (event) => tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px"))
-            .on("mouseout", (event) => { tooltip.style("opacity", 0); d3.select(event.currentTarget).style("fill-opacity", 0.7).style("stroke-width", 2); });
-        
-        d3.forceSimulation(bubbleData)\
-            .force("x", d3.forceX(d => x(d.category)).strength(0.15))\
-            .force("y", d3.forceY(d => y(d.status)).strength(1.2))\
-            .force("collide", d3.forceCollide(d => radius(d.risk) + 2).strength(0.95))\
-            .force("bounds", () => {\
-                bubbleData.forEach(d => {\
-                    const r = radius(d.risk);\
-                    d.x = Math.max(r, Math.min(width - r, d.x));\
-                    d.y = Math.max(r, Math.min(height - r, d.y));\
-                });\
-            })\
-            .on("tick", () => nodes.attr("cx", d => d.x).attr("cy", d => d.y));
-        
-        const legendContainer = d3.select("#bubble-chart-legend");
-        statusOrder.slice().reverse().forEach(status => { 
-            const li = legendContainer.append("div").attr("class", "legend-item"); 
-            li.append("div").attr("class", "legend-color").style("background-color", statusColors[status]); 
-            li.append("span").text(status); 
-        });
-    })();
+        // BUBBLE CHART
+        (() => {
+            if (!bubbleData || bubbleData.length === 0) {
+                console.error('❌ Bubble chart data is empty. Please inject actual data into the bubbleData array.');
+                return;
+            }
+            const margin = {top: 50, right: 30, bottom: 60, left: 80};
+            const container = d3.select("#bubble-chart");
+
+            // Ensure container node is available
+            const containerNode = container.node();
+            if (!containerNode) {
+                console.error('❌ Bubble chart container #bubble-chart not found.');
+                return;
+            }
+            
+            const width = containerNode.getBoundingClientRect().width - margin.left - margin.right;
+            const height = containerNode.getBoundingClientRect().height - margin.top - margin.bottom;
+
+            if (width <= 0 || height <= 0) {
+                console.error(`❌ Bubble chart container has zero or negative dimensions (W: ${width}, H: ${height}). Chart rendering failed.`);
+                return;
+            }
+
+            const svg = container.append("svg").attr("width", "100%").attr("height", "100%").attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+            
+            // Calculate average risk per category for center-weighted ordering
+            const categoryRiskMap = {};
+            bubbleData.forEach(d => {
+                if (!categoryRiskMap[d.category]) {
+                    categoryRiskMap[d.category] = { total: 0, count: 0 };
+                }
+                categoryRiskMap[d.category].total += d.risk;
+                categoryRiskMap[d.category].count += 1;
+            });
+            
+            const categoryAvgRisk = Object.keys(categoryRiskMap).map(cat => ({
+                category: cat,
+                avgRisk: categoryRiskMap[cat].total / categoryRiskMap[cat].count
+            })).sort((a, b) => b.avgRisk - a.avgRisk);
+            
+            console.log(`✅ Categories found in data: ${categoryAvgRisk.length}`, categoryAvgRisk.map(c => c.category));
+            
+            // Arrange categories with highest risk in center
+            const arrangedCategories = [];
+            const leftSide = [];
+            const rightSide = [];
+            categoryAvgRisk.forEach((item, idx) => {
+                if (idx === 0) {
+                    arrangedCategories.push(item.category);
+                } else if (idx % 2 === 1) {
+                    leftSide.unshift(item.category);
+                } else {
+                    rightSide.push(item.category);
+                }
+            });
+            const categories = [...leftSide, ...arrangedCategories, ...rightSide];
+            
+            const statuses = statusOrder.slice().reverse();
+            const x = d3.scalePoint().domain(categories).range([0, width]).padding(0.5);
+            const y = d3.scalePoint().domain(statuses).range([height, 0]).padding(0.5);
+            const radius = d3.scaleSqrt().domain(d3.extent(bubbleData, d => d.risk)).range([4, 32]);
+            
+            svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x)).call(g => g.select(".domain").remove()).selectAll("text").attr("class", "axis-label").style("font-size", "0.875rem");
+            svg.selectAll("yGrid").data(statuses).enter().append("line").attr("x1", 0).attr("x2", width).attr("y1", d => y(d)).attr("y2", d => y(d)).attr("stroke", "#374151").attr("stroke-dasharray", "2,2");
+            svg.append("g").call(d3.axisLeft(y).tickSize(0).tickPadding(10)).select(".domain").remove();
+            svg.selectAll(".tick text").attr("class", "axis-label").style("font-size", "0.875rem");
+            
+            const nodes = svg.selectAll(".node").data(bubbleData).enter().append("circle").attr("class", "node")
+                .attr("r", d => radius(d.risk))\
+                .style("fill", d => statusColors[d.status] || '#95A5A6')
+                .style("fill-opacity", 0.7)\
+                .style("stroke", d => statusColors[d.status] || '#95A5A6')
+                .style("stroke-width", 2)\
+                .on("mouseover", (event, d) => { 
+                    const icon = statusIcons[d.status] || '';
+                    tooltip.style("opacity", 1).html(`<strong>[No.${d.no}] [${d.category}]</strong><br>${d.fact}<br><span class="tooltip-risk">Risk: ${d.risk}</span><br>${icon} ${d.status}`); 
+                    d3.select(event.currentTarget).style("fill-opacity", 1).style("stroke-width", 3); 
+                })\
+                .on("mousemove", (event) => tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px"))
+                .on("mouseout", (event) => { tooltip.style("opacity", 0); d3.select(event.currentTarget).style("fill-opacity", 0.7).style("stroke-width", 2); });
+            
+            d3.forceSimulation(bubbleData)\
+                .force("x", d3.forceX(d => x(d.category)).strength(0.15))\
+                .force("y", d3.forceY(d => y(d.status)).strength(1.2))\
+                .force("collide", d3.forceCollide(d => radius(d.risk) + 2).strength(0.95))\
+                .force("bounds", () => {\
+                    bubbleData.forEach(d => {\
+                        const r = radius(d.risk);\
+                        d.x = Math.max(r, Math.min(width - r, d.x));\
+                        d.y = Math.max(r, Math.min(height - r, d.y));\
+                    });\
+                })\
+                .on("tick", () => nodes.attr("cx", d => d.x).attr("cy", d => d.y));
+            
+            const legendContainer = d3.select("#bubble-chart-legend");
+            statusOrder.slice().reverse().forEach(status => { 
+                const li = legendContainer.append("div").attr("class", "legend-item"); 
+                li.append("div").attr("class", "legend-color").style("background-color", statusColors[status]); 
+                li.append("span").text(status); 
+            });
+        })();
+
+    }, 100); // 100ms delay
 
 }); // End of DOMContentLoaded
 </script>
