@@ -58,6 +58,9 @@
     </div>
     <div class="tooltip"></div>
 <script>
+// ✅ FIX: Wait for the DOM to be fully loaded before running D3 scripts
+document.addEventListener("DOMContentLoaded", function() {
+
     const tooltip = d3.select(".tooltip");
     
     // ===================================================================
@@ -86,10 +89,6 @@
     
     // ==================================================================
     // ✅ PHASE 4: Inject your SSoT-derived analysis data into the three variables below.
-    // ⚠️ CRITICAL REQUIREMENTS:
-    // 1. All arrays MUST contain ACTUAL data from your Phase 4 aggregation (derived from Phase 3 SSoT list)
-    // 2. Data MUST NOT be empty or placeholder.
-    // 3. Data MUST be 100% synchronized with Section 1 (Summary) and Section 3 (Table).
     // ==================================================================
     
     // 100% SSoT-derived analysis data (N=8)
@@ -376,6 +375,8 @@
             li.append("span").text(status); 
         });
     })();
+
+}); // End of DOMContentLoaded
 </script>
 </body>
 </html>
