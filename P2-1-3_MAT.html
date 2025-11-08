@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 기술의 심장, 수학 (v2.0 - Dynamic)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts - Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- MathJax 3 CDN and Configuration -->
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+          },
+          svg: {
+            fontCache: 'global'
+          },
+          startup: {
+            ready: () => {
+              console.log('MathJax is ready, rendering math.');
+              MathJax.startup.default();
+              document.body.classList.remove('mathjax-loading');
+            }
+          }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #0c0a09; /* Very Dark (Stone 950) */
+            overflow-x: hidden; /* 가로 스크롤바 방지 */
+        }
+        .gradient-text-vibrant {
+            background: linear-gradient(to right, #22D3EE, #8B5CF6, #F472B6); /* Cyan -> Purple -> Pink */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-bg-vibrant {
+            background: linear-gradient(90deg, #8B5CF6, #F472B6);
+        }
+        .gradient-bg-blue {
+            background: linear-gradient(90deg, #3B82F6, #22D3EE);
+        }
+        /* 아코디언 */
+        .accordion-content {
+            display: none;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        /* MathJax 로딩 플리커 방지 */
+        body.mathjax-loading {
+            visibility: hidden;
+        }
+        
+        /* --- 스크롤 애니메이션 --- */
+        .animate-on-scroll {
+            opacity: 0;
+            transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+        .animate-fade-in {
+            transform: translateY(30px);
+        }
+        .animate-slide-in-left {
+            transform: translateX(-50px);
+        }
+        .animate-slide-in-right {
+            transform: translateX(50px);
+        }
+        .animate-on-scroll.is-visible {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+
+        /* --- AI 교육 피라미드 (Custom Diagram) --- */
+        .pyramid-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+        .pyramid-level {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            font-weight: 700;
+            text-align: center;
+            position: relative;
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+            width: 100%;
+            max-width: 500px;
+            padding: 1.2rem;
+        }
+        .pyramid-level-3 {
+            background-color: #EC4899; /* Pink 500 */
+            width: 60%;
+            padding: 0.8rem;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+        }
+        .pyramid-level-2 {
+            background-color: #A855F7; /* Purple 500 */
+            width: 80%;
+            margin-top: -1px;
+        }
+        .pyramid-level-1 {
+            background-color: #3B82F6; /* Blue 500 */
+            width: 100%;
+            margin-top: -1px;
+        }
+    </style>
+</head>
+<body class="text-gray-200 mathjax-loading"> <!-- 로딩 클래스 추가 -->
+
+    <div class="container mx-auto max-w-6xl px-4 py-24">
+
+        <!-- 헤더 -->
+        <header class="text-center mb-24 animate-on-scroll animate-fade-in">
+            <h1 class="text-5xl md:text-7xl font-black mb-6 gradient-text-vibrant">
+                AI 기술의 심장, 수학
+            </h1>
+            <p class="text-2xl md:text-3xl font-bold text-gray-100">
+                머스크가 교육 강화를 외친 까닭
+            </p>
+        </header>
+
+        <!-- 소개 카드 -->
+        <div class="bg-gray-900 rounded-2xl shadow-xl border border-gray-700 p-8 mb-24 animate-on-scroll animate-fade-in">
+            <p class="text-xl text-gray-300 leading-relaxed text-center">
+                2024년 3월, 일론 머스크와 샘 올트먼이 '매스 매터스 AI(Math Matters AI)' 캠페인에 서명했습니다. 그들이 AI 산업 최전선에서 수학 교육을 강조한 이유는 명확합니다. <strong>AI의 핵심이 대수, 미적분, 확률로 구성됐기 때문입니다.</strong> 딥러닝은 미적분으로 작동하고, 벡터와 행렬은 AI의 언어입니다.
+            </p>
+        </div>
+
+        <!-- 제1장: 10가지 이유 (아이콘 그리드) -->
+        <section class="mb-24">
+            <h2 class="text-4xl font-bold text-center mb-12 animate-on-scroll animate-fade-in"><span class="gradient-text-vibrant">제1장:</span> AI 시대, 수학이 중요한 10가지 이유</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 10가지 이유 아이콘 카드 -->
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-4 animate-on-scroll animate-fade-in">
+                    <svg class="w-12 h-12 text-pink-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.534 4.695a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.534 4.695c.3.921-.755 1.688-1.54 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.784.57-1.838-.197-1.539-1.118l1.534-4.695a1 1 0 00-.363-1.118L2.06 10.122c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.534-4.695z"></path></svg>
+                    <div><h3 class="text-xl font-bold text-white mb-2">1. AI의 핵심 언어</h3><p class="text-gray-400">신경망은 행렬 곱셈, 학습은 미분의 반복입니다. AI의 모든 과정은 수학으로 표현됩니다.</p></div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-4 animate-on-scroll animate-fade-in" style="transition-delay: 50ms;">
+                    <svg class="w-12 h-12 text-pink-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <div><h3 class="text-xl font-bold text-white mb-2">2. 학습의 기초체력</h3><p class="text-gray-400">수학은 AI 학습의 기초체력입니다. 역전파는 연쇄 법칙, 경사하강법은 최적화 기법입니다.</p></div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-4 animate-on-scroll animate-fade-in" style="transition-delay: 100ms;">
+                    <svg class="w-12 h-12 text-pink-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    <div><h3 class="text-xl font-bold text-white mb-2">3. 코딩만으론 불충분</h3><p class="text-gray-400">코딩은 도구일 뿐, AI의 본질은 수학입니다. 원리를 모르면 문제 해결이 불가능합니다.</p></div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-4 animate-on-scroll animate-fade-in" style="transition-delay: 150ms;">
+                    <svg class="w-12 h-12 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <div><h3 class="text-xl font-bold text-white mb-2">4. 테크 리더들의 강조</h3><p class="text-gray-400">머스크와 올트먼은 AI를 '창조'하기 위해 수학이 필수라고 강조합니다. (Math Matters AI)</p></div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-4 animate-on-scroll animate-fade-in" style="transition-delay: 200ms;">
+                    <svg class="w-12 h-12 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <div><h3 class="text-xl font-bold text-white mb-2">5. 다변수 사고력</h3><p class="text-gray-400">딥러닝은 수천억 개 변수를 동시 최적화합니다. 심화 수학은 이 다변수 사고력을 키웁니다.</p></div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-4 animate-on-scroll animate-fade-in" style="transition-delay: 250ms;">
+                    <svg class="w-12 h-12 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H5v-2H3v-2H1v-2h2v-2h2v2h2v-2h2v-2h2v-2H9.257A6 6 0 0115 7z"></path></svg>
+                    <div><h3 class="text-xl font-bold text-white mb-2">6. 선형대수 (블랙박스 열쇠)</h3><p class="text-gray-400">벡터와 행렬은 AI 내부의 데이터 변환을 이해하는 열쇠입니다. (어텐션 = 행렬 곱셈)</p></div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-4 animate-on-scroll animate-fade-in" style="transition-delay: 300ms;">
+                    <svg class="w-12 h-12 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                    <div><h3 class="text-xl font-bold text-white mb-2">7. 미적분 (최적화)</h3><p class="text-gray-400">경사하강법(미분)은 손실 함수를 최소화하는 핵심 최적화 도구입니다.</p></div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-4 animate-on-scroll animate-fade-in" style="transition-delay: 350ms;">
+                    <svg class="w-12 h-12 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                    <div><h3 class="text-xl font-bold text-white mb-2">8. 확률과 통계 (불확실성)</h3><p class="text-gray-400">AI는 불확실성 속에서 '가장 그럴듯한 답'을 찾습니다. (조건부 확률, 베이즈 정리)</p></div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 flex items-start space-x-4 animate-on-scroll animate-fade-in" style="transition-delay: 400ms;">
+                    <svg class="w-12 h-12 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.866 10.74 9 12.321 5.134-1.58 9-6.73 9-12.321 0-1.028-.278-2.017-.764-2.888z"></path></svg>
+                    <div><h3 class="text-xl font-bold text-white mb-2">9. 수학적 사고 (생존 역량)</h3><p class="text-gray-400">AI 교육 피라미드의 정점은 도구 활용이 아닌, 원리를 이해하는 수학적 사고입니다.</p></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 제2장: 알고리즘 속 수학 (아코디언) -->
+        <section class="mb-24">
+            <h2 class="text-4xl font-bold text-center mb-12 animate-on-scroll animate-fade-in"><span class="gradient-text-vibrant">제2장:</span> AI 알고리즘 속 수학의 실체</h2>
+            <div class="max-w-4xl mx-auto space-y-4">
+                <!-- 아코디언 1: 딥러닝 -->
+                <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-slide-in-left">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">1. 딥러닝 구조: $y = f(W \cdot x + b)$</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>신경망은 퍼셉트론 $y = f(w·x + b)$의 다층 구조입니다. $w·x$는 벡터 내적이며, 층(Layer)은 행렬 곱셈 $h_i = f_i(W_i h_{i-1} + b_i)$로 표현됩니다. 활성화 함수 $f$는 렐루(ReLU) $f(x) = \max(0, x)$ 등을 사용하여 비선형성을 도입합니다.</p>
+                    </div>
+                </div>
+                <!-- 아코디언 2: 선형대수 -->
+                <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-slide-in-right">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">2. 선형대수: $Y = XW + b$</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>모든 데이터는 벡터(텍스트 임베딩, 이미지 픽셀)로 표현됩니다. 신경망 계산은 $Y = XW + b$ 형태의 행렬 연산이며 GPU가 이를 병렬 처리합니다. 차원 축소(PCA)는 공분산 행렬의 고유벡터(Eigenvector)를 찾는 문제입니다.</p>
+                    </div>
+                </div>
+                <!-- 아코디언 3: 미적분 -->
+                <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-slide-in-left">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">3. 미적분: $W \leftarrow W - \eta(\partial L / \partial W)$</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>학습은 손실 함수 $L(W, b)$를 최소화하는 최적화 문제입니다. 경사하강법은 기울기(편미분)의 반대 방향으로 $W$를 갱신합니다. 이 모든 기울기를 효율적으로 계산하는 것이 연쇄 법칙 $dz/dx = (dz/dy)(dy/dx)$을 재귀적으로 적용하는 역전파 알고리즘입니다.</p>
+                    </div>
+                </div>
+                <!-- 아코디언 4: 확률과 통계 -->
+                <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-slide-in-right">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">4. 확률: $P(A|B) = P(B|A)P(A) / P(B)$</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>AI는 불확실성을 다룹니다. 베이즈 정리는 AI 추론의 기초입니다. 지피티는 다음 단어의 조건부 확률 $P(w_{next} | w_1, ..., w_t)$를 모델링하며, 디퓨전 모델은 확률 분포에서 노이즈를 점진적으로 제거해 이미지를 생성합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 제3장: 데이터로 보는 교육 현실 (차트 섹션) -->
+        <section class="mb-24">
+            <h2 class="text-4xl font-bold text-center mb-12 animate-on-scroll animate-fade-in"><span class="gradient-text-vibrant">제3장:</span> 데이터로 보는 수학 교육의 현실</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- 차트 1: PISA 데이터 -->
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-slide-in-left">
+                    <h3 class="text-xl font-bold text-white mb-4 text-center">PISA 2023: 한국 학생의 역설</h3>
+                    <canvas id="pisaChart"></canvas>
+                    <p class="text-center text-gray-400 mt-4">수학 성적은 세계 3위지만, 수학에 대한 즐거움은 46개국 중 42위로 최하위권입니다.</p>
+                </div>
+
+                <!-- 차트 2: MIT 데이터 -->
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-slide-in-right">
+                    <h3 class="text-xl font-bold text-white mb-4 text-center">MIT: AI 최고 성과자의 배경 (2025)</h3>
+                    <canvas id="mitChart"></canvas>
+                    <p class="text-center text-gray-400 mt-4">AI 최고 성과 연구자의 94%가 수학, 물리학 등 기초과학 배경을 가졌습니다.</p>
+                </div>
+
+                <!-- 차트 3: KAIST/서울대 데이터 -->
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-slide-in-left">
+                    <h3 class="text-xl font-bold text-white mb-4 text-center">국내 대학생의 어려움 (KAIST/서울대 2024)</h3>
+                    <canvas id="kaistChart"></canvas>
+                    <p class="text-center text-gray-400 mt-4">이공계 신입생 67%가 "고교 심화 수학을 배우지 않아 대학 적응에 어려움을 겪었다"고 답했습니다.</p>
+                </div>
+                
+                <!-- 다이어그램 4: AI 교육 피라미드 -->
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-slide-in-right">
+                    <h3 class="text-xl font-bold text-white mb-6 text-center">AI 시대 교육 피라미드 (문화일보)</h3>
+                    <div class="pyramid-container">
+                        <div class="pyramid-level pyramid-level-3 animate-on-scroll animate-fade-in" style="transition-delay: 600ms;">정점: 수학적 사고</div>
+                        <div class="pyramid-level pyramid-level-2 animate-on-scroll animate-fade-in" style="transition-delay: 300ms;">중간: AI 도구 활용</div>
+                        <div class="pyramid-level pyramid-level-1 animate-on-scroll animate-fade-in">기반: 디지털 리터러시</div>
+                    </div>
+                    <p class="text-center text-gray-400 mt-4">단순한 도구 활용(중간)을 넘어, 원리를 이해하는 수학적 사고(정점)가 핵심 경쟁력입니다.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 제4장: 글로벌 정책 비교 (카드 섹션) -->
+        <section class="mb-24">
+            <h2 class="text-4xl font-bold text-center mb-12 animate-on-scroll animate-fade-in"><span class="gradient-text-vibrant">제4장:</span> AI 경쟁, 세계는 지금 '수학 전쟁' 중</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-fade-in"><h3 class="text-xl font-bold text-white mb-2">미국 (California)</h3><p class="text-gray-400">'매스 매터스 AI' 캠페인 결과, 2027년부터 고교에 AI 수학 모듈(선형대수, 미적분, 확률론)을 필수로 포함.</p></div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-fade-in" style="transition-delay: 100ms;"><h3 class="text-xl font-bold text-white mb-2">영국</h3><p class="text-gray-400">2024년부터 '수학 18세까지 의무화' 정책 시행. "AI 시대에 수학은 읽기/쓰기만큼 기본 소양."</p></div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-fade-in" style="transition-delay: 200ms;"><h3 class="text-xl font-bold text-white mb-2">중국</h3><p class="text-gray-400">'수학 강국 건설 계획' 발표. "AI 경쟁은 결국 수학 경쟁"이라며 국가 전략 산업으로 격상.</p></div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-fade-in" style="transition-delay: 300ms;"><h3 class="text-xl font-bold text-white mb-2">싱가포르</h3><p class="text-gray-400">초등학교부터 '컴퓨팅 사고와 수학 통합 교육과정' 도입. 수학 개념을 코딩으로 함께 학습.</p></div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-fade-in" style="transition-delay: 400ms;"><h3 class="text-xl font-bold text-white mb-2">일본</h3><p class="text-gray-400">'수학-AI 이중 전공' 장학금 지원. 기업 채용 시 '수학 전공자 우대' 명시.</p></div>
+                <div class="bg-red-900 p-6 rounded-xl shadow-lg border border-red-700 animate-on-scroll animate-fade-in" style="transition-delay: 500ms;"><h3 class="text-xl font-bold text-red-300 mb-2">한국 (2028 수능)</h3><p class="text-red-300">미적분II와 기하를 수능에서 제외. 글로벌 흐름과 역행하는 정책으로 '하향 평준화' 우려 (중앙일보).</p></div>
+            </div>
+        </section>
+
+        <!-- 제5장: 교육 로드맵 -->
+        <section class="mb-24">
+            <h2 class="text-4xl font-bold text-center mb-12 animate-on-scroll animate-fade-in"><span class="gradient-text-vibrant">제5장:</span> 미래 인재를 위한 수학 교육 로드맵</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-fade-in"><h3 class="text-xl font-bold text-white mb-2">초등 저학년</h3><p class="text-gray-400">수 감각과 공간 지각 (블록, 퍼즐, 보드게임)</p></div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-fade-in" style="transition-delay: 100ms;"><h3 class="text-xl font-bold text-white mb-2">초등 고학년</h3><p class="text-gray-400">논리적 사고와 패턴 인식 (규칙 찾기, 스크래치)</p></div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-fade-in" style="transition-delay: 200ms;"><h3 class="text-xl font-bold text-white mb-2">중학생</h3><p class="text-gray-400">대수와 함수의 기초 (일차/이차 함수 → 회귀/손실)</p></div>
+                <div class="bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-700 animate-on-scroll animate-fade-in" style="transition-delay: 300ms;"><h3 class="text-xl font-bold text-white mb-2">고등학생</h3><p class="text-gray-400">미적분(경사하강법), 선형대수(벡터), 확률론(베이즈)</p></div>
+            </div>
+        </section>
+
+        <!-- 제6장: Q&A -->
+        <section class="mb-24">
+            <h2 class="text-4xl font-bold text-center mb-12 animate-on-scroll animate-fade-in"><span class="gradient-text-vibrant">제6장:</span> 인사이트 포커스 Q&A 10선</h2>
+            <div class="max-w-4xl mx-auto space-y-4">
+                <!-- Q&A 1 -->
+                <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-fade-in">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-lg font-semibold text-gray-100">Q1. AI가 수학 문제를 풀어주는데 왜 수학을 배워야 하나요?</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>A: AI는 정해진 문제를 푸는 도구지만, 문제를 정의하고 풀이 전략을 선택하는 것은 인간의 역할입니다. 챗지피티는 미적분 문제는 잘 풀지만, 실생활 상황을 수학적으로 모델링하는 능력은 거의 없습니다. 더 중요한 것은 AI 자체가 수학(미적분, 선형대수)으로 만들어졌다는 사실입니다. 수학을 모르면 AI를 사용만 할 뿐 이해하거나 개선하지 못합니다.</p>
+                    </div>
+                </div>
+                <!-- Q&A 2 -->
+                <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-fade-in">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-lg font-semibold text-gray-100">Q2. 코딩을 잘하면 AI 분야에서 성공할 수 있지 않나요?</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>A: 코딩은 필요조건이지만 충분조건이 아닙니다. 구글 딥마인드의 채용 공고는 "필수: 선형대수, 미적분, 확률론 / 우대: 파이썬 경험"입니다. 샘 올트먼은 "오픈에이아이 채용에서 가장 중요한 자질은 수학적 직관"이라고 말했습니다. AI 프레임워크는 계속 변하지만, 그 근간이 되는 수학 원리는 변하지 않습니다.</p>
+                    </div>
+                </div>
+                <!-- Q&A 3 (나머지 Q&A는 동일한 패턴으로 추가) -->
+                 <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-fade-in">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-lg font-semibold text-gray-100">Q3. 수학이 어려워서 AI 분야를 포기해야 할까요?</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>A: 수학이 어렵게 느껴지는 것은 대부분 '왜 배우는지' 몰라서입니다. 충북교육청의 '인공지능 수학' 사례처럼, 수학이 AI에 어떻게 쓰이는지 알면 흥미가 생깁니다. AI 수학은 처음부터 높은 수준이 필요하지 않으며, 중학교 수학만으로도 선형회귀 등을 이해할 수 있습니다. 핵심은 수학적 사고방식입니다.</p>
+                    </div>
+                </div>
+                 <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-fade-in">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-lg font-semibold text-gray-100">Q5. 심화 수학을 배우지 않으면 정말 불리한가요?</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>A: 대학 이공계, 특히 AI 전공에서는 확실히 불리합니다. KAIST와 서울대 입학생 67%가 "고교 때 심화 수학을 배우지 않아 대학 수업 적응에 어려움을 겪었다"고 답했습니다. 미적분II와 기하 없이는 대학의 다변수 미적분, 벡터 미적분을 따라가기 어렵습니다. 나중에 메울 수 있지만, 전공 공부와 병행하는 것은 부담이 큽니다.</p>
+                    </div>
+                </div>
+                 <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-fade-in">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-lg font-semibold text-gray-100">Q9. 대학에서 수학과를 가야 AI를 잘할 수 있나요?</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>A: 꼭 그런 것은 아니지만, 매우 유리합니다. 2025년 MIT 보고서에 따르면 AI 최고 성과자의 47%가 수학/통계학 전공, 32%가 물리학/공학, 15%가 컴공 출신입니다. 새로운 알고리즘의 수렴성을 증명하고 복잡도를 분석하는 등 연구의 기초가 수학이기 때문입니다. 가장 이상적인 것은 '수학-AI 융합 트랙'입니다.</p>
+                    </div>
+                </div>
+                 <div class="accordion-item bg-gray-900 rounded-lg shadow-lg border border-gray-700 animate-on-scroll animate-fade-in">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-lg font-semibold text-gray-100">Q10. 수학을 잘하면 AI 외에 다른 분야에서도 유리한가요?</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg prose-custom">
+                        <p>A: 당연합니다. 수학은 금융(파생상품, 리스크 관리), 생명과학(유전자 분석), 경제학(게임 이론) 등 모든 분야의 범용 도구입니다. 2024년 WEF '미래 직업 보고서'는 "수학적 추론 능력"을 2030년 가장 중요한 역량 2위로 선정했습니다. 수학 전공자의 임금은 최상위권이며 실업률은 최하위권입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. 결론 -->
+        <section class="mt-24 text-center animate-on-scroll animate-fade-in">
+            <h2 class="text-3xl font-bold mb-6 gradient-text-vibrant">💡 의사 결정을 위한 인사이트!</h2>
+            <p class="text-xl max-w-4xl mx-auto text-gray-200 leading-relaxed">
+                AI 시대의 핵심 역설은 기계가 인간을 대체할수록, 기계를 이해하고 설계할 수학적 사고는 더욱 희소하고 귀한 역량이 된다는 것입니다. 코딩은 AI가 자동화하지만, 문제를 수학적으로 정식화하고 최적 알고리즘을 선택하는 판단은 여전히 인간의 몫입니다. 심화 수학은 선택이 아니라 생존 전략이며, 수학적 사고는 AI 시대를 항해할 나침반입니다.
+            </p>
+        </section>
+    </div>
+
+    <script>
+        (function() {
+            // --- 차트 생성 로직 ---
+            const createCharts = () => {
+                // 차트 1: PISA
+                const pisaCtx = document.getElementById('pisaChart');
+                if (pisaCtx) {
+                    new Chart(pisaCtx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['수학 성적 (순위)', '수학 즐거움 (순위)'],
+                            datasets: [{
+                                label: '한국 학생 PISA 2023 성적 vs 즐거움 (46개국 중)',
+                                data: [3, 42],
+                                backgroundColor: ['#3B82F6', '#EC4899'],
+                                borderColor: ['#60A5FA', '#F472B6'],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    max: 50,
+                                    ticks: { color: '#9CA3AF' },
+                                    grid: { color: '#374151' }
+                                },
+                                y: { ticks: { color: '#D1D5DB', font: { size: 14 } } }
+                            }
+                        }
+                    });
+                }
+
+                // 차트 2: MIT
+                const mitCtx = document.getElementById('mitChart');
+                if (mitCtx) {
+                    new Chart(mitCtx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['수학/물리학 등 기초과학', '순수 컴퓨터공학'],
+                            datasets: [{
+                                data: [94, 6],
+                                backgroundColor: ['#8B5CF6', '#4B5563'],
+                                borderColor: ['#111827'],
+                                borderWidth: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: '#D1D5DB' } }
+                            }
+                        }
+                    });
+                }
+                
+                // 차트 3: KAIST/서울대
+                const kaistCtx = document.getElementById('kaistChart');
+                if (kaistCtx) {
+                     new Chart(kaistCtx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['적응에 어려움', '어려움 없음'],
+                            datasets: [{
+                                data: [67, 33],
+                                backgroundColor: ['#EF4444', '#4B5563'],
+                                borderColor: ['#111827'],
+                                borderWidth: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: '#D1D5DB' } }
+                            }
+                        }
+                    });
+                }
+            };
+
+            // --- 아코디언 스크립트 ---
+            const setupAccordion = () => {
+                document.querySelectorAll('.accordion-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const content = button.nextElementSibling;
+                        const icon = button.querySelector('svg');
+                        const isOpening = content.style.display !== 'block';
+                        
+                        // 모든 아코디언 닫기
+                        document.querySelectorAll('.accordion-content').forEach(c => {
+                            if (c !== content) {
+                                c.style.display = 'none';
+                                c.previousElementSibling.querySelector('svg').style.transform = 'rotate(0deg)';
+                            }
+                        });
+
+                        if (isOpening) {
+                            content.style.display = 'block';
+                            icon.style.transform = 'rotate(180deg)';
+                        } else {
+                            content.style.display = 'none';
+                            icon.style.transform = 'rotate(0deg)';
+                        }
+                    });
+                });
+            };
+
+            // --- 스크롤 애니메이션 (Intersection Observer) ---
+            const setupScrollAnimation = () => {
+                const animatedElements = document.querySelectorAll('.animate-on-scroll');
+                
+                if ("IntersectionObserver" in window) {
+                    const observer = new IntersectionObserver((entries, observer) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('is-visible');
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, { threshold: 0.1 }); // 10% 보일 때 애니메이션
+
+                    animatedElements.forEach(el => observer.observe(el));
+                } else {
+                    // IntersectionObserver 미지원 브라우저 (예: IE)
+                    animatedElements.forEach(el => el.classList.add('is-visible'));
+                }
+            };
+            
+            // --- MathJax 로딩 실패 폴백 타이머 ---
+            const setupMathJaxFallback = () => {
+                setTimeout(() => {
+                    if (document.body.classList.contains('mathjax-loading')) {
+                        console.warn('MathJax load timed out or failed. Forcing display.');
+                        document.body.classList.remove('mathjax-loading');
+                    }
+                }, 3000); // 3초 대기
+            };
+
+            // --- 모든 스크립트 실행 ---
+            // DOM이 준비된 후 차트와 애니메이션 설정
+            document.addEventListener('DOMContentLoaded', () => {
+                createCharts();
+                setupAccordion();
+                setupScrollAnimation();
+                setupMathJaxFallback();
+            });
+
+        })();
+    </script>
+</body>
+</html>
