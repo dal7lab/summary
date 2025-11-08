@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1장. 100만 원이라는 질문: 인터랙티브 인포그래픽</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 커스텀 스타일 */
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #0F172A; /* bg-slate-900 */
+            color: #E2E8F0; /* text-slate-200 */
+        }
+        
+        /* 헤더의 그라데이션 텍스트 */
+        .gradient-text {
+            background: linear-gradient(to right, #22D3EE, #A5B4FC); /* cyan-400 to indigo-300 */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 스크롤 기반 애니메이션용 클래스 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 탭 버튼 스타일 */
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: 2px solid #334155; /* border-slate-700 */
+            background-color: #1E293B; /* bg-slate-800 */
+            color: #94A3B8; /* text-slate-400 */
+        }
+
+        .tab-btn.active {
+            background-color: #0E7490; /* bg-cyan-700 */
+            border-color: #0E7490;
+            color: #FFFFFF;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background-color: #334155; /* bg-slate-700 */
+        }
+
+        /* 탭 컨텐츠 */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 모달 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #1E293B; /* bg-slate-800 */
+            padding: 2rem;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 600px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+
+        /* 핫스팟 (클릭 가능한 용어) */
+        .hotspot {
+            color: #22D3EE; /* text-cyan-400 */
+            cursor: pointer;
+            font-weight: 700;
+            border-bottom: 2px dashed #22D3EE;
+        }
+        
+        .hotspot:hover {
+            color: #67E8F9; /* text-cyan-300 */
+        }
+
+        /* 결과 스탬프 */
+        .stamp {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 3rem;
+            font-weight: 900;
+            padding: 1rem 2rem;
+            border: 5px solid;
+            border-radius: 0.5rem;
+            opacity: 0.3;
+            text-transform: uppercase;
+        }
+        
+        .stamp-fail {
+            color: #F43F5E; /* text-rose-500 */
+            border-color: #F43F5E;
+        }
+        
+        .stamp-success {
+            color: #10B981; /* text-emerald-500 */
+            border-color: #10B981;
+        }
+
+        /* 외부 링크 스타일 */
+        a.external-link {
+            color: #5EEAD4; /* text-teal-300 */
+            text-decoration: none;
+            border-bottom: 1px dotted #5EEAD4;
+            transition: color 0.3s ease;
+        }
+        a.external-link:hover {
+            color: #99F6E4; /* text-teal-200 */
+        }
+
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200">
+
+    <!-- 모달 창 -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal-content relative">
+            <button id="modal-close" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl">&times;</button>
+            <h3 id="modal-title" class="text-2xl font-bold text-white mb-4"></h3>
+            <p id="modal-description" class="text-lg text-slate-300"></p>
+        </div>
+    </div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="container max-w-4xl mx-auto p-4 md:p-12">
+
+        <!-- 1장. 100만 원이라는 질문 -->
+        <header class="text-center my-12 md:my-20">
+            <h1 class="text-4xl md:text-6xl font-black gradient-text mb-4">1장. 100만 원이라는 질문</h1>
+            <p class="text-xl md:text-2xl text-slate-300">경제학, 교실의 문을 열다</p>
+        </header>
+
+        <!-- 1장 1절. Part 1 -->
+        <section class="mb-20 fade-in">
+            <h2 class="text-3xl font-bold text-white mb-6">100만 원의 두 가지 선택지</h2>
+            
+            <div class="bg-slate-800 p-6 md:p-8 rounded-lg shadow-xl mb-8">
+                <p class="text-2xl md:text-3xl font-bold text-center text-cyan-300">
+                    "여기 100만 원이 있다."
+                </p>
+                <p class="text-lg text-center text-slate-300 mt-2">이 돈을 어디에 쓰시겠습니까?</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <!-- 선택지 1: 사교육비 -->
+                <div class="bg-slate-800 p-6 rounded-lg border-2 border-slate-700 text-center fade-in">
+                    <div class="text-5xl mb-4">📚</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">선택 ①: 사교육비</h3>
+                    <p class="text-lg text-cyan-400 font-bold">'기술(How)'을 구매한다</p>
+                    <p class="text-slate-300 mt-3">검증된 강사에게 아이의 '시간'과 '노력'을 위탁하는 '거래'.</p>
+                </div>
+                <!-- 선택지 2: 보상금 -->
+                <div class="bg-slate-800 p-6 rounded-lg border-2 border-slate-700 text-center fade-in" style="transition-delay: 200ms;">
+                    <div class="text-5xl mb-4">🏆</div>
+                    <h3 class="text-2xl font-bold text-white mb-2">선택 ②: 보상금</h3>
+                    <p class="text-lg text-cyan-400 font-bold">'동기(Why)'를 자극한다</p>
+                    <p class="text-slate-300 mt-3">"평균 90점 넘기면 이 돈은 네 것." '성과'에 대한 '보상'을 약속.</p>
+                </div>
+            </div>
+
+            <p class="text-lg text-slate-300 leading-relaxed mb-6">
+                이 질문은 더 이상 탁상공론이 아닙니다. 2024년 대한민국의 연간 사교육비 총액은...
+            </p>
+            
+            <div class="text-center bg-slate-800 p-8 rounded-lg shadow-xl fade-in">
+                <p class="text-2xl text-slate-400 mb-2">연간 사교육비 총액</p>
+                <div class="text-7xl font-black text-white">
+                    <span data-target="29.2" class="counter">0</span>조 2천억 원
+                </div>
+                <p class="text-xl text-slate-400 mt-4">
+                    학생 10명 중 <span class="text-cyan-300 font-bold text-2xl">8명</span> (80.0%) 참여
+                </p>
+                <p class="text-sm mt-4 text-slate-500">
+                    (출처: 
+                    <a href="https://www.google.com/search?q=https://eiec.kdi.rekr/policy/materialView.do%3Fnum%3D264250" target="_blank" class="external-link">2024년 초중고사교육비조사 결과</a>, 
+                    <a href="https://www.index.go.kr/unity/potal/main/EachDtlPageDetail.do?idx_cd=2697" target="_blank" class="external-link">지표누리</a>)
+                </p>
+            </div>
+            
+            <p class="text-lg text-slate-300 leading-relaxed my-8">
+                29조 2천억 원의 돈은, 부모들이 압도적으로 '첫 번째 선택지(사교육비)'를 택했음을 보여주는 실물 증거입니다. 이 선택은 '희망'보다는 <span class="text-rose-400 font-bold">'불안'</span>에 기반합니다.
+            </p>
+
+            <!-- 소득별 사교육비 지출 -->
+            <div class="bg-slate-800 p-6 md:p-8 rounded-lg shadow-xl mb-8 fade-in">
+                <h3 class="text-xl font-bold text-white text-center mb-6">가구 소득별 월평균 사교육비 (학생 1인당)</h3>
+                <div class="flex items-end justify-center space-x-8">
+                    <div class="text-center">
+                        <div class="bg-cyan-600 rounded-t-lg mx-auto" style="height: 250px; width: 80px;"></div>
+                        <p class="text-2xl font-bold text-white mt-2">67만 6천 원</p>
+                        <p class="text-slate-400">상위 20%</p>
+                        <p class="text-slate-500 text-sm">(월 800만 원 이상)</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-cyan-800 rounded-t-lg mx-auto" style="height: 76px; width: 80px;"></div>
+                        <p class="text-2xl font-bold text-white mt-2">20만 5천 원</p>
+                        <p class="text-slate-400">하위 20%</p>
+                        <p class="text-slate-500 text-sm">(월 300만 원 미만)</p>
+                    </div>
+                </div>
+                <p class="text-sm text-center mt-4 text-slate-500">
+                    (출처: <a href="https://www.index.go.kr/unify/idx-info.do?idxCd=4244" target="_blank" class="external-link">지표누리</a>)
+                </p>
+            </div>
+
+            <p class="text-lg text-slate-300 leading-relaxed my-8">
+                만약 '두 번째 선택지', 즉 100만 원의 '보상금'이 더 적은 비용으로 더 확실하게 아이의 '동기'를 끌어낼 수 있다면 어떨까요? 이 도발적인 질문을 검증하기 위해, 인류 역사상 가장 거대한 교육 실험을 설계한 경제학자가 있습니다.
+            </p>
+            
+            <div class="bg-slate-800 p-8 rounded-lg shadow-xl text-center fade-in">
+                <p class="text-xl text-slate-300">하버드 천재 경제학자</p>
+                <h3 class="text-4xl font-black text-white my-2">롤랜드 프라이어 주니어</h3>
+                <p class="text-lg text-slate-400">(Roland G. Fryer Jr.)</p>
+                <p class="text-md text-slate-500 mt-4">"그에게 교육은 신성한 영역이 아니었다.<br>그것은 '인센티브'가 뒤엉킨, 가장 복잡하고 비효율적인 '시장'이었다."</p>
+            </div>
+        </section>
+
+        <!-- 1장 1절. Part 2 - A/B 테스트 (학생) -->
+        <section class="mb-20 fade-in">
+            <h2 class="text-3xl font-bold text-white mb-6">A/B 테스트: '학생'에게 돈을 걸다</h2>
+            <p class="text-lg text-slate-300 leading-relaxed mb-8">
+                프라이어는 '100만 원의 질문'을 두 개의 거대한 실험 모델로 나누어, 무엇이 '성적'이라는 최종 산출물을 바꾸는지 정밀하게 측정했습니다.
+            </p>
+
+            <!-- 탭 버튼 -->
+            <div class="flex space-x-4 mb-6" id="student-tabs">
+                <button class="tab-btn active" data-target="tab-output">모델 A: '결과물(Output)' 인센티브</button>
+                <button class="tab-btn" data-target="tab-input">모델 B: '투입물(Input)' 인센티브</button>
+            </div>
+
+            <!-- 탭 컨텐츠 -->
+            <div class_ ="relative">
+                <!-- 모델 A: 결과물 -->
+                <div id="tab-output" class="tab-content active bg-slate-800 p-8 rounded-lg border-l-4 border-cyan-500">
+                    <h3 class="text-2xl font-bold text-white mb-3">모델 A: '결과물(Output)' 인센티브</h3>
+                    <p class="text-lg text-slate-300 mb-4">(≒ '100만 원의 성적 보상금')</p>
+                    <ul class="list-disc list-inside text-lg text-slate-300 space-y-2">
+                        <li><strong>실험 도시:</strong> 시카고 (9학년 대상)</li>
+                        <li><strong>보상 대상:</strong> <strong>'성적표'</strong> (A, B, C 등급)</li>
+                        <li><strong>거래:</strong> "학기 말에 너의 '성적표'를 가져오면 '현금'을 지급하겠다."</li>
+                        <li><strong>가정:</strong> 학생은 '방법(How)'을 알고, '동기(Why)'가 부족하다.</li>
+                    </ul>
+                    <div class="relative h-48 mt-6">
+                        <div class="stamp stamp-fail">FAIL</div>
+                    </div>
+                </div>
+
+                <!-- 모델 B: 투입물 -->
+                <div id="tab-input" class="tab-content bg-slate-800 p-8 rounded-lg border-l-4 border-emerald-500">
+                    <h3 class="text-2xl font-bold text-white mb-3">모델 B: '투입물(Input)' 인센티브</h3>
+                    <p class="text-lg text-slate-300 mb-4">(≒ '100만 원의 사교육비')</p>
+                    <ul class="list-disc list-inside text-lg text-slate-300 space-y-2">
+                        <li><strong>실험 도시:</strong> 댈러스 (2학년), 뉴욕 (4, 7학년)</li>
+                        <li><strong>보상 대상:</strong> <strong>'행동'</strong> (책 읽기, 숙제, 출석 등)</li>
+                        <li><strong>거래:</strong> "책 한 권 읽고 퀴즈 통과하면, '즉시 2달러'를 주겠다."</li>
+                        <li><strong>가정:</strong> 학생은 '방법(How)'을 모르므로, '과정'을 유도해야 한다.</li>
+                    </ul>
+                    <div class="relative h-48 mt-6">
+                        <div class="stamp stamp-success">SUCCESS</div>
+                        <p class="absolute bottom-0 right-0 text-sm text-slate-400">(단기적 성과)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1장 1절. Part 3 - 진단 -->
+        <section class="mb-20 fade-in">
+            <h2 class="text-3xl font-bold text-white mb-6">실패와 성공의 이유: '생산 함수'의 부재</h2>
+            <p class="text-lg text-slate-300 leading-relaxed mb-8">
+                왜 똑같은 '돈'이 시카고에서는 작동하지 않고, 댈러스에서는 작동했을까요? 프라이어의 진단은 간결했습니다. "학생들은 
+                <span class="hotspot" data-title="교육 생산 함수 (Educational Production Function)" 
+                      data-description="경제학에서 '투입물(Input)'을 '산출물(Output)'로 변환시키는 '기술' 혹은 '공정 지도'를 의미합니다. 교육에서는 '노력'과 '시간'이라는 투입물을 '성적'이라는 산출물로 바꾸는 '기술', 즉 '공부하는 방법'을 뜻합니다.">
+                    '교육 생산 함수'
+                </span>
+                를 모른다."
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 시카고의 실패 -->
+                <div class="bg-slate-800 p-8 rounded-lg shadow-xl fade-in border-b-4 border-rose-500">
+                    <h3 class="text-2xl font-bold text-white mb-4">시카고 9학년의 비극 (결과물 모델)</h3>
+                    <p class="text-lg text-slate-300 mb-6">
+                        '좋은 성적'도, '50달러 보상'도 원했지만, '노력'을 '성적'으로 바꾸는 <span class="text-rose-400 font-bold">'방법(기술)'</span>을 9년간 배우지 못했습니다.
+                    </p>
+                    <div class="text-center font-bold text-lg p-4 bg-slate-900 rounded-lg">
+                        <span class="text-slate-400">노력/시간</span>
+                        <span class="text-3xl mx-4">→</span>
+                        <span class="text-rose-500 text-3xl">❓</span>
+                        <span class="text-3xl mx-4">→</span>
+                        <span class="text-slate-400">성적</span>
+                    </div>
+                    <p class="text-center text-rose-400 font-bold mt-4 text-xl">'기술'이 없는 공허한 약속</p>
+                </div>
+
+                <!-- 댈러스의 성공 -->
+                <div class="bg-slate-800 p-8 rounded-lg shadow-xl fade-in border-b-4 border-emerald-500" style="transition-delay: 200ms;">
+                    <h3 class="text-2xl font-bold text-white mb-4">댈러스 2학년의 성공 (투입물 모델)</h3>
+                    <p class="text-lg text-slate-300 mb-6">
+                        '성적'이라는 막연한 '결과' 대신, '책 읽기'라는 '생산 함수'의 첫 단계를 구체적으로 제시하고, 그 <span class="text-emerald-400 font-bold">'행동'</span> 자체를 2달러로 구매했습니다.
+                    </p>
+                    <div class="text-center font-bold text-lg p-4 bg-slate-900 rounded-lg">
+                        <span class="text-emerald-400">책 읽기 ($2)</span>
+                        <span class="text-3xl mx-4">→</span>
+                        <span class="text-emerald-400">📖</span>
+                        <span class="text-3xl mx-4">→</span>
+                        <span class="text-emerald-400">읽기 능력 향상</span>
+                    </div>
+                    <p class="text-center text-emerald-400 font-bold mt-4 text-xl">'행동'을 구매하는 명확한 거래</p>
+                </div>
+            </div>
+
+            <p class="text-lg text-slate-300 leading-relaxed my-8">
+                이것이 바로 '100만 원의 사교육비'가 작동하는 핵심 원리입니다. 29조 2천억 원의 학부모들은 '성적'이 아니라, '어떻게' 공부해야 하는지에 대한 <span class="text-cyan-300 font-bold">'기술(How)'</span>과 그 '시스템(System)'을 구매하는 것입니다.
+            </p>
+        </section>
+
+        <!-- 1장 1절. Part 4 - 딜레마 -->
+        <section class="mb-20 fade-in">
+            <h2 class="text-3xl font-bold text-white mb-6">독이 든 사과: 내재적 동기의 파괴</h2>
+            <p class="text-lg text-slate-300 leading-relaxed mb-8">
+                하지만 이 '기술적 승리'는 어두운 질문을 남깁니다. 2달러를 받고 책을 읽은 아이는, '책 읽는 즐거움'을 배운 것일까요, 아니면 '책 읽기라는 노동의 대가는 2달러'임을 배운 것일까요?
+            </p>
+
+            <div class="bg-slate-800 p-8 rounded-lg shadow-xl fade-in">
+                <h3 class="text-2xl font-bold text-white text-center mb-6">밀어내기 효과 (Crowding-Out Effect)</h3>
+                <p class="text-lg text-slate-300 text-center mb-8">
+                    '돈'이라는 '외재적 동기'가 개입하는 순간, '호기심', '즐거움' 같은 '내재적 동기'가 자라날 토양을 황폐하게 만듭니다. (마이클 샌델)
+                </p>
+                
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+                    <!-- 내재적 동기 -->
+                    <div class="text-center p-6 border-2 border-slate-700 rounded-lg w-full md:w-2/5">
+                        <div class="text-5xl mb-3">❤️</div>
+                        <h4 class="text-xl font-bold text-white">내재적 동기 (Intrinsic)</h4>
+                        <p class="text-lg text-slate-300">즐거움, 호기심, 성취감</p>
+                        <p class="text-lg text-slate-400 mt-2">"책이 재미있어서 읽는다"</p>
+                    </div>
+                    
+                    <!-- 밀어내기 효과 -->
+                    <div class="text-5xl text-rose-500 font-black hidden md:block">
+                        →
+                    </div>
+                     <div class="text-5xl text-rose-500 font-black md:hidden">
+                        ↓
+                    </div>
+                    
+                    <!-- 외재적 동기 -->
+                    <div class="text-center p-6 border-2 border-cyan-500 rounded-lg w-full md:w-2/5 bg-slate-900 shadow-lg">
+                        <div class="text-5xl mb-3">💰</div>
+                        <h4 class="text-xl font-bold text-white">외재적 동기 (Extrinsic)</h4>
+                        <p class="text-lg text-cyan-300">돈, 보상 ($2)</p>
+                        <p class="text-lg text-slate-400 mt-2">"2달러를 벌기 위해 읽는다"</p>
+                    </div>
+                </div>
+                
+                <p class="text-center text-rose-400 font-bold text-xl mt-8">
+                    '기술(How)'은 성공했지만, '연료(Why)'는 불타버렸다.
+                </p>
+            </div>
+            
+            <p class="text-lg text-slate-300 leading-relaxed my-8">
+                '수요자(학생)'에게 직접 돈을 거는 방식은, 기술이 없어서 실패하거나, 영혼이 타락해서 실패했습니다. 이 지점에서 롤랜드 프라이어의 시선은 '공급자(교사)'에게로 향합니다.
+            </p>
+        </section>
+
+        <!-- 1장 2절. Part 1 & 2 - 교사 인센티브 -->
+        <section class="mb-20 fade-in">
+            <h2 class="text-3xl font-bold text-white mb-6">1장 2절. 공급자 인센티브: '교사'에게 돈을 걸다</h2>
+            <p class="text-lg text-slate-300 leading-relaxed mb-8">
+                '수요자'가 '생산 함수'를 모른다면, 애초에 그 '함수'를 가르쳐야 할 '교사'에게 문제가 있었던 것은 아닐까요? 이 가설을 검증하기 위해, 프라이어와 마이클 블룸버그 뉴욕시장은 역사상 가장 거대한 '교사 성과급' 실험을 시작합니다.
+            </p>
+            
+            <div class="text-center bg-slate-800 p-8 rounded-lg shadow-xl mb-12 fade-in">
+                <p class="text-2xl text-slate-400 mb-2">뉴욕시 교사 인센티브 프로그램 (2007-2010)</p>
+                <div class="text-7xl font-black text-white">
+                    $<span data-target="75" class="counter">0</span>00만 달러
+                </div>
+                <p class="text-xl text-slate-400 mt-4">
+                    200개 학교, <span class="text-cyan-300 font-bold text-2xl">2만 명</span>의 교사 대상
+                </p>
+                <p class="text-lg text-slate-300 mt-4">
+                    <strong>실험:</strong> 학생들의 '시험 성적(결과물)' 향상 목표 달성 시, 교사 1인당 평균 <span class="text-cyan-300">$3,000</span> 보너스 지급
+                </p>
+            </div>
+
+            <h3 class="text-3xl font-bold text-white mb-6 text-center">...그리고 3년 뒤, 그 결과는?</h3>
+            
+            <div class="relative bg-slate-800 p-8 rounded-lg shadow-xl mb-8 fade-in">
+                <div class="text-center">
+                    <h4 class="text-2xl font-bold text-white mb-4">참혹하고도 완벽한 실패</h4>
+                    <p class="text-lg text-slate-300 leading-relaxed">
+                        7,500만 달러는 학생들의 학업 성취도를 <span class="text-rose-400 font-bold">"전혀 향상시키지 못했다(did not increase student achievement at all)."</span> 심지어 어떤 면에서는 성취도가 '하락'했다.
+                    </p>
+                    <p class="text-sm mt-4 text-slate-500">
+                        (출처: <a href="https://www.google.com/search?q=https://www.ber.org/system/files/working_papers/w16850/w16850.pdf" target="_blank" class="external-link">NBER w16850</a>, 
+                        <a href="https://www.chalkbeat.org/newyork/2011/3/7/21087847/study-75m-teacher-pay-initiative-did-not-improve-achievement/" target="_blank" class="external-link">Chalkbeat</a>)
+                    </p>
+                </div>
+                <div class="relative h-48 mt-6">
+                    <div class="stamp stamp-fail">Total Fail</div>
+                </div>
+            </div>
+
+            <h3 class="text-3xl font-bold text-white mb-6">왜 $7,500만 달러는 증발했는가?</h3>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 실패 원인 1: 복잡성 -->
+                <div class="bg-slate-800 p-8 rounded-lg shadow-xl fade-in border-b-4 border-rose-500">
+                    <h3 class="text-2xl font-bold text-white mb-4">① '복잡성'의 안개</h3>
+                    <p class="text-lg text-slate-300 mb-6">
+                        보너스 공식(VAM 모델)이 너무 복잡해, 교사들은 "나의 '어떤 노력'이 '얼마의 보상'으로 연결되는지" 그 인과관계를 전혀 알 수 없었습니다.
+                    </p>
+                    <div class="text-center font-mono text-sm p-4 bg-slate-900 rounded-lg text-rose-400 overflow-x-auto">
+                        (VAM<sub>it</sub> * α) / (NCLB<sub>t-1</sub> - Σ(p)) = $?
+                    </div>
+                </div>
+
+                <!-- 실패 원인 2: 희석 -->
+                <div class="bg-slate-800 p-8 rounded-lg shadow-xl fade-in border-b-4 border-rose-500" style="transition-delay: 200ms;">
+                    <h3 class="text-2xl font-bold text-white mb-4">② '희석'된 당근</h3>
+                    <p class="text-lg text-slate-300 mb-6">
+                        '개인'이 아닌 '학교(집단)' 단위의 보상. 보너스는 성과와 상관없이 '균등 분배'되었습니다. '무임승차자 문제'가 발생한 것입니다.
+                    </p>
+                    <div class="text-center font-bold text-lg p-4 bg-slate-900 rounded-lg flex justify-around items-center">
+                        <span class="text-2xl">👨‍🏫</span>
+                        <span class="text-2xl">👩‍🏫</span>
+                        <span class="text-2xl text-slate-500">👨‍🏫</span>
+                        <span class="text-3xl mx-2">→</span>
+                        <span class="text-2xl">💰</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1장 2절. Part 3 & 4 - 행동 경제학 -->
+        <section class="mb-20 fade-in">
+            <h2 class="text-3xl font-bold text-white mb-6">실패의 해답: '손실 회피'라는 교활한 설계</h2>
+            <p class="text-lg text-slate-300 leading-relaxed mb-8">
+                고전 경제학이 실패하자, 프라이어는 '행동 경제학'으로 눈을 돌립니다. 특히 "사람은 '얻는' 기쁨보다 '잃는' 고통을 2배 이상 강하게 느낀다"는 
+                <span class="hotspot" data-title="손실 회피 (Loss Aversion)" 
+                      data-description="행동 경제학의 핵심 개념. 사람들은 동일한 양이라도 이득(Gain)에서 오는 기쁨보다 손실(Loss)에서 오는 고통을 훨씬 더 크게, 그리고 회피하려 한다는 심리적 특성을 말합니다. (대니얼 카너먼)">
+                    '손실 회피(Loss Aversion)'
+                </span>
+                이론에 주목했습니다.
+            </p>
+
+            <div class="bg-slate-800 p-8 rounded-lg shadow-xl mb-12 text-center fade-in">
+                <div class="text-5xl mb-4">⚖️</div>
+                <h3 class="text-2xl font-bold text-white mb-6">기쁨 vs 고통 (전망 이론)</h3>
+                <div class="flex items-center justify-center space-x-8">
+                    <div class="text-center p-4">
+                        <p class="text-2xl font-bold text-emerald-400">+ 100만 원 (이득)</p>
+                        <p class="text-lg text-slate-300">기쁨 (x 1)</p>
+                    </div>
+                    <div class="text-center p-4">
+                        <p class="text-2xl font-bold text-rose-400">- 100만 원 (손실)</p>
+                        <p class="text-lg text-slate-300">고통 (x 2.0 ~ 2.5)</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-lg text-slate-300 leading-relaxed mb-8">
+                프라이어는 똑같은 8,000달러의 보너스를, 완전히 다른 '심리적 프레임'으로 제안하는 새로운 A/B 테스트를 설계합니다.
+            </p>
+            
+            <!-- 탭 버튼 -->
+            <div class="flex space-x-4 mb-6" id="teacher-tabs">
+                <button class="tab-btn active" data-target="tab-gain">모델 C: '이득 프레임' (Gain)</button>
+                <button class="tab-btn" data-target="tab-loss">모델 D: '손실 프레임' (Loss)</button>
+            </div>
+
+            <!-- 탭 컨텐츠 -->
+            <div class_ ="relative">
+                <!-- 모델 C: 이득 프레임 -->
+                <div id="tab-gain" class="tab-content active bg-slate-800 p-8 rounded-lg border-l-4 border-cyan-500">
+                    <h3 class="text-2xl font-bold text-white mb-3">모델 C: '이득 프레임' (Gain Frame)</h3>
+                    <p class="text-lg text-slate-300 mb-4">(≒ 7,500만 달러 뉴욕 실험)</p>
+                    <ul class="list-disc list-inside text-lg text-slate-300 space-y-2">
+                        <li><strong>핵심 메시지:</strong> "성과를 내면, '나중에' 돈을 <strong>얻을</strong> 것이다."</li>
+                        <li><strong>심리 기제:</strong> 희망 (Hope), 미래의 이득</li>
+                        <li><strong>결과:</strong> <span class="font-bold text-rose-400">실패 (성적 변화 없음)</span></li>
+                    </ul>
+                    <div class="relative h-48 mt-6">
+                        <div class="stamp stamp-fail">FAIL</div>
+                    </div>
+                </div>
+
+                <!-- 모델 D: 손실 프레임 -->
+                <div id="tab-loss" class="tab-content bg-slate-800 p-8 rounded-lg border-l-4 border-emerald-500">
+                    <h3 class="text-2xl font-bold text-white mb-3">모델 D: '손실 프레임' (Loss Frame)</h3>
+                    <p class="text-lg text-slate-300 mb-4">(≒ '100만 원 사교육비'의 공포 심리)</p>
+                    <ul class="list-disc list-inside text-lg text-slate-300 space-y-2">
+                        <li><strong>핵심 메시지:</strong> "'지금 당장' $8,000을 선지급했다. 성과 못 내면 <strong>반납(잃는다)</strong>."</li>
+                        <li><strong>심리 기제:</strong> 공포 (Fear), 현재의 손실 회피</li>
+                        <li><strong>결과:</strong> <span class="font-bold text-emerald-400">성공 (성적 대폭 향상)</span></li>
+                    </ul>
+                    <div class="relative h-48 mt-6">
+                        <div class="stamp stamp-success">SUCCESS</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1장. 결론 -->
+        <section class="mb-20 fade-in">
+            <h2 class="text-3xl font-bold text-white mb-6">1장의 결론: 공포는 희망보다 강력하다</h2>
+            <p class="text-lg text-slate-300 leading-relaxed mb-8">
+                경제학적으로는 동일한 8,000달러였지만, '심리적 프레임' 하나가 모든 차이를 만들었습니다. '미래의 100만 원(이득)'은 인간을 움직이지 못했지만, '현재의 100만 원을 잃을 공포(손실)'는 인간을 움직였습니다.
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <!-- 보상금의 실패 -->
+                <div class="bg-slate-800 p-8 rounded-lg shadow-xl fade-in border-b-4 border-rose-500">
+                    <h3 class="text-2xl font-bold text-white mb-4">'100만 원 보상금'이 실패하는 이유</h3>
+                    <p class="text-lg text-slate-300">
+                        인간의 동기를 자극하는 데 가장 비효율적인 방식인 <span class="text-rose-400 font-bold">'이득 프레임(Gain)'</span>이기 때문입니다. "하면 좋다"는 희망일 뿐, 절박함을 주지 못합니다.
+                    </p>
+                </div>
+
+                <!-- 사교육비의 성공 -->
+                <div class="bg-slate-800 p-8 rounded-lg shadow-xl fade-in border-b-4 border-emerald-500" style="transition-delay: 200ms;">
+                    <h3 class="text-2xl font-bold text-white mb-4">'100만 원 사교육비'가 성공하는 이유</h3>
+                    <p class="text-lg text-slate-300">
+                        가장 강력한 <span class="text-emerald-400 font-bold">'손실 프레임(Loss)'</span>으로 작동하기 때문입니다. 학원가는 '희망'이 아니라 "하지 않으면 '잃는다'"는 <span class="text-emerald-400 font-bold">'공포'</span>를 팝니다.
+                    </p>
+                </div>
+            </div>
+            
+            <p class="text-xl text-center text-slate-300 leading-relaxed my-12">
+                대한민국의 29조 2천억 원 시장은, '낙오의 공포'라는 '손실 회피'의 방아쇠에 정확히 반응한, 어쩌면 가장 <span class="text-cyan-300 font-bold">'합리적인'</span> 선택이었던 것입니다.
+            </p>
+
+            <!-- 최종 요약 테이블 -->
+            <div class="bg-slate-800 p-4 md:p-8 rounded-lg shadow-xl mb-12 fade-in overflow-x-auto">
+                <h3 class="text-2xl font-bold text-white mb-6 text-center">[1장. '인센티브' 실험 최종 요약]</h3>
+                <table class="w-full min-w-max text-left border-collapse">
+                    <thead>
+                        <tr class="border-b-2 border-slate-600">
+                            <th class="p-3 text-sm font-bold text-slate-300">실험 주체</th>
+                            <th class="p-3 text-sm font-bold text-slate-300">모델</th>
+                            <th class="p-3 text-sm font-bold text-slate-300">유사 질문</th>
+                            <th class="p-3 text-sm font-bold text-slate-300">결과</th>
+                            <th class="p-3 text-sm font-bold text-slate-300">원인 / 한계</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 학생 -->
+                        <tr class="border-b border-slate-700">
+                            <td rowspan="2" class="p-3 align-top font-bold text-white">수요자 (학생)</td>
+                            <td class="p-3 align-top">① 결과물 (시카고)</td>
+                            <td class="p-3 align-top">'100만 원 보상금'</td>
+                            <td class="p-3 align-top font-bold text-rose-400">실패</td>
+                            <td class="p-3 align-top text-rose-400"><strong>'기술'의 부재</strong> (생산 함수 모름)</td>
+                        </tr>
+                        <tr class="border-b-2 border-slate-600">
+                            <td class="p-3 align-top">② 투입물 (댈러스)</td>
+                            <td class="p-3 align-top">'100만 원 사교육비'</td>
+                            <td class="p-3 align-top font-bold text-emerald-400">단기 성공</td>
+                            <td class="p-3 align-top text-yellow-400"><strong>'내재적 동기' 파괴 위험</strong></td>
+                        </tr>
+                        <!-- 교사 -->
+                        <tr class="border-b border-slate-700">
+                            <td rowspan="2" class="p-3 align-top font-bold text-white">공급자 (교사)</td>
+                            <td class="p-3 align-top">③ 결과물 (뉴욕)</td>
+                            <td class="p-3 align-top">'교사 성과급'</td>
+                            <td class="p-3 align-top font-bold text-rose-400">실패</td>
+                            <td class="p-3 align-top text-rose-400"><strong>'구조'의 실패</strong> (복잡성, 무임승차)</td>
+                        </tr>
+                        <tr class="border-b border-slate-700">
+                            <td class="p-3 align-top">④ 손실 회피 (시카고H)</td>
+                            <td class="p-3 align-top">'사교육의 공포'</td>
+                            <td class="p-3 align-top font-bold text-emerald-400">단기 성공</td>
+                            <td class="p-3 align-top text-yellow-400"><strong>'내재적 동기' 파괴 위험</strong> ('공포' 기반)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 2장 예고 -->
+            <div class="text-center mt-20 fade-in">
+                <p class="text-xl text-slate-300 leading-relaxed mb-6">
+                    '인센티브' 실험은 '기술'의 부재와 '영혼'의 타락이라는 딜레마만 남겼습니다.<br>
+                    그렇다면, '100만 원의 질문'은 '인센티브(동기)'의 문제가 아니었을지도 모릅니다.
+                </p>
+                <p class="text-2xl font-bold text-white leading-relaxed mb-8">
+                    어쩌면 진짜 문제는 '동기(Why)'가 아니라 '기술(How)'이었으며,<br>
+                    '인센티브'가 아니라 '시스템'이었던 것입니다.
+                </p>
+                <div class="h-1 bg-cyan-700 w-24 mx-auto my-8"></div>
+                <h2 class="text-4xl font-black gradient-text mb-4">2장에서 계속...</h2>
+                <p class="text-2xl text-slate-300">2장. '교육 생산 함수'의 정체</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // 1. 스크롤 기반 Fade-in 애니메이션
+            const faders = document.querySelectorAll('.fade-in');
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // 한번 보이면 더 이상 관찰하지 않음 (선택적)
+                        // observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            faders.forEach(fader => {
+                observer.observe(fader);
+            });
+
+            // 2. 숫자 카운트업 애니메이션
+            const counters = document.querySelectorAll('.counter');
+            const counterObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        const target = parseFloat(el.getAttribute('data-target'));
+                        const duration = 2000;
+                        const frameRate = 1000 / 60;
+                        const totalFrames = Math.round(duration / frameRate);
+                        const increment = target / totalFrames;
+                        let current = 0;
+                        const isInt = Number.isInteger(target);
+
+                        const counterInterval = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
+                                clearInterval(counterInterval);
+                                current = target;
+                            }
+                            // 소수점 첫째 자리까지 표시
+                            el.textContent = current.toFixed(isInt ? 0 : 1);
+                        }, frameRate);
+                        
+                        observer.unobserve(el);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            counters.forEach(counter => {
+                counterObserver.observe(counter);
+            });
+
+            // 3. 탭 인터페이스 로직
+            function setupTabs(tabContainerId) {
+                const tabContainer = document.getElementById(tabContainerId);
+                if (!tabContainer) return;
+
+                const tabButtons = tabContainer.querySelectorAll('.tab-btn');
+                const tabContents = tabContainer.nextElementSibling.querySelectorAll('.tab-content');
+
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const targetId = button.getAttribute('data-target');
+
+                        // 버튼 활성화
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+
+                        // 컨텐츠 활성화
+                        tabContents.forEach(content => {
+                            if (content.id === targetId) {
+                                content.classList.add('active');
+                            } else {
+                                content.classList.remove('active');
+                            }
+                        });
+                    });
+                });
+            }
+
+            setupTabs('student-tabs');
+            setupTabs('teacher-tabs');
+
+            // 4. 모달 및 핫스팟 로직
+            const modal = document.getElementById('modal');
+            const modalClose = document.getElementById('modal-close');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const hotspots = document.querySelectorAll('.hotspot');
+
+            hotspots.forEach(hotspot => {
+                hotspot.addEventListener('click', () => {
+                    const title = hotspot.getAttribute('data-title');
+                    const description = hotspot.getAttribute('data-description');
+                    
+                    modalTitle.textContent = title;
+                    modalDescription.textContent = description;
+                    modal.classList.add('open');
+                });
+            });
+
+            function closeModal() {
+                modal.classList.remove('open');
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
+
