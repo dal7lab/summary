@@ -35,12 +35,12 @@
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
                 <div class="lg:col-span-2 chart-container">
                     <h2 class="chart-title">종합 검증 결과</h2>
-                    <div id="donut-chart" class="w-full h-80 flex items-center justify-center"></div>
+                    <div id="donut-chart" class="w-full h-80 flex items-center justify-center" style="height: 20rem;"></div>
                     <div id="donut-legend" class="flex flex-wrap justify-center mt-4"></div>
                 </div>
                 <div class="lg:col-span-3 chart-container">
                     <h2 class="chart-title">리스크 지수별 검증 현황</h2>
-                    <div id="bar-chart" class="w-full h-80"></div>
+                    <div id="bar-chart" class="w-full h-80" style="height: 20rem;"></div>
                     <div id="bar-examples" class="mt-4 space-y-2 text-xs text-gray-400"></div>
                 </div>
             </div>
@@ -52,7 +52,7 @@
                     <p class="text-md text-gray-400 -mt-4">버블의 크기는 리스크 지수를, 색상은 검증 결과를 의미합니다.</p>
                 </header>
                 <div id="bubble-chart-legend" class="flex flex-wrap justify-center mb-6"></div>
-                <div id="bubble-chart" class="w-full h-[650px]"></div>
+                <div id="bubble-chart" class="w-full h-[650px]" style="height: 650px;"></div>
             </div>
         </section>
     </div>
@@ -211,8 +211,22 @@
         }
         const margin = { top: 20, right: 20, bottom: 40, left: 60 };
         const container = d3.select("#bar-chart");
-        const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
-        const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
+        
+        // Ensure container node is available
+        const containerNode = container.node();
+        if (!containerNode) {
+            console.error('❌ Bar chart container #bar-chart not found.');
+            return;
+        }
+        
+        const width = containerNode.getBoundingClientRect().width - margin.left - margin.right;
+        const height = containerNode.getBoundingClientRect().height - margin.top - margin.bottom;
+
+        if (width <= 0 || height <= 0) {
+            console.warn(`Bar chart container has zero or negative dimensions (W: ${width}, H: ${height}). Chart rendering skipped. Ensure container is visible and has a defined height.`);
+            return;
+        }
+
         const svg = container.append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
         
         // Remove duplicate risk levels
@@ -268,8 +282,22 @@
         }
         const margin = {top: 50, right: 30, bottom: 60, left: 80};
         const container = d3.select("#bubble-chart");
-        const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
-        const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
+
+        // Ensure container node is available
+        const containerNode = container.node();
+        if (!containerNode) {
+            console.error('❌ Bubble chart container #bubble-chart not found.');
+            return;
+        }
+        
+        const width = containerNode.getBoundingClientRect().width - margin.left - margin.right;
+        const height = containerNode.getBoundingClientRect().height - margin.top - margin.bottom;
+
+        if (width <= 0 || height <= 0) {
+            console.warn(`Bubble chart container has zero or negative dimensions (W: ${width}, H: ${height}). Chart rendering skipped. Ensure container is visible and has a defined height.`);
+            return;
+        }
+
         const svg = container.append("svg").attr("width", "100%").attr("height", "100%").attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
         
         // Calculate average risk per category for center-weighted ordering
