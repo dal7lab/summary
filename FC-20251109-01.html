@@ -28,8 +28,8 @@
     <div class="max-w-7xl mx-auto">
         <header class="text-center mb-12">
             <h1 class="text-3xl md:text-4xl font-bold text-white">AIA 고밀도 감사 리포트 시각화</h1>
-            <p class="text-lg text-gray-400 mt-2">총 15개 항목에 대한 심층 분석 결과</p>
-    <p class="text-md text-blue-300 mt-3 italic">분석 대상: 남성 육아휴직 증가 추세 분석</p>
+            <p class="text-lg text-gray-400 mt-2">총 8개 항목에 대한 심층 분석 결과</p>
+    <p class="text-md text-blue-300 mt-3 italic">분석 대상: 남성 육아휴직 증가 추세 관련 텍스트</p>
       </header>
         <section class="mb-12">
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -92,64 +92,57 @@
     // 3. Data MUST be 100% synchronized with Section 1 (Summary) and Section 3 (Table).
     // ==================================================================
     
-    // SSoT-derived analysis data (15 items total)
+    // 100% SSoT-derived analysis data (N=8)
     const donutData = [
-        { status: '검증 완료', count: 5 },
-        { status: '맥락상 사실', count: 5 },
-        { status: '일부 확인됨', count: 2 },
-        { status: '부정확함', count: 3 },
-        { status: '확인 불가', count: 0 }
+        { status: '검증 완료', count: 4 },
+        { status: '맥락상 사실', count: 3 },
+        { status: '일부 확인됨', count: 0 },
+        { status: '부정확함', count: 0 },
+        { status: '확인 불가', count: 1 }
     ];
     
     const barData = [
         { 
-          level: '고위험 (80+)', 
-          '검증 완료': 0, 
-          '맥락상 사실': 1, 
-          '일부 확인됨': 1, 
-          '부정확함': 2, 
-          '확인 불가': 0, 
-          total: 4,
-          example: '2025년 상반기 비율 36.4%' 
-        },
-        { 
-          level: '중위험 (50-79)', 
-          '검증 완료': 4, 
-          '맥락상 사실': 1, 
-          '일부 확인됨': 0, 
-          '부정확함': 1, 
-          '확인 불가': 0, 
-          total: 6,
-          example: '중소기업으로 확산' 
-        },
-        { 
-          level: '저위험 (<50)', 
-          '검증 완료': 1, 
-          '맥락상 사실': 3, 
-          '일부 확인됨': 1, 
-          '부정확함': 0, 
-          '확인 불가': 0, 
-          total: 5,
-          example: '과거 대기업 전유물로 여겨짐' 
-        }
+            level: '고위험 (80+)', 
+            '검증 완료': 2, 
+            '맥락상 사실': 0, 
+            '일부 확인됨': 0, 
+            '부정확함': 0, 
+            '확인 불가': 0, 
+            total: 2,
+            example: '2025년 상반기 36.4%' 
+          },
+          { 
+            level: '중위험 (50-79)', 
+            '검증 완료': 2, 
+            '맥락상 사실': 1, 
+            '일부 확인됨': 0, 
+            '부정확함': 0, 
+            '확인 불가': 0, 
+            total: 3,
+            example: '중소기업으로 확산' 
+          },
+          { 
+            level: '저위험 (<50)', 
+            '검증 완료': 0, 
+            '맥락상 사실': 2, 
+            '일부 확인됨': 0, 
+            '부정확함': 0, 
+            '확인 불가': 1, 
+            total: 3,
+            example: "'부모의 공부력' 전제 조건" 
+          }
     ];
     
     const bubbleData = [
-        {no: 1, category: '통계', risk: 95, fact: '2025년 상반기 남성 육아휴직자 비율은 36.4%에 육박한다.', status: '부정확함'},
-        {no: 2, category: '통계', risk: 92, fact: '(2025년 상반기...) 전년 동기 대비 54.2% 증가했다.', status: '부정확함'},
-        {no: 3, category: '주장', risk: 85, fact: '(아빠들의 가정 복귀가) \'부모의 공부력\' 시대를 연 첫 번째 전제 조건이다.', status: '맥락상 사실'},
-        {no: 4, category: '주장', risk: 80, fact: '(남성 육아휴직) 추세는 2025년 들어 더욱 가속화되고 있다.', status: '일부 확인됨'},
-        {no: 5, category: '주장', risk: 75, fact: '남성 육아휴직이 이제는 중소기업으로 확산되고 있다.', status: '검증 완료'},
-        {no: 6, category: '용어', risk: 70, fact: '(확산 대상은) 우선지원대상기업이다.', status: '검증 완료'},
-        {no: 7, category: '주장', risk: 65, fact: '(이 현상은) 단순히 몇몇 \'깨어있는\' 아빠들의 선택이 아니다.', status: '맥락상 사실'},
-        {no: 8, category: '분석', risk: 60, fact: '(이 증가세는) 폭발적인 증가세이다.', status: '부정확함'},
-        {no: 9, category: '분석', risk: 55, fact: '(정부의 제도는) 강력한 제도적 드라이브이다.', status: '검증 완료'},
-        {no: 10, category: '사실', risk: 50, fact: '정부의 \'부모함께 육아휴직제\'가 (존재한다).', status: '검증 완료'},
-        {no: 11, category: '사실', risk: 45, fact: '남성 육아휴직은 과거 대기업의 전유물로 여겨졌다.', status: '맥락상 사실'},
-        {no: 12, category: '분석', risk: 40, fact: '(중소기업 확산이) 핵심이다.', status: '맥락상 사실'},
-        {no: 13, category: '사례', risk: 35, fact: '아빠들이 물리적으로 가정으로 돌아오기 시작했다.', status: '맥락상 사실'},
-        {no: 14, category: '가설', risk: 30, fact: '과거 아빠들은 \'무관심\'했다.', status: '일부 확인됨'},
-        {no: 15, category: '사실', risk: 20, fact: '2025년 (현재 시점).', status: '검증 완료'}
+        {no: 1, category: '통계', risk: 95, fact: '2025년 상반기 남성 육아휴직자 비율은 36.4%에 육박.', status: '검증 완료'},
+        {no: 2, category: '통계', risk: 92, fact: '(2025년 상반기 남성 육아휴직자 비율은) 전년 동기 대비 54.2% 증가.', status: '검증 완료'},
+        {no: 3, category: '분석', risk: 78, fact: '남성 육아휴직이 중소기업(우선지원대상기업)으로 확산되고 있다.', status: '검증 완료'},
+        {no: 4, category: '분석', risk: 75, fact: '정부의 \'부모함께 육아휴직제\'가 강력한 제도적 드라이브가 됨.', status: '검증 완료'},
+        {no: 5, category: '주장', risk: 60, fact: '(남성 육아휴직 증가) 추세는 2025년 들어 더욱 가속화되고 있다.', status: '맥락상 사실'},
+        {no: 6, category: '가설', risk: 45, fact: '(\'무관심\'했던 아빠들의 물리적 가정 복귀가) \'부모의 공부력\' 시대를 연 첫 번째 전제 조건이다.', status: '확인 불가'},
+        {no: 7, category: '비유', risk: 30, fact: '\'무관심\'했던 아빠들이 물리적으로 가정으로 돌아오기 시작했다.', status: '맥락상 사실'},
+        {no: 8, category: '주장', risk: 25, fact: '(남성 육아휴직 증가는) 단순히 몇몇 \'깨어있는\' 아빠들의 선택이 아니다.', status: '맥락상 사실'}
     ];
 
     // ==================================================================
@@ -329,7 +322,7 @@
             .style("stroke-width", 2)\
             .on("mouseover", (event, d) => { 
                 const icon = statusIcons[d.status] || '';
-                tooltip.style("opacity", 1).html(`<strong>[No.${d.no}] [${d.category}]</strong><br>${d.fact}<br><span class=\"tooltip-risk\">Risk: ${d.risk}</span><br>${icon} ${d.status}`); 
+                tooltip.style("opacity", 1).html(`<strong>[No.${d.no}] [${d.category}]</strong><br>${d.fact}<br><span class="tooltip-risk">Risk: ${d.risk}</span><br>${icon} ${d.status}`); 
                 d3.select(event.currentTarget).style("fill-opacity", 1).style("stroke-width", 3); 
             })\
             .on("mousemove", (event) => tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px"))
@@ -341,7 +334,11 @@
             .force("collide", d3.forceCollide(d => radius(d.risk) + 2).strength(0.95))\
             .force("bounds", () => {\
                 bubbleData.forEach(d => {\
-                    const r = radius(d.risk);\n                    d.x = Math.max(r, Math.min(width - r, d.x));\n                    d.y = Math.max(r, Math.min(height - r, d.y));\n                });\n            })\
+                    const r = radius(d.risk);\
+                    d.x = Math.max(r, Math.min(width - r, d.x));\
+                    d.y = Math.max(r, Math.min(height - r, d.y));\
+                });\
+            })\
             .on("tick", () => nodes.attr("cx", d => d.x).attr("cy", d => d.y));
         
         const legendContainer = d3.select("#bubble-chart-legend");
