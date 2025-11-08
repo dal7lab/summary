@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전략적 라이프 플래닝 - Dynamic Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Noto Sans KR & Inter 폰트 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Noto Sans KR (제목) 및 Inter (본문) 폰트 설정 */
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            /* 스크롤바 숨김 (디자인적 요소) */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        body::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
+        .main-title {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 900;
+        }
+
+        /* 메인 타이틀 그라데이션 */
+        .title-gradient {
+            background-image: linear-gradient(to right, #67e8f9, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* 사이드바 메뉴 아이템 호버 효과 */
+        .nav-item {
+            @apply relative block px-4 py-3 rounded-md text-gray-300 transition-all duration-200 ease-in-out;
+            @apply hover:bg-cyan-500/10 hover:text-white;
+        }
+        /* 사이드바 내 활성/그룹 타이틀 */
+        .nav-group-title {
+            @apply px-4 pt-4 pb-2 text-xs font-semibold text-cyan-400 uppercase tracking-wider;
+        }
+
+        /* 메인 콘텐츠 존 호버 효과 */
+        .zone-card {
+            @apply relative overflow-hidden p-8 bg-gray-800 rounded-2xl shadow-lg border border-gray-700 transition-all duration-300 ease-in-out cursor-pointer;
+            @apply hover:scale-[1.03] hover:border-cyan-500 hover:shadow-cyan-500/20;
+        }
+        
+        /* 메인 콘텐츠 존 배경 그라데이션 (장식) */
+        .zone-card::before {
+            content: '';
+            @apply absolute -top-1/2 -left-1/2 w-[200%] h-[200%] opacity-0 transition-opacity duration-500;
+            background-image: radial-gradient(circle at center, theme('colors.cyan.600 / 0.15'), transparent 40%);
+            z-index: 0;
+        }
+        .zone-card:hover::before {
+            @apply opacity-100;
+        }
+
+        /* 로드 시 페이드-인 애니메이션 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+
+    <!-- 
+      사이드바 (Sidenav)
+      - 기본적으로 `transform -translate-x-full`로 숨겨져 있음
+      - `is-sidebar-open` 클래스가 body에 추가되면 `translate-x-0`으로 변경됨
+    -->
+    <aside id="sidebar" class="fixed top-0 left-0 z-50 w-72 h-full bg-gray-900/80 backdrop-blur-lg border-r border-gray-700 shadow-2xl transition-transform duration-300 ease-in-out transform -translate-x-full">
+        <div class="flex justify-between items-center p-4 border-b border-gray-700">
+            <h2 class="text-lg font-bold text-white">전체 메뉴</h2>
+            <!-- 닫기 버튼 -->
+            <button id="close-menu-btn" class="p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <!-- 네비게이션 링크 (스크롤 가능) -->
+        <nav class="h-[calc(100vh-65px)] overflow-y-auto pb-8">
+            <ul>
+                <!-- Phase 1 -->
+                <li>
+                    <span class="nav-group-title">Phase 1. 자신 알기</span>
+                    <ul>
+                        <li><a href="https://dal7lab.github.io/summary/P1-1-1.html" target="_blank" class="nav-item">P1-1-1: 강점과 약점</a></li>
+                        <li><a href="https://dal7lab.github.io/summary/P1-1-2.html" target="_blank" class="nav-item">P1-1-2: 흥미와 적성</a></li>
+                        <li><a href="https://dal7lab.github.io/summary/P1-1-3.html" target="_blank" class="nav-item">P1-1-3: 가치관과 비전</a></li>
+                    </ul>
+                </li>
+                <!-- Phase 2 -->
+                <li>
+                    <span class="nav-group-title">Phase 2. 학습 전략</span>
+                    <ul>
+                        <li><a href="https://dal7lab.github.io/summary/P2-1-1_ENG.html" target="_blank" class="nav-item">P2-1-1: 영어 학습법</a></li>
+                        <li><a href="https://dal7lab.github.io/summary/P2-1-2_KOR.html" target="_blank" class="nav-item">P2-1-2: 국어 학습법</a></li>
+                        <li><a href="https://dal7lab.github.io/summary/P2-1-3_MATH.html" target="_blank" class="nav-item">P2-1-3: 수학 학습법 (MATH)</a></li>
+                        <li><a href="https://dal7lab.github.io/summary/P2-1-3_MAT.html" target="_blank" class="nav-item">P2-1-3: 수학 학습법 (MAT)</a></li>
+                        <li><a href="https://dal7lab.github.io/summary/P2-1-4_SELF.html" target="_blank" class="nav-item">P2-1-4: 자기주도학습</a></li>
+                    </ul>
+                </li>
+                <!-- Phase 3 -->
+                <li>
+                    <span class="nav-group-title">Phase 3. 미래 계획</span>
+                    <ul>
+                        <li><a href="https://dal7lab.github.io/summary/P3-1-1.html" target="_blank" class="nav-item">P3-1-1: 진로 탐색과 목표</a></li>
+                    </ul>
+                </li>
+                <!-- Phase 4 (Dopamine) -->
+                <li>
+                    <span class="nav-group-title">Phase 4. 멘탈 관리</span>
+                    <ul>
+                        <li><a href="https://dal7lab.github.io/summary/dopamine.html" target="_blank" class="nav-item">도파민 이해하기</a></li>
+                        <li><a href="https://dal7lab.github.io/summary/dopamine_addiction.html" target="_blank" class="nav-item">도파민 중독 관리</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- 사이드바 오버레이 (배경) -->
+    <div id="sidebar-overlay" class="fixed top-0 left-0 z-40 w-full h-full bg-black/50 hidden"></div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div id="main-content" class="min-h-screen transition-all duration-300">
+        <!-- 
+          상단 헤더 (Header)
+          - 스티키(sticky)로 상단에 고정
+        -->
+        <header class="sticky top-0 z-30 w-full bg-gray-900/70 backdrop-blur-md border-b border-gray-700">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- 왼쪽: 메뉴 버튼 -->
+                    <div class="flex-shrink-0">
+                        <button id="open-menu-btn" class="p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700">
+                            <span class="sr-only">메뉴 열기</span>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        </button>
+                    </div>
+                    <!-- 중앙: 로고/타이틀 -->
+                    <div class="flex-1 text-center">
+                        <span class="text-xl font-bold text-white whitespace-nowrap">
+                            전략적 라이프 플래닝
+                        </span>
+                    </div>
+                    <!-- 오른쪽: 빈 공간 (대칭을 위해) -->
+                    <div class="flex-shrink-0 w-8">
+                        <!-- w-8은 햄버거 버튼과 동일한 너비(p-2 + w-6 = 2rem)를 확보하기 위함 -->
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 메인 콘텐츠 -->
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            
+            <!-- 히어로 섹션 -->
+            <section class="text-center mb-16 fade-in" style="animation-delay: 100ms;">
+                <h1 class="text-4xl md:text-6xl main-title mb-4 title-gradient">
+                    당신의 미래를 설계하세요
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
+                    이곳은 중학교 3학년을 위한 전략적 라이프 플래닝 허브입니다.
+                    <br class="hidden sm:block">
+                    핵심 영역을 탐색하고, 메뉴를 열어 세부 계획을 확인하세요.
+                </p>
+            </section>
+
+            <!-- 인터랙티브 존 그리드 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Zone 1: 자신 알기 -->
+                <a href="https://dal7lab.github.io/summary/P1-1-1.html" target="_blank" class="zone-card fade-in" style="animation-delay: 300ms;">
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-center w-16 h-16 mb-6 bg-cyan-500/10 rounded-full border border-cyan-500">
+                            <!-- 아이콘: User -->
+                            <svg class="w-8 h-8 text-cyan-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-white mb-3">Phase 1. 자신 알기</h2>
+                        <p class="text-gray-300 mb-6">
+                            나의 강점, 약점, 흥미, 가치관을 탐색하여 '나'라는 사람의 핵심을 발견합니다.
+                        </p>
+                        <span class="font-semibold text-cyan-400 group-hover:text-cyan-300 transition-colors">
+                            탐색 시작하기 &rarr;
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Zone 2: 학습 전략 -->
+                <a href="https://dal7lab.github.io/summary/P2-1-1_ENG.html" target="_blank" class="zone-card fade-in" style="animation-delay: 400ms;">
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-center w-16 h-16 mb-6 bg-indigo-500/10 rounded-full border border-indigo-500">
+                            <!-- 아이콘: Book Open -->
+                            <svg class="w-8 h-8 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" /></svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-white mb-3">Phase 2. 학습 전략</h2>
+                        <p class="text-gray-300 mb-6">
+                            영어, 국어, 수학 등 주요 과목의 핵심 전략과 자기주도학습 역량을 강화합니다.
+                        </p>
+                        <span class="font-semibold text-indigo-400 group-hover:text-indigo-300 transition-colors">
+                            전략 수립하기 &rarr;
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Zone 3: 미래 계획 -->
+                <a href="https://dal7lab.github.io/summary/P3-1-1.html" target="_blank" class="zone-card fade-in" style="animation-delay: 500ms;">
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-center w-16 h-16 mb-6 bg-purple-500/10 rounded-full border border-purple-500">
+                            <!-- 아이콘: Flag -->
+                            <svg class="w-8 h-8 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.5-5.001-4.04 1.257-2.07 5.001 2.5 5.001 4.04-1.257 2.07-5.001z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.5-5.001-4.04 1.257-2.07 5.001 2.5 5.001 4.04-1.257 2.07-5.001zM15.042 21.672L13.684 16.6m0 0l-2.5-5.001-4.04 1.257-2.07 5.001 2.5 5.001 4.04-1.257 2.07-5.001zM9 12l2.07 5.001 4.04-1.257 2.07-5.001-2.5-5.001-4.04 1.257L9 12z" /></svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-white mb-3">Phase 3. 미래 계획</h2>
+                        <p class="text-gray-300 mb-6">
+                            장기적인 진로 방향을 설정하고, 이를 달성하기 위한 구체적인 목표를 세웁니다.
+                        </p>
+                        <span class="font-semibold text-purple-400 group-hover:text-purple-300 transition-colors">
+                            목표 설정하기 &rarr;
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Zone 4: 멘탈 관리 -->
+                <a href="https://dal7lab.github.io/summary/dopamine.html" target="_blank" class="zone-card fade-in" style="animation-delay: 600ms;">
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-center w-16 h-16 mb-6 bg-rose-500/10 rounded-full border border-rose-500">
+                            <!-- 아이콘: Sparkles -->
+                            <svg class="w-8 h-8 text-rose-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.62L16.5 21.75l-.398-1.13a3.375 3.375 0 00-2.455-2.456L12.75 18l1.13-.398a3.375 3.375 0 002.455-2.456L16.5 14.25l.398 1.13a3.375 3.375 0 002.456 2.456l1.13.398-1.13.398a3.375 3.375 0 00-2.456 2.456z" /></svg>
+                        </div>
+                        <h2 class="text-3xl font-bold text-white mb-3">Phase 4. 멘탈 관리</h2>
+                        <p class="text-gray-300 mb-6">
+                            동기부여의 핵심, 도파민을 이해하고 건강한 습관과 강인한 마음을 훈련합니다.
+                        </p>
+                        <span class="font-semibold text-rose-400 group-hover:text-rose-300 transition-colors">
+                            마음 챙기기 &rarr;
+                        </span>
+                    </div>
+                </a>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript (사이드바 토글 로직) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const openBtn = document.getElementById('open-menu-btn');
+            const closeBtn = document.getElementById('close-menu-btn');
+
+            const openSidebar = () => {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.classList.add('is-sidebar-open', 'overflow-hidden');
+            };
+
+            const closeSidebar = () => {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('is-sidebar-open', 'overflow-hidden');
+            };
+
+            openBtn.addEventListener('click', openSidebar);
+            closeBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+        });
+    </script>
+</body>
+</html>
+
+
