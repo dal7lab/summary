@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 성장 곡선 시뮬레이터 (v7 - AI 컨설팅)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts - Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+        .gradient-text {
+            /* Blue to Teal Gradient */
+            background: linear-gradient(to right, #38BDF8, #2DD4BF, #34D399); 
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .accordion-content { display: none; overflow: hidden; }
+        .chart-container { position: relative; height: 60vh; width: 100%; min-height: 450px; }
+        .formula {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.25rem; color: #D1D5DB; background: #1F2937;
+            padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #4B5563;
+        }
+        input[type="range"] {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 8px; background: #374151;
+            border-radius: 5px; outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 20px; height: 20px; background: #2DD4BF; /* accent-teal-500 */
+            border-radius: 50%; cursor: pointer; transition: background 0.2s;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px; height: 20px; background: #2DD4BF;
+            border-radius: 50%; cursor: pointer; border: none;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <div class="container mx-auto max-w-7xl px-4 py-16">
+
+        <!-- 헤더 -->
+        <header class="text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-black mb-6 gradient-text">
+                로지스틱 성장 시뮬레이터
+            </h1>
+            <p class="text-2xl md:text-3xl font-bold text-gray-100">
+                (Python 로직 기반 v7)
+            </p>
+        </header>
+
+        <!-- 시뮬레이션 메인 (그리드) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- 1. 컨트롤 패널 (L) -->
+            <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 h-fit">
+                <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.835 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.835 2.942-.734 2.106-2.106a1.532 1.532 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01.947-2.287c.835-1.372-.734-2.942-2.106-2.106A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                    일일 학습 변수
+                </h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label for="param-total_time" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>총 학습 시간 (T_d)</span>
+                            <span id="val-total_time" class="font-bold text-sky-300 text-base">12.0 시간</span>
+                        </label>
+                        <p class="text-xs text-gray-400 mt-2">하루에 투자하는 총 시간입니다.</p>
+                        <input type="range" id="param-total_time" min="0" max="16" value="12.0" step="0.5" class="w-full mt-2">
+                    </div>
+
+                    <div>
+                        <label for="param-focus_level" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>학습 몰입도 (F_p)</span>
+                            <span id="val-focus_level" class="font-bold text-sky-300 text-base">95 %</span>
+                        </label>
+                        <p class="text-xs text-gray-400 mt-2">학습 시간 중 실제 몰입한 비율입니다. (0.0 ~ 1.0)</p>
+                        <input type="range" id="param-focus_level" min="0" max="1" value="0.95" step="0.01" class="w-full mt-2">
+                    </div>
+
+                    <div>
+                        <label for="param-continuous_time" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>최대 연속 학습 시간 (T_c)</span>
+                            <span id="val-continuous_time" class="font-bold text-sky-300 text-base">2.8 시간</span>
+                        </label>
+                        <p class="text-xs text-gray-400 mt-2">쉬지 않고 한 번에 집중하는 시간입니다. (연속 보너스)</p>
+                        <input type="range" id="param-continuous_time" min="0" max="4" value="2.8" step="0.1" class="w-full mt-2">
+                    </div>
+                </div>
+
+                <!-- 고급 설정 -->
+                <div class="mt-8 pt-6 border-t border-gray-600">
+                    <h3 class="text-lg font-semibold text-white mb-3">고급 설정 (시뮬레이션 상수)</h3>
+                    <div class="space-y-6">
+                         <div>
+                            <label for="param-A0" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>초기 능력치 (A₀)</span>
+                                <span id="val-A0" class="font-bold text-white text-base">1</span>
+                            </label>
+                            <input type="range" id="param-A0" min="1" max="100" value="1" step="1" class="w-full mt-2">
+                        </div>
+                        <div>
+                            <label for="param-L" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>최대 능력치 (L)</span>
+                                <span id="val-L" class="font-bold text-white text-base">1000</span>
+                            </label>
+                            <input type="range" id="param-L" min="500" max="2000" value="1000" step="50" class="w-full mt-2">
+                        </div>
+                        <div>
+                            <label for="param-B" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>기본 학습 효율 (B)</span>
+                                <span id="val-B" class="font-bold text-white text-base">0.010</span>
+                            </label>
+                            <input type="range" id="param-B" min="0.001" max="0.05" value="0.01" step="0.001" class="w-full mt-2">
+                        </div>
+                        <div>
+                            <label for="param-wc" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>연속 보너스 가중치 (w_c)</span>
+                                <span id="val-wc" class="font-bold text-white text-base">0.25</span>
+                            </label>
+                            <input type="range" id="param-wc" min="0" max="1" value="0.25" step="0.01" class="w-full mt-2">
+                        </div>
+                        <div>
+                            <label for="param-Sim_Days" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>시뮬레이션 기간 (Sim_Days)</span>
+                                <span id="val-Sim_Days" class="font-bold text-white text-base">365 일</span>
+                            </label>
+                            <input type="range" id="param-Sim_Days" min="30" max="18250" value="365" step="30" class="w-full mt-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 그래프 및 해석 (R) -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- 차트 -->
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-4">📈 능력치(A) 성장 곡선</h2>
+                    <div class="chart-container">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 1. 시뮬레이션 결과 분석 -->
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15v4a1 1 0 001 1h12a1 1 0 001-1v-4a1 1 0 00-.293-.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
+                        시뮬레이션 결과 분석
+                    </h2>
+                    <div id="analysis-text" class="text-lg text-gray-300 leading-relaxed space-y-3">
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
+                </div>
+
+                <!-- 2. [신규] 학습 전략 컨설팅 보고서 -->
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        학습 전략 컨설팅 보고서
+                    </h2>
+                    <div id="consulting-report" class="text-base text-gray-300 leading-relaxed space-y-4">
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
+                </div>
+
+                <!-- 3. [신규] 변수 상세 설명 및 AI 활용법 -->
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21v-1m-4-4H7M17 17h-1" />
+                        </svg>
+                        변수 상세 설명과 AI 학습 도우미를 활용한 성장률 향상
+                    </h2>
+                    <div id="variable-ai-guide" class="text-gray-300 leading-relaxed space-y-6">
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 시뮬레이션 작동 원리 (아코디언) -->
+        <section class="mt-24">
+            <h2 class="text-4xl font-extrabold text-center mb-12 gradient-text">
+                시뮬레이션 작동 원리
+            </h2>
+            <div class="max-w-4xl mx-auto space-y-4">
+                
+                <!-- 아코디언 1: 일일 성장률(k) 계산 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">1. 일일 성장률 (k) 계산</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            매일의 '성장률(k)'은 총 학습 시간, 몰입도, 연속 학습 시간을 기반으로 계산됩니다.
+                        </p>
+                        <div class="formula">
+                            $E_{eff} = T_d \cdot F_p$ (유효 학습 시간)
+                            <br>
+                            $C_{bonus} = 1 + (w_c \cdot T_c)$ (연속 학습 보너스)
+                            <br>
+                            $k = B \cdot E_{eff} \cdot C_{bonus}$
+                        </div>
+                        <ul class="list-disc list-outside pl-6 mt-4 space-y-2">
+                            <li>$k$: 그날의 최종 성장률 (시뮬레이션의 핵심 변수)</li>
+                            <li>$B$: 기본 학습 효율 (상수)</li>
+                            <li>$T_d$: 총 학습 시간, $F_p$: 몰입도, $T_c$: 연속 학습 시간</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 아코디언 2: 로지스틱 성장 모델 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">2. 로지스틱 성장 모델 (이산형)</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            일일 '능력치 변화량($\Delta A$)'은 어제의 능력치($A_{t-1}$)와 성장 한계($L$)에 의해 결정됩니다. 이는 전형적인 로지스틱 성장 공식입니다.
+                        </p>
+                        <div class="formula">
+                            $\Delta A = k \cdot A_{t-1} \cdot (1 - \frac{A_{t-1}}{L})$
+                        </div>
+                        <ul class="list-disc list-outside pl-6 mt-4 space-y-2">
+                            <li>$\Delta A$: 하루 동안의 능력치 성장량</li>
+                            <li>$k$: 1번에서 계산된 일일 성장률</li>
+                            <li>$A_{t-1}$: 어제의 능력치</li>
+                            <li>$L$: 최대 능력치 (성장 한계)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 아코디언 3: 시뮬레이션 루프 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">3. 시뮬레이션 루프</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            시뮬레이션은 $Sim\_Days$ (예: 365일) 동안 매일 다음 계산을 반복합니다.
+                        </p>
+                        <div class="formula">
+                            $A_t = A_{t-1} + \Delta A$
+                        </div>
+                        <p class="text-gray-400 mt-4">
+                            이 과정을 반복하여 매일의 능력치($A$)를 계산하고 그래프로 그립니다. (단, $A_t$는 $L$을 초과할 수 없습니다.)
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        let growthChart; 
+        const inputs = {};
+        const values = {};
+        const paramIds = [
+            'total_time', 'focus_level', 'continuous_time', 
+            'A0', 'L', 'B', 'wc', 'Sim_Days'
+        ];
+
+        // --- 1. 시뮬레이션 핵심 로직 ---
+
+        function calculateKDaily(params) {
+            const { total_time, focus_level, continuous_time, B, wc } = params;
+            const effective_hours = total_time * focus_level;
+            const continuity_bonus = 1 + (wc * continuous_time);
+            const k_value = B * effective_hours * continuity_bonus;
+            return k_value;
+        }
+
+        function runSimulation(params, k_scenario) {
+            const { A0, L, Sim_Days } = params;
+            let ability_history = [A0];
+            let days = [0];
+            let current_ability = A0;
+
+            for (let day = 1; day <= Sim_Days; day++) {
+                let growth = 0;
+                if (current_ability > 0 && current_ability < L) {
+                    const logistic_factor = current_ability * (1 - (current_ability / L));
+                    growth = k_scenario * logistic_factor;
+                }
+                current_ability += growth;
+                current_ability = Math.min(Math.max(current_ability, 0), L);
+                ability_history.push(current_ability);
+                days.push(day);
+            }
+            return { days, ability_history };
+        }
+
+        // --- 2. UI 업데이트 함수 ---
+
+        function updateChart(data) {
+            const chartCanvas = document.getElementById('growthChart')?.getContext('2d');
+            if (!chartCanvas) return;
+
+            const L = parseFloat(inputs.L.value);
+            const line_50 = new Array(data.days.length).fill(L * 0.5);
+            const line_90 = new Array(data.days.length).fill(L * 0.9);
+            const Sim_Days = parseFloat(inputs.Sim_Days.value);
+            const labelStep = Math.max(30, Math.ceil(Sim_Days / 12 / 30) * 30); 
+
+            try {
+                if (growthChart) {
+                    growthChart.data.labels = data.days;
+                    growthChart.data.datasets[0].data = data.ability_history;
+                    growthChart.data.datasets[1].data = line_50;
+                    growthChart.data.datasets[2].data = line_90;
+                    growthChart.data.datasets[1].borderColor = '#3B82F6'; // 50% = Blue
+                    growthChart.data.datasets[2].borderColor = '#EF4444'; // 90% = Red
+                    growthChart.options.scales.y.max = L; 
+                    growthChart.options.scales.x.ticks.callback = function(value, index, values) {
+                        return (index % labelStep === 0) ? `${data.days[index]}일` : null;
+                    };
+                    growthChart.update();
+                } else {
+                    growthChart = new Chart(chartCanvas, {
+                        type: 'line',
+                        data: {
+                            labels: data.days,
+                            datasets: [
+                                {
+                                    label: '능력치 (A)',
+                                    data: data.ability_history,
+                                    borderColor: '#2DD4BF', // Teal-500
+                                    backgroundColor: '#2DD4BF30',
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.1
+                                },
+                                {
+                                    label: '50% 달성선',
+                                    data: line_50,
+                                    borderColor: '#3B82F6', // Blue-500
+                                    borderWidth: 1.5,
+                                    borderDash: [5, 5], 
+                                    fill: false,
+                                    pointRadius: 0
+                                },
+                                {
+                                    label: '90% 달성선',
+                                    data: line_90,
+                                    borderColor: '#EF4444', // Red-500
+                                    borderWidth: 1.5,
+                                    borderDash: [5, 5], 
+                                    fill: false,
+                                    pointRadius: 0
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top', labels: { color: '#E5E7EB', font: { size: 14 } } },
+                                tooltip: { mode: 'index', intersect: false, callbacks: { 
+                                    title: (tooltipItems) => `${tooltipItems[0].label} 일차`,
+                                    label: (tooltipItem) => `${tooltipItem.dataset.label || ''}: ${parseFloat(tooltipItem.raw).toFixed(1)}`
+                                } }
+                            },
+                            scales: {
+                                x: {
+                                    title: { display: true, text: '시간 (일)', color: '#9CA3AF' },
+                                    ticks: {
+                                        color: '#9CA3AF',
+                                        callback: function(value, index, values) {
+                                            return (index % labelStep === 0) ? `${data.days[index]}일` : null;
+                                        },
+                                        maxRotation: 0,
+                                        autoSkip: false
+                                    },
+                                    grid: { color: '#374151' }
+                                },
+                                y: {
+                                    title: { display: true, text: '능력치 (A)', color: '#9CA3AF' },
+                                    ticks: { color: '#9CA3AF' },
+                                    grid: { color: '#374151' },
+                                    min: 0,
+                                    max: L
+                                }
+                            },
+                            elements: { point: { radius: 0, hitRadius: 10, hoverRadius: 5 } }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("[Chart Error]", error);
+            }
+        }
+
+        function updateAnalysis(data, params, k_value) {
+            const analysisText = document.getElementById('analysis-text');
+            if (!analysisText) return;
+            
+            const { L, Sim_Days } = params;
+            const L_50 = L * 0.5;
+            const L_90 = L * 0.9;
+
+            const day_50 = data.ability_history.findIndex(val => val >= L_50);
+            const day_90 = data.ability_history.findIndex(val => val >= L_90);
+
+            const day_50_text = (day_50 > 0) ? `약 <span class="text-white font-bold">${day_50}</span> 일차에 ${L_50.toFixed(0)} 달성` : `<span class="text-red-400">${Sim_Days.toFixed(0)}</span>일 내 도달 못함`;
+            const day_90_text = (day_90 > 0) ? `약 <span class="text-white font-bold">${day_90}</span> 일차에 ${L_90.toFixed(0)} 달성` : `<span class="text-red-400">${Sim_Days.toFixed(0)}</span>일 내 도달 못함`;
+
+            analysisText.innerHTML = `
+                <p>계산된 일일 <strong>성장률 (k)</strong>: <span class="text-teal-300 font-bold text-2xl">${k_value.toFixed(4)}</span></p>
+                <p class="mt-4 pt-4 border-t border-gray-600"><strong>50% 도달 (A=${L_50.toFixed(0)}):</strong><br>${day_50_text}</p>
+                <p class="mt-2"><strong>90% 도달 (A=${L_90.toFixed(0)}):</strong><br>${day_90_text}</p>
+            `;
+        }
+
+        /**
+         * [신규] 컨설팅 보고서 업데이트
+         */
+        function updateConsultingReport(data, params, k_value) {
+            const reportDiv = document.getElementById('consulting-report');
+            if (!reportDiv) return;
+
+            const { total_time, focus_level, continuous_time, L, Sim_Days } = params;
+            const day_50 = data.ability_history.findIndex(val => val >= L * 0.5);
+            const day_90 = data.ability_history.findIndex(val => val >= L * 0.9);
+
+            let diagnosis = "";
+            if (k_value > 0.015) {
+                diagnosis = `현재 설정(k=${k_value.toFixed(4)})은 <strong class="text-teal-300">매우 공격적인 고속 성장</strong> 유형입니다. 단기간에 폭발적인 성과를 낼 수 있는 이상적인 설정입니다.`;
+            } else if (k_value > 0.007) {
+                diagnosis = `현재 설정(k=${k_value.toFixed(4)})은 <strong class="text-sky-300">안정적인 성장</strong> 유형입니다. 꾸준히 우상향하는 모범적인 학습 곡선입니다.`;
+            } else if (k_value > 0.003) {
+                diagnosis = `현재 설정(k=${k_value.toFixed(4)})은 <strong class="text-yellow-300">다소 더딘 성장</strong> 유형입니다. 성장이 정체되거나 현상 유지에 그칠 가능성이 있습니다.`;
+            } else {
+                diagnosis = `현재 설정(k=${k_value.toFixed(4)})은 <strong class="text-red-400">성장 정체</strong> 유형입니다. 투입하는 노력 대비 성과가 거의 없거나, 능력치가 하락할 수 있습니다.`;
+            }
+
+            let bottleneck = "";
+            if (focus_level < 0.6) {
+                bottleneck = `가장 시급한 문제는 <strong class="text-red-400">몰입도(F_p: ${(focus_level * 100).toFixed(0)}%)</strong>입니다. ${total_time.toFixed(1)}시간을 앉아있어도, 실제 유효 학습 시간은 ${(total_time * focus_level).toFixed(1)}시간에 불과합니다. '양'보다 '질'을 먼저 확보해야 합니다.`;
+            } else if (total_time < 4) {
+                bottleneck = `절대적인 <strong class="text-red-400">학습 시간(T_d: ${total_time.toFixed(1)}시간)</strong>이 부족합니다. 몰입도가 아무리 높아도, 투입되는 총량이 적어 k값이 낮게 유지됩니다.`;
+            } else if (continuous_time < 1.0) {
+                bottleneck = `연속 학습(T_c: ${continuous_time.toFixed(1)}시간)을 통한 <strong class="text-yellow-300">보너스(w_c)</strong>를 거의 활용하지 못하고 있습니다. 잦은 휴식은 몰입을 방해하고 k값의 잠재력을 억제합니다.`;
+            } else {
+                bottleneck = `현재 입력 변수들은 <strong class="text-green-300">매우 균형 잡힌 상태</strong>입니다. k값을 더 높이려면, 기본 효율(B) 자체를 높이는 질적 개선이 필요합니다. (아래 AI 활용법 참고)`;
+            }
+
+            let result_analysis = "";
+            if (day_90 > 0) {
+                result_analysis = `이 추세라면 <strong class="text-white">${day_90}</strong>일 만에 전문가 수준(90%)에 도달합니다. 이는 상위 1%의 학습 속도입니다.`;
+            } else if (day_50 > 0) {
+                result_analysis = `전문가 수준(90%)은 ${Sim_Days.toFixed(0)}일 내 도달하기 어렵지만, <strong class="text-white">${day_50}</strong>일 만에 중급자(50%) 수준에는 도달합니다. 인내심을 가지고 지속해야 합니다.`;
+            } else {
+                result_analysis = `${Sim_Days.toFixed(0)}일의 기간 동안 중급자(50%) 수준에도 도달하기 어렵습니다. 학습 전략의 <strong class="text-red-400">전면적인 재검토</strong>가 필요합니다.`;
+            }
+            
+            const final_recommendation = (bottleneck.includes("균형 잡힌 상태"))
+                ? "현재 전략을 유지하되, AI 도구를 활용해 '기본 효율(B)'을 극대화하는 데 집중하십시오."
+                : "먼저 위에서 진단된 핵심 병목 현상을 해결하는 데 집중하십시오. 작은 변수 하나만 고쳐도 k값은 기하급수적으로 상승할 수 있습니다.";
+
+            reportDiv.innerHTML = `
+                <p class="text-sm text-gray-400">30년 경력 교육학 전문가 (AI)가 현재 설정을 기반으로 분석한 보고서입니다.</p>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white">1. 현재 상태 진단 (k-value)</h3>
+                    <p>${diagnosis}</p>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white">2. 핵심 병목 현상 분석</h3>
+                    <p>${bottleneck}</p>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white">3. 성장 예측 및 최종 전략</h3>
+                    <p>${result_analysis}</p>
+                    <p class="mt-2"><strong>[최종 제언]</strong>: ${final_recommendation}</p>
+                </div>
+            `;
+        }
+
+        /**
+         * [신규] 변수 가이드 및 AI 활용법 업데이트
+         */
+        function updateVariableGuide(params, k_value) {
+            const guideDiv = document.getElementById('variable-ai-guide');
+            if (!guideDiv) return;
+
+            const { total_time, focus_level, continuous_time, B, wc, L } = params;
+
+            guideDiv.innerHTML = `
+                <!-- T_d -->
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-sky-300">1. 총 학습 시간 (T_d) <span class="text-sm font-normal text-white">(현재: ${total_time.toFixed(1)} 시간)</span></h4>
+                    <p class="text-sm text-gray-400 mt-1">하루에 학습에 투입하는 총 시간입니다. k값에 직접적인 '양'을 결정합니다.</p>
+                    <p class="text-sm mt-1"><strong>추천:</strong> 최소 4시간, 고속 성장을 위해 8시간 이상</p>
+                    <p class="text-sm mt-1"><strong>AI 활용법:</strong> AI에게 "현재 나의 k값(${k_value.toFixed(4)})을 0.015로 올리고 싶어. T_d를 몇 시간으로 늘려야 할까?"라고 물어보거나, "나의 하루 일과표를 주고 ${total_time.toFixed(1)}시간 대신 8시간의 학습 시간을 확보할 수 있는 스케줄을 최적화해줘"라고 요청하십시오.</p>
+                </div>
+
+                <!-- F_p -->
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-sky-300">2. 학습 몰입도 (F_p) <span class="text-sm font-normal text-white">(현재: ${(focus_level * 100).toFixed(0)} %)</span></h4>
+                    <p class="text-sm text-gray-400 mt-1">T_d 중 실제 학습에 몰입한 시간의 '비율'입니다. 10시간을 앉아있어도 몰입도가 50%면 유효 시간은 5시간입니다. k값의 '질'을 결정합니다.</p>
+                    <p class="text-sm mt-1"><strong>추천:</strong> 최소 80%, 이상적으로 95% 이상</p>
+                    <p class="text-sm mt-1"><strong>AI 활용법:</strong> '뽀모도로 타이머' 사용을 자동화하고, 학습 중 방해 요소를 차단하는 환경을 AI와 함께 설정하십시오. AI에게 "내가 [주제]를 학습할 때 몰입도가 떨어지는 징후가 보이면, 즉시 알려주고 관련된 퀴즈를 내줘"라고 요청하여 상호작용을 유지하십시오.</p>
+                </div>
+
+                <!-- T_c -->
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-sky-300">3. 최대 연속 학습 시간 (T_c) <span class="text-sm font-normal text-white">(현재: ${continuous_time.toFixed(1)} 시간)</span></h4>
+                    <p class="text-sm text-gray-400 mt-1">'연속 보너스(C_bonus)'를 결정합니다. 뇌가 특정 주제에 깊이 빠져드는 '딥다이브' 상태를 반영합니다.</p>
+                    <p class="text-sm mt-1"><strong>추천:</strong> 1.5 ~ 3.0 시간. (너무 길면 오히려 몰입도(F_p)가 떨어질 수 있음)</p>
+                    <p class="text-sm mt-1"><strong>AI 활용법:</strong> AI에게 "2시간 분량의 [주제]에 대한 딥다이브 학습 세션을 설계해줘. 중간에 흐름이 끊기지 않도록 관련 개념을 순서대로 배열해줘"라고 요청하여 '연속 학습' 자체의 질을 높이십시오.</p>
+                </div>
+
+                <!-- B -->
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-white">4. 기본 학습 효율 (B) <span class="text-sm font-normal text-white">(현재: ${B.toFixed(3)})</span></h4>
+                    <p class="text-sm text-gray-400 mt-1">가장 중요한 상수. 동일한 시간(T_d)과 몰입도(F_p)를 투입해도, 얼마나 효율적으로 지식으로 변환되는지를 나타냅니다. (예: 올바른 교재, 좋은 강의, 효율적인 암기법)</p>
+                    <p class="text-sm mt-1"><strong>추천:</strong> 0.01 이상. 이 값이 높으면 천재, 낮으면 비효율적인 학습.</p>
+                    <p class="text-sm mt-1"><strong>AI 활용법:</strong> <strong>B값을 극대화하는 것이 AI 활용의 핵심입니다.</strong> AI에게 "내가 [주제]를 L=${L.toFixed(0)} 수준까지 배우려 해. 가장 효율적인 학습 로드맵(B가 높은)을 짜줘", "이 개념을 '파인만 기법'으로 설명해줘", "관련된 '메타인지' 질문 5개만 해줘"라고 요청하여 학습 효율 자체를 극대화하십시오.</p>
+                </div>
+
+                <!-- w_c -->
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-white">5. 연속 보너스 가중치 (w_c) <span class="text-sm font-normal text-white">(현재: ${wc.toFixed(2)})</span></h4>
+                    <p class="text-sm text-gray-400 mt-1">T_c(연속 시간)가 얼마나 큰 보너스를 줄지 결정하는 상수입니다. 이 값이 0이면 T_c는 아무 의미가 없습니다.</p>
+                    <p class="text-sm mt-1"><strong>추천:</strong> 0.2 ~ 0.5. (주제에 따라 다름)</p>
+                    <p class="text-sm mt-1"><strong>AI 활용법:</strong> AI에게 "나는 [창의적인 작업]을 하고 있어. T_c 보너스가 큰(w_c=0.5) 작업이니, 2시간 동안 방해받지 않도록 보조해줘"라고 선언하며 학습 환경을 설정할 수 있습니다.</p>
+                </div>
+            `;
+        }
+
+        // --- 3. 유틸리티 및 메인 실행 ---
+
+        function runFullSimulation() {
+            const params = {};
+            paramIds.forEach(id => {
+                params[id] = parseFloat(inputs[id].value);
+            });
+
+            // k값 계산 (한 번만)
+            const k_value = calculateKDaily(params);
+
+            // 시뮬레이션 실행
+            const data = runSimulation(params, k_value);
+            
+            // 모든 UI 섹션 업데이트
+            updateChart(data);
+            updateAnalysis(data, params, k_value);
+            updateConsultingReport(data, params, k_value); // [신규]
+            updateVariableGuide(params, k_value); // [신규]
+        }
+
+        function updateSliderLabel(key, value) {
+            if (values[key]) {
+                if (key === 'total_time' || key === 'continuous_time') {
+                    values[key].textContent = `${value.toFixed(1)} 시간`;
+                } else if (key === 'focus_level') {
+                    values[key].textContent = `${(value * 100).toFixed(0)} %`;
+                } else if (key === 'B') {
+                    values[key].textContent = value.toFixed(3);
+                } else if (key === 'wc') {
+                    values[key].textContent = value.toFixed(2);
+                } else if (key === 'Sim_Days') {
+                    values[key].textContent = `${value.toFixed(0)} 일`;
+                } else { // A0, L
+                    values[key].textContent = value.toFixed(0);
+                }
+            }
+        }
+
+        function updateSimDaysStep(currentValue) {
+            const slider = inputs.Sim_Days;
+            if (!slider) return;
+
+            let newStep = 30; // 기본값
+            if (currentValue < 1825) { // 5년 미만
+                newStep = 5;
+            } else if (currentValue < 3650) { // 10년 미만
+                newStep = 7;
+            } else if (currentValue < 7300) { // 20년 미만
+                newStep = 30;
+            } else if (currentValue < 10950) { // 30년 미만
+                newStep = 60;
+            } else if (currentValue < 14600) { // 40년 미만
+                newStep = 90;
+            } else { // 50년 이하
+                newStep = 120;
+            }
+            slider.step = newStep;
+        }
+
+        function initializeApp() {
+            console.log("DOM 로드 완료. 앱 초기화 시작...");
+            
+            paramIds.forEach(id => {
+                inputs[id] = document.getElementById(`param-${id}`);
+                values[id] = document.getElementById(`val-${id}`);
+            });
+
+            paramIds.forEach(id => {
+                if(inputs[id]) {
+                    inputs[id].addEventListener('input', (event) => {
+                        const value = parseFloat(event.target.value);
+                        if (id === 'Sim_Days') {
+                            updateSimDaysStep(value);
+                        }
+                        updateSliderLabel(id, value);
+                        runFullSimulation(); 
+                    });
+                }
+            });
+            
+            document.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('svg');
+                    const isOpening = content.style.display !== 'block';
+                    
+                    document.querySelectorAll('.accordion-content').forEach(c => c.style.display = 'none');
+                    document.querySelectorAll('.accordion-button svg').forEach(i => i.style.transform = 'rotate(0deg)');
+
+                    if (isOpening) {
+                        content.style.display = 'block';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // 초기 실행
+            runFullSimulation();
+            console.log("앱 초기화 완료.");
+        }
+        
+    </script>
+</body>
+</html>
+
