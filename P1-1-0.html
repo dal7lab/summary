@@ -12,6 +12,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- [신규] MathJax (수학식 렌더링) 설정 -->
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // 인라인 수식 $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']] // 디스플레이 수식 $$...$$
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+    
+    <!-- [신규] MathJax (수학식 렌더링) 라이브러리 로드 -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
@@ -25,9 +42,10 @@
         }
         .accordion-content { display: none; overflow: hidden; }
         .chart-container { position: relative; height: 60vh; width: 100%; min-height: 450px; }
+        /* [수정] MathJax 렌더링을 위해 폰트 크기 조정 */
         .formula {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.25rem; color: #D1D5DB; background: #1F2937;
+            font-size: 1.1rem; 
+            color: #D1D5DB; background: #1F2937;
             padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #4B5563;
         }
         input[type="range"] {
@@ -126,7 +144,7 @@
                         </div>
                         <div>
                             <label for="param-wc" class="flex justify-between items-center text-sm font-medium text-gray-300">
-                                <span>연속 보너스 가중치 (w_c)</span>
+                                <span>연속 학습 가중치 (w_c)</span>
                                 <span id="val-wc" class="font-bold text-white text-base">0.25</span>
                             </label>
                             <input type="range" id="param-wc" min="0" max="1" value="0.25" step="0.01" class="w-full mt-2">
@@ -205,16 +223,15 @@
                         <span class="text-xl font-semibold text-gray-100">1. 일일 성장률 (k) 계산</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             매일의 '성장률(k)'은 총 학습 시간, 몰입도, 연속 학습 시간을 기반으로 계산됩니다.
                         </p>
                         <div class="formula">
-                            $E_{eff} = T_d \cdot F_p$ (유효 학습 시간)
-                            <br>
-                            $C_{bonus} = 1 + (w_c \cdot T_c)$ (연속 학습 보너스)
-                            <br>
-                            $k = B \cdot E_{eff} \cdot C_{bonus}$
+                            $$ E_{eff} = T_d \cdot F_p \quad (\text{유효 학습 시간}) $$
+                            $$ C_{bonus} = 1 + (w_c \cdot T_c) \quad (\text{연속 학습 보너스}) $$
+                            $$ k = B \cdot E_{eff} \cdot C_{bonus} $$
                         </div>
                         <ul class="list-disc list-outside pl-6 mt-4 space-y-2">
                             <li>$k$: 그날의 최종 성장률 (시뮬레이션의 핵심 변수)</li>
@@ -230,12 +247,13 @@
                         <span class="text-xl font-semibold text-gray-100">2. 로지스틱 성장 모델 (이산형)</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             일일 '능력치 변화량($\Delta A$)'은 어제의 능력치($A_{t-1}$)와 성장 한계($L$)에 의해 결정됩니다. 이는 전형적인 로지스틱 성장 공식입니다.
                         </p>
                         <div class="formula">
-                            $\Delta A = k \cdot A_{t-1} \cdot (1 - \frac{A_{t-1}}{L})$
+                            $$ \Delta A = k \cdot A_{t-1} \cdot \left(1 - \frac{A_{t-1}}{L}\right) $$
                         </div>
                         <ul class="list-disc list-outside pl-6 mt-4 space-y-2">
                             <li>$\Delta A$: 하루 동안의 능력치 성장량</li>
@@ -252,12 +270,13 @@
                         <span class="text-xl font-semibold text-gray-100">3. 시뮬레이션 루프</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             시뮬레이션은 $Sim\_Days$ (예: 365일) 동안 매일 다음 계산을 반복합니다.
                         </p>
                         <div class="formula">
-                            $A_t = A_{t-1} + \Delta A$
+                            $$ A_t = A_{t-1} + \Delta A $$
                         </div>
                         <p class="text-gray-400 mt-4">
                             이 과정을 반복하여 매일의 능력치($A$)를 계산하고 그래프로 그립니다. (단, $A_t$는 $L$을 초과할 수 없습니다.)
@@ -432,9 +451,6 @@
             `;
         }
 
-        /**
-         * [신규] 컨설팅 보고서 업데이트
-         */
         function updateConsultingReport(data, params, k_value) {
             const reportDiv = document.getElementById('consulting-report');
             if (!reportDiv) return;
@@ -496,9 +512,6 @@
             `;
         }
 
-        /**
-         * [신규] 변수 가이드 및 AI 활용법 업데이트
-         */
         function updateVariableGuide(params, k_value) {
             const guideDiv = document.getElementById('variable-ai-guide');
             if (!guideDiv) return;
@@ -540,7 +553,7 @@
 
                 <!-- w_c -->
                 <div class="p-4 bg-gray-900 rounded-lg">
-                    <h4 class="text-lg font-semibold text-white">5. 연속 보너스 가중치 (w_c) <span class="text-sm font-normal text-white">(현재: ${wc.toFixed(2)})</span></h4>
+                    <h4 class="text-lg font-semibold text-white">5. 연속 학습 가중치 (w_c) <span class="text-sm font-normal text-white">(현재: ${wc.toFixed(2)})</span></h4>
                     <p class="text-sm text-gray-400 mt-1">T_c(연속 시간)가 얼마나 큰 보너스를 줄지 결정하는 상수입니다. 이 값이 0이면 T_c는 아무 의미가 없습니다.</p>
                     <p class="text-sm mt-1"><strong>추천:</strong> 0.2 ~ 0.5. (주제에 따라 다름)</p>
                     <p class="text-sm mt-1"><strong>AI 활용법:</strong> AI에게 "나는 [창의적인 작업]을 하고 있어. T_c 보너스가 큰(w_c=0.5) 작업이니, 2시간 동안 방해받지 않도록 보조해줘"라고 선언하며 학습 환경을 설정할 수 있습니다.</p>
