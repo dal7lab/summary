@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학습 성장 곡선 시뮬레이터 (v8 - 비교 분석)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts - Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+        .gradient-text {
+            /* Blue to Teal Gradient */
+            background: linear-gradient(to right, #38BDF8, #2DD4BF, #34D399); 
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .accordion-content { display: none; overflow: hidden; }
+        .chart-container { position: relative; height: 60vh; width: 100%; min-height: 450px; }
+        .formula {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.25rem; color: #D1D5DB; background: #1F2937;
+            padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #4B5563;
+        }
+        input[type="range"] {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 8px; background: #374151;
+            border-radius: 5px; outline: none;
+        }
+        /* 시나리오 1 슬라이더 썸 */
+        input[type="range"].slider-scenario-1::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 20px; height: 20px; background: #F9A8D4; /* accent-pink-300 */
+            border-radius: 50%; cursor: pointer; transition: background 0.2s;
+        }
+        input[type="range"].slider-scenario-1::-moz-range-thumb {
+            width: 20px; height: 20px; background: #F9A8D4;
+            border-radius: 50%; cursor: pointer; border: none;
+        }
+        /* 시나리오 2 슬라이더 썸 */
+        input[type="range"].slider-scenario-2::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 20px; height: 20px; background: #2DD4BF; /* accent-teal-500 */
+            border-radius: 50%; cursor: pointer; transition: background 0.2s;
+        }
+        input[type="range"].slider-scenario-2::-moz-range-thumb {
+            width: 20px; height: 20px; background: #2DD4BF;
+            border-radius: 50%; cursor: pointer; border: none;
+        }
+        /* 고급 설정 슬라이더 썸 (기본) */
+        input[type="range"].slider-shared::-webkit-slider-thumb {
+             -webkit-appearance: none; appearance: none;
+            width: 20px; height: 20px; background: #9CA3AF; /* gray-400 */
+            border-radius: 50%; cursor: pointer; transition: background 0.2s;
+        }
+        input[type="range"].slider-shared::-moz-range-thumb {
+            width: 20px; height: 20px; background: #9CA3AF;
+            border-radius: 50%; cursor: pointer; border: none;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <div class="container mx-auto max-w-7xl px-4 py-16">
+
+        <!-- 헤더 -->
+        <header class="text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-black mb-6 gradient-text">
+                학습 성장 곡선 비교 시뮬레이터
+            </h1>
+            <p class="text-2xl md:text-3xl font-bold text-gray-100">
+                (Python 로직 기반 v8)
+            </p>
+        </header>
+
+        <!-- 시뮬레이션 메인 (그리드) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- 1. 컨트롤 패널 (L) -->
+            <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 h-fit">
+                
+                <!-- [수정] 시나리오 1 -->
+                <h2 class="text-2xl font-bold text-pink-300 mb-6 pb-3 border-b border-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1zm-1 4a1 1 0 100 2h2a1 1 0 100-2H6zm3 0a1 1 0 100 2h2a1 1 0 100-2H9zm3 0a1 1 0 100 2h1a1 1 0 100-2h-1zm-1-4a1 1 0 100 2h2a1 1 0 100-2h-2z" clip-rule="evenodd" /></svg>
+                    시나리오 1 (현재)
+                </h2>
+                <div class="space-y-6">
+                    <div>
+                        <label for="param-total_time_1" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>총 학습 시간 (T_d)</span>
+                            <span id="val-total_time_1" class="font-bold text-pink-300 text-base">4.0 시간</span>
+                        </label>
+                        <input type="range" id="param-total_time_1" min="0" max="16" value="4.0" step="0.5" class="w-full mt-2 slider-scenario-1">
+                    </div>
+                    <div>
+                        <label for="param-focus_level_1" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>학습 몰입도 (F_p)</span>
+                            <span id="val-focus_level_1" class="font-bold text-pink-300 text-base">70 %</span>
+                        </label>
+                        <input type="range" id="param-focus_level_1" min="0" max="1" value="0.70" step="0.01" class="w-full mt-2 slider-scenario-1">
+                    </div>
+                    <div>
+                        <label for="param-continuous_time_1" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>최대 연속 학습 시간 (T_c)</span>
+                            <span id="val-continuous_time_1" class="font-bold text-pink-300 text-base">1.0 시간</span>
+                        </label>
+                        <input type="range" id="param-continuous_time_1" min="0" max="4" value="1.0" step="0.1" class="w-full mt-2 slider-scenario-1">
+                    </div>
+                </div>
+
+                <!-- [신규] 시나리오 2 -->
+                <h2 class="text-2xl font-bold text-teal-300 mt-10 mb-6 pb-3 border-b border-gray-600">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 2a3 3 0 00-3 3v10a3 3 0 003 3h10a3 3 0 003-3V5a3 3 0 00-3-3H5zm2.5 4a.5.5 0 000 1h3a.5.5 0 000-1h-3zM8 9a.5.5 0 000 1h3a.5.5 0 000-1H8zM7 13.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
+                    시나리오 2 (개선)
+                </h2>
+                 <div class="space-y-6">
+                    <div>
+                        <label for="param-total_time_2" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>총 학습 시간 (T_d)</span>
+                            <span id="val-total_time_2" class="font-bold text-teal-300 text-base">12.0 시간</span>
+                        </label>
+                        <input type="range" id="param-total_time_2" min="0" max="16" value="12.0" step="0.5" class="w-full mt-2 slider-scenario-2">
+                    </div>
+                    <div>
+                        <label for="param-focus_level_2" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>학습 몰입도 (F_p)</span>
+                            <span id="val-focus_level_2" class="font-bold text-teal-300 text-base">95 %</span>
+                        </label>
+                        <input type="range" id="param-focus_level_2" min="0" max="1" value="0.95" step="0.01" class="w-full mt-2 slider-scenario-2">
+                    </div>
+                    <div>
+                        <label for="param-continuous_time_2" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>최대 연속 학습 시간 (T_c)</span>
+                            <span id="val-continuous_time_2" class="font-bold text-teal-300 text-base">2.8 시간</span>
+                        </label>
+                        <input type="range" id="param-continuous_time_2" min="0" max="4" value="2.8" step="0.1" class="w-full mt-2 slider-scenario-2">
+                    </div>
+                </div>
+
+                <!-- [공통] 고급 설정 -->
+                <div class="mt-10 pt-6 border-t border-gray-600">
+                    <h3 class="text-xl font-bold text-white mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.835 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.835 2.942-.734 2.106-2.106a1.532 1.532 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01.947-2.287c.835-1.372-.734-2.942-2.106-2.106A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                        공통 고급 설정 (상수)
+                    </h3>
+                    <div class="space-y-6">
+                         <div>
+                            <label for="param-A0" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>초기 능력치 (A₀)</span>
+                                <span id="val-A0" class="font-bold text-white text-base">1</span>
+                            </label>
+                            <input type="range" id="param-A0" min="1" max="100" value="1" step="1" class="w-full mt-2 slider-shared">
+                        </div>
+                        <div>
+                            <label for="param-L" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>최대 능력치 (L)</span>
+                                <span id="val-L" class="font-bold text-white text-base">1000</span>
+                            </label>
+                            <input type="range" id="param-L" min="500" max="2000" value="1000" step="50" class="w-full mt-2 slider-shared">
+                        </div>
+                        <div>
+                            <label for="param-B" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>기본 학습 효율 (B)</span>
+                                <span id="val-B" class="font-bold text-white text-base">0.010</span>
+                            </label>
+                            <input type="range" id="param-B" min="0.001" max="0.05" value="0.01" step="0.001" class="w-full mt-2 slider-shared">
+                        </div>
+                        <div>
+                            <label for="param-wc" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>연속 보너스 가중치 (w_c)</span>
+                                <span id="val-wc" class="font-bold text-white text-base">0.25</span>
+                            </label>
+                            <input type="range" id="param-wc" min="0" max="1" value="0.25" step="0.01" class="w-full mt-2 slider-shared">
+                        </div>
+                        <div>
+                            <label for="param-Sim_Days" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                                <span>시뮬레이션 기간 (Sim_Days)</span>
+                                <span id="val-Sim_Days" class="font-bold text-white text-base">365 일</span>
+                            </label>
+                            <input type="range" id="param-Sim_Days" min="30" max="18250" value="365" step="30" class="w-full mt-2 slider-shared">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 그래프 및 해석 (R) -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- 차트 -->
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-4">📈 능력치(A) 비교 성장 곡선</h2>
+                    <div class="chart-container">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 1. 시뮬레이션 결과 요약 -->
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15v4a1 1 0 001 1h12a1 1 0 001-1v-4a1 1 0 00-.293-.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
+                        시뮬레이션 결과 요약
+                    </h2>
+                    <!-- [수정] analysis-text가 이제 2개 시나리오를 비교 -->
+                    <div id="analysis-text" class="text-lg text-gray-300 leading-relaxed space-y-3">
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
+                </div>
+
+                <!-- 2. [신규] 상세 비교 컨설팅 보고서 -->
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        상세 비교 컨설팅 보고서
+                    </h2>
+                    <div id="comparative-consulting-report" class="text-base text-gray-300 leading-relaxed space-y-4">
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
+                </div>
+
+                <!-- 3. [유지] 변수 상세 설명 및 AI 활용법 (시나리오 2 기준) -->
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21v-1m-4-4H7M17 17h-1" />
+                        </svg>
+                        '시나리오 2'를 위한 AI 학습 도우미 활용법
+                    </h2>
+                    <div id="variable-ai-guide" class="text-gray-300 leading-relaxed space-y-6">
+                        <!-- JS로 동적 업데이트 (시나리오 2 기준) -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 시뮬레이션 작동 원리 (아코디언) -->
+        <section class="mt-24">
+            <h2 class="text-4xl font-extrabold text-center mb-12 gradient-text">
+                시뮬레이션 작동 원리
+            </h2>
+            <div class="max-w-4xl mx-auto space-y-4">
+                
+                <!-- 아코디언 1: 일일 성장률(k) 계산 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">1. 일일 성장률 (k) 계산</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            매일의 '성장률(k)'은 총 학습 시간, 몰입도, 연속 학습 시간을 기반으로 계산됩니다.
+                        </p>
+                        <div class="formula">
+                            $E_{eff} = T_d \cdot F_p$ (유효 학습 시간)
+                            <br>
+                            $C_{bonus} = 1 + (w_c \cdot T_c)$ (연속 학습 보너스)
+                            <br>
+                            $k = B \cdot E_{eff} \cdot C_{bonus}$
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 아코디언 2: 로지스틱 성장 모델 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">2. 로지스틱 성장 모델 (이산형)</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            일일 '능력치 변화량($\Delta A$)'은 어제의 능력치($A_{t-1}$)와 성장 한계($L$)에 의해 결정됩니다.
+                        </p>
+                        <div class="formula">
+                            $\Delta A = k \cdot A_{t-1} \cdot (1 - \frac{A_{t-1}}{L})$
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 아코디언 3: 시뮬레이션 루프 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">3. 시뮬레이션 루프</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            시뮬레이션은 $Sim\_Days$ (예: 365일) 동안 매일 다음 계산을 반복합니다.
+                        </p>
+                        <div class="formula">
+                            $A_t = A_{t-1} + \Delta A$
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        let growthChart; 
+        const inputs = {};
+        const values = {};
+        
+        // [수정] 파라미터 ID를 시나리오 1, 2, 공통으로 분리
+        const paramIds_1 = ['total_time_1', 'focus_level_1', 'continuous_time_1'];
+        const paramIds_2 = ['total_time_2', 'focus_level_2', 'continuous_time_2'];
+        const paramIds_shared = ['A0', 'L', 'B', 'wc', 'Sim_Days'];
+        const allParamIds = [...paramIds_1, ...paramIds_2, ...paramIds_shared];
+
+        // --- 1. 시뮬레이션 핵심 로직 ---
+
+        function calculateKDaily(params) {
+            // params 객체는 'total_time', 'focus_level' 등 일반 키를 가짐
+            const { total_time, focus_level, continuous_time, B, wc } = params;
+            const effective_hours = total_time * focus_level;
+            const continuity_bonus = 1 + (wc * continuous_time);
+            const k_value = B * effective_hours * continuity_bonus;
+            return k_value;
+        }
+
+        function runSimulation(params, k_scenario) {
+            const { A0, L, Sim_Days } = params;
+            let ability_history = [A0];
+            let days = [0];
+            let current_ability = A0;
+
+            for (let day = 1; day <= Sim_Days; day++) {
+                let growth = 0;
+                if (current_ability > 0 && current_ability < L) {
+                    const logistic_factor = current_ability * (1 - (current_ability / L));
+                    growth = k_scenario * logistic_factor;
+                }
+                current_ability += growth;
+                current_ability = Math.min(Math.max(current_ability, 0), L);
+                ability_history.push(current_ability);
+                days.push(day);
+            }
+            return { days, ability_history };
+        }
+
+        // --- 2. UI 업데이트 함수 ---
+
+        function updateChart(data_A, data_B) {
+            const chartCanvas = document.getElementById('growthChart')?.getContext('2d');
+            if (!chartCanvas) return;
+
+            const L = parseFloat(inputs.L.value);
+            const line_50 = new Array(data_A.days.length).fill(L * 0.5);
+            const line_90 = new Array(data_A.days.length).fill(L * 0.9);
+            const Sim_Days = parseFloat(inputs.Sim_Days.value);
+            const labelStep = Math.max(30, Math.ceil(Sim_Days / 12 / 30) * 30); 
+
+            try {
+                if (growthChart) {
+                    growthChart.data.labels = data_A.days; // X축은 동일
+                    growthChart.data.datasets[0].data = data_A.ability_history;
+                    growthChart.data.datasets[1].data = data_B.ability_history;
+                    growthChart.data.datasets[2].data = line_50;
+                    growthChart.data.datasets[3].data = line_90;
+                    growthChart.options.scales.y.max = L; 
+                    growthChart.options.scales.x.ticks.callback = function(value, index, values) {
+                        return (index % labelStep === 0) ? `${data_A.days[index]}일` : null;
+                    };
+                    growthChart.update();
+                } else {
+                    growthChart = new Chart(chartCanvas, {
+                        type: 'line',
+                        data: {
+                            labels: data_A.days,
+                            datasets: [
+                                {
+                                    label: '시나리오 1 (현재)',
+                                    data: data_A.ability_history,
+                                    borderColor: '#F9A8D4', // Pink
+                                    backgroundColor: '#F9A8D430',
+                                    borderWidth: 2.5,
+                                    fill: false,
+                                    tension: 0.1
+                                },
+                                {
+                                    label: '시나리오 2 (개선)',
+                                    data: data_B.ability_history,
+                                    borderColor: '#2DD4BF', // Teal
+                                    backgroundColor: '#2DD4BF30',
+                                    borderWidth: 3.5,
+                                    fill: true,
+                                    tension: 0.1
+                                },
+                                {
+                                    label: '50% 달성선',
+                                    data: line_50,
+                                    borderColor: '#3B82F6', // Blue-500
+                                    borderWidth: 1.5,
+                                    borderDash: [5, 5], 
+                                    fill: false,
+                                    pointRadius: 0
+                                },
+                                {
+                                    label: '90% 달성선',
+                                    data: line_90,
+                                    borderColor: '#EF4444', // Red-500
+                                    borderWidth: 1.5,
+                                    borderDash: [5, 5], 
+                                    fill: false,
+                                    pointRadius: 0
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top', labels: { color: '#E5E7EB', font: { size: 14 } } },
+                                tooltip: { mode: 'index', intersect: false, callbacks: { 
+                                    title: (tooltipItems) => `${tooltipItems[0].label} 일차`,
+                                    label: (tooltipItem) => `${tooltipItem.dataset.label || ''}: ${parseFloat(tooltipItem.raw).toFixed(1)}`
+                                } }
+                            },
+                            scales: {
+                                x: {
+                                    title: { display: true, text: '시간 (일)', color: '#9CA3AF' },
+                                    ticks: {
+                                        color: '#9CA3AF',
+                                        callback: function(value, index, values) {
+                                            return (index % labelStep === 0) ? `${data_A.days[index]}일` : null;
+                                        },
+                                        maxRotation: 0,
+                                        autoSkip: false
+                                    },
+                                    grid: { color: '#374151' }
+                                },
+                                y: {
+                                    title: { display: true, text: '능력치 (A)', color: '#9CA3AF' },
+                                    ticks: { color: '#9CA3AF' },
+                                    grid: { color: '#374151' },
+                                    min: 0,
+                                    max: L
+                                }
+                            },
+                            elements: { point: { radius: 0, hitRadius: 10, hoverRadius: 5 } }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("[Chart Error]", error);
+            }
+        }
+
+        /**
+         * [수정] 결과 요약 (두 시나리오 모두 표시)
+         */
+        function updateAnalysis(data_A, data_B, params, k_value_A, k_value_B) {
+            const analysisText = document.getElementById('analysis-text');
+            if (!analysisText) return;
+            
+            const { L, Sim_Days } = params;
+            const L_50 = L * 0.5;
+            const L_90 = L * 0.9;
+
+            // 시나리오 1
+            const day_50_A = data_A.ability_history.findIndex(val => val >= L_50);
+            const day_90_A = data_A.ability_history.findIndex(val => val >= L_90);
+            const day_50_A_text = (day_50_A > 0) ? `약 ${day_50_A}일` : `${Sim_Days}일 내 도달 못함`;
+            const day_90_A_text = (day_90_A > 0) ? `약 ${day_90_A}일` : `${Sim_Days}일 내 도달 못함`;
+
+            // 시나리오 2
+            const day_50_B = data_B.ability_history.findIndex(val => val >= L_50);
+            const day_90_B = data_B.ability_history.findIndex(val => val >= L_90);
+            const day_50_B_text = (day_50_B > 0) ? `약 ${day_50_B}일` : `${Sim_Days}일 내 도달 못함`;
+            const day_90_B_text = (day_90_B > 0) ? `약 ${day_90_B}일` : `${Sim_Days}일 내 도달 못함`;
+
+            analysisText.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 시나리오 1 요약 -->
+                    <div class="p-4 bg-gray-900 rounded-lg">
+                        <h4 class="text-lg font-semibold text-pink-300">시나리오 1 (현재)</h4>
+                        <p class="mt-2"><strong>성장률 (k)</strong>: <span class="font-bold text-xl">${k_value_A.toFixed(4)}</span></p>
+                        <p class="mt-1 text-sm"><strong>50% (A=${L_50.toFixed(0)}) 도달:</strong> ${day_50_A_text}</p>
+                        <p class="mt-1 text-sm"><strong>90% (A=${L_90.toFixed(0)}) 도달:</strong> <span class="${day_90_A > 0 ? '' : 'text-red-400'}">${day_90_A_text}</span></p>
+                    </div>
+                    <!-- 시나리오 2 요약 -->
+                    <div class="p-4 bg-gray-900 rounded-lg">
+                        <h4 class="text-lg font-semibold text-teal-300">시나리오 2 (개선)</h4>
+                        <p class="mt-2"><strong>성장률 (k)</strong>: <span class="font-bold text-xl">${k_value_B.toFixed(4)}</span></p>
+                        <p class="mt-1 text-sm"><strong>50% (A=${L_50.toFixed(0)}) 도달:</strong> ${day_50_B_text}</p>
+                        <p class="mt-1 text-sm"><strong>90% (A=${L_90.toFixed(0)}) 도달:</strong> <span class="${day_90_B > 0 ? 'text-white' : 'text-red-400'}">${day_90_B_text}</span></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * [신규] 상세 비교 컨설팅 보고서
+         */
+        function updateComparativeReport(data_A, data_B, params, k_value_A, k_value_B) {
+            const reportDiv = document.getElementById('comparative-consulting-report');
+            if (!reportDiv) return;
+
+            const { L, Sim_Days } = params;
+            const final_A = data_A.ability_history[data_A.ability_history.length - 1];
+            const final_B = data_B.ability_history[data_B.ability_history.length - 1];
+            const k_diff_percent = (k_value_A > 0) ? ((k_value_B / k_value_A) - 1) * 100 : (k_value_B > 0 ? 1000 : 0);
+            
+            const day_90_A = data_A.ability_history.findIndex(val => val >= L * 0.9);
+            const day_90_B = data_B.ability_history.findIndex(val => val >= L * 0.9);
+
+            // 1. k값 비교
+            let k_analysis = `시나리오 2의 성장률(k=${k_value_B.toFixed(4)})은 1(${k_value_A.toFixed(4)}) 대비 <strong class="text-teal-300">${k_diff_percent.toFixed(0)}%</strong> 더 높습니다. 이것이 모든 차이를 만드는 핵심입니다.`;
+            if (k_value_B < k_value_A) {
+                 k_analysis = `시나리오 2의 성장률(k=${k_value_B.toFixed(4)})은 1(${k_value_A.toFixed(4)}) 대비 <strong class="text-red-400">${Math.abs(k_diff_percent).toFixed(0)}%</strong> 더 낮습니다. 개선안이 오히려 비효율적입니다.`;
+            }
+
+            // 2. 핵심 동인
+            const diff_T = params.total_time_2 - params.total_time_1;
+            const diff_F = params.focus_level_2 - params.focus_level_1;
+            const diff_C = params.continuous_time_2 - params.continuous_time_1;
+            let driver_analysis = "";
+            if (k_diff_percent > 10) {
+                 driver_analysis = `이 성과를 이끈 핵심 동인은 <strong class="text-white">${Math.abs(diff_T).toFixed(1)}시간 증가한 총 학습 시간</strong>과 <strong class="text-white">${(Math.abs(diff_F)*100).toFixed(0)}%p 증가한 몰입도</strong>입니다. '양'과 '질' 모두를 잡았습니다.`;
+            } else if (k_diff_percent < -10) {
+                driver_analysis = `k값이 하락한 주된 원인은 <strong class="text-red-400">학습 시간 감소(${diff_T.toFixed(1)}h)</strong> 및 <strong class="text-red-400">몰입도 하락(${(diff_F*100).toFixed(0)}%p)</strong>입니다.`;
+            } else {
+                driver_analysis = "두 시나리오 간의 k값 차이가 미미합니다. 더 극적인 변화를 위해 변수 값을 조정해보세요.";
+            }
+
+            // 3. 목표 달성 속도
+            let goal_analysis = "";
+            if (day_90_A > 0 && day_90_B > 0) {
+                goal_analysis = `전문가 수준(90%) 도달 속도가 <strong class="text-white">${day_90_A}일</strong>에서 <strong class="text-teal-300">${day_90_B}일</strong>로 <strong class="text-teal-300">${day_90_A - day_90_B}일</strong> 단축되었습니다.`;
+            } else if (day_90_A <= 0 && day_90_B > 0) {
+                goal_analysis = `시나리오 1은 ${Sim_Days}일 내 90% 도달이 불가능했지만, 시나리오 2는 <strong class="text-teal-300">${day_90_B}일</strong> 만에 90% 도달에 성공했습니다. <strong class="text-teal-300">'불가능'이 '가능'으로 바뀌었습니다.</strong>`;
+            } else if (day_90_A > 0 && day_90_B <= 0) {
+                goal_analysis = `오히려 시나리오 2에서 90% 도달이 <strong class="text-red-400">불가능</strong>해졌습니다. 시나리오 1의 전략을 유지해야 합니다.`;
+            } else {
+                goal_analysis = `두 시나리오 모두 ${Sim_Days}일 내 90% 도달에 실패했습니다. 더 높은 k값 또는 더 긴 시뮬레이션 기간이 필요합니다.`;
+            }
+
+            // 4. 최종 성장도
+            let final_analysis = `${Sim_Days}일 후, 시나리오 2의 최종 능력치(<strong class="text-teal-300">${final_B.toFixed(0)}</strong>)는 1(<strong class="text-pink-300">${final_A.toFixed(0)}</strong>)보다 <strong class="text-white">${(final_B - final_A).toFixed(0)} 포인트</strong> 더 높습니다. 이 차이는 시간이 지날수록 기하급수적으로 벌어질 것입니다.`;
+            if (final_B < final_A) {
+                final_analysis = `${Sim_Days}일 후, 시나리오 2의 최종 능력치(<strong class="text-teal-300">${final_B.toFixed(0)}</strong>)는 1(<strong class="text-pink-300">${final_A.toFixed(0)}</strong>)보다 <strong class="text-red-400">${(final_A - final_B).toFixed(0)} 포인트</strong> 더 낮습니다.`;
+            }
+
+            reportDiv.innerHTML = `
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white">1. 성장률(k) 비교</h3>
+                    <p>${k_analysis}</p>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white">2. 핵심 변화 동인</h3>
+                    <p>${driver_analysis}</p>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white">3. 목표 달성 속도 비교 (90% 기준)</h3>
+                    <p>${goal_analysis}</p>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white">4. 최종 능력치 및 전략 제언</h3>
+                    <p>${final_analysis}</p>
+                    <p class="mt-2"><strong>[최종 제언]</strong>: ${k_diff_percent > 10 ? "시뮬레이션 결과가 명확하게 보여주듯, '시나리오 2'의 학습 습관을 즉시 도입하는 것이 장기적으로 막대한 이익을 가져옵니다. 아래의 AI 활용법을 참고하여 '시나리오 2'를 현실로 만드십시오." : "현재 '시나리오 2'의 설정이 '시나리오 1'보다 비효율적이거나 차이가 미미합니다. '개선' 시나리오의 T_d, F_p 값을 더 높게 설정하여 k값의 극적인 차이를 확인해보십시오."}</p>
+                </div>
+            `;
+        }
+
+        /**
+         * [수정] 변수 가이드 (시나리오 2 기준)
+         */
+        function updateVariableGuide(params, k_value) {
+            const guideDiv = document.getElementById('variable-ai-guide');
+            if (!guideDiv) return;
+
+            const { total_time, focus_level, continuous_time, B, wc, L } = params; // params = params_B
+
+            guideDiv.innerHTML = `
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-sky-300">1. 총 학습 시간 (T_d) <span class="text-sm font-normal text-white">(목표: ${total_time.toFixed(1)} 시간)</span></h4>
+                    <p class="text-sm mt-1"><strong>AI 활용법:</strong> AI에게 "나의 하루 일과표(예: 미팅, 식사 시간)를 주고, 목표 ${total_time.toFixed(1)}시간의 학습 시간을 확보할 수 있는 최적의 스케줄을 3가지 안으로 제안해줘"라고 요청하십시오.</p>
+                </div>
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-sky-300">2. 학습 몰입도 (F_p) <span class="text-sm font-normal text-white">(목표: ${(focus_level * 100).toFixed(0)} %)</span></h4>
+                    <p class="text-sm mt-1"><strong>AI 활용법:</strong> '뽀모도로 타이머' 세션(예: 50분 학습, 10분 휴식)을 AI와 함께 시작하십시오. AI에게 "내가 [주제]를 학습할 때 몰입도가 떨어지는 징후가 보이면, 즉시 알려주고 관련된 퀴즈를 내줘"라고 요청하여 상호작용을 유지하십시오.</p>
+                </div>
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-sky-300">3. 최대 연속 학습 시간 (T_c) <span class="text-sm font-normal text-white">(목표: ${continuous_time.toFixed(1)} 시간)</span></h4>
+                    <p class="text-sm mt-1"><strong>AI 활용법:</strong> AI에게 "${continuous_time.toFixed(1)}시간 분량의 [주제]에 대한 딥다이브 학습 세션을 설계해줘. 중간에 흐름이 끊기지 않도록 관련 개념을 순서대로 배열하고, 마지막 10분은 복습 퀴즈로 구성해줘"라고 요청하십시오.</p>
+                </div>
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-white">4. 기본 학습 효율 (B) <span class="text-sm font-normal text-white">(현재: ${B.toFixed(3)})</span></h4>
+                    <p class="text-sm mt-1"><strong>AI 활용법 (핵심):</strong> B값을 극대화하는 것이 AI 활용의 핵심입니다. AI에게 "내가 [주제]를 L=${L.toFixed(0)} 수준까지 배우려 해. 가장 효율적인(B가 높은) 학습 로드맵을 짜줘", "이 복잡한 개념을 '파인만 기법'으로 10살 아이도 이해하게 설명해줘", "관련된 '메타인지' 질문 5개만 해줘"라고 요청하여 학습 효율 자체를 극대화하십시오.</p>
+                </div>
+            `;
+        }
+        
+        // --- 3. 유틸리티 및 메인 실행 ---
+
+        /**
+         * [수정] 메인 실행 함수
+         */
+        function runFullSimulation() {
+            // 1. 공통 파라미터 읽기
+            const params_shared = {};
+            paramIds_shared.forEach(id => {
+                params_shared[id] = parseFloat(inputs[id].value);
+            });
+
+            // 2. 시나리오 1 파라미터 객체 생성
+            const params_A = { ...params_shared };
+            paramIds_1.forEach(id => {
+                const genericKey = id.replace('_1', ''); // 'total_time_1' -> 'total_time'
+                params_A[genericKey] = parseFloat(inputs[id].value);
+            });
+
+            // 3. 시나리오 2 파라미터 객체 생성
+            const params_B = { ...params_shared };
+            paramIds_2.forEach(id => {
+                const genericKey = id.replace('_2', ''); // 'total_time_2' -> 'total_time'
+                params_B[genericKey] = parseFloat(inputs[id].value);
+            });
+
+            // 4. 각 시나리오별 k값 및 시뮬레이션 실행
+            const k_value_A = calculateKDaily(params_A);
+            const data_A = runSimulation(params_A, k_value_A);
+            
+            const k_value_B = calculateKDaily(params_B);
+            const data_B = runSimulation(params_B, k_value_B); // Sim_Days가 같으므로 X축 길이는 동일
+            
+            // 5. 모든 UI 섹션 업데이트
+            updateChart(data_A, data_B);
+            updateAnalysis(data_A, data_B, params_shared, k_value_A, k_value_B);
+            updateComparativeReport(data_A, data_B, params_A, params_B, k_value_A, k_value_B); // params_A/B 전달
+            updateVariableGuide(params_B, k_value_B); // 시나리오 2(개선) 기준
+        }
+
+        /**
+         * [수정] 슬라이더 레이블 업데이트 (id 기준)
+         */
+        function updateSliderLabel(id, value) {
+            if (values[id]) {
+                const key = id.replace(/_1|_2$/, ''); // 'total_time_1' -> 'total_time'
+                
+                if (key === 'total_time' || key === 'continuous_time') {
+                    values[id].textContent = `${value.toFixed(1)} 시간`;
+                } else if (key === 'focus_level') {
+                    values[id].textContent = `${(value * 100).toFixed(0)} %`;
+                } else if (key === 'B') {
+                    values[id].textContent = value.toFixed(3);
+                } else if (key === 'wc') {
+                    values[id].textContent = value.toFixed(2);
+                } else if (key === 'Sim_Days') {
+                    values[id].textContent = `${value.toFixed(0)} 일`;
+                } else { // A0, L
+                    values[id].textContent = value.toFixed(0);
+                }
+            }
+        }
+
+        function updateSimDaysStep(currentValue) {
+            const slider = inputs.Sim_Days;
+            if (!slider) return;
+
+            let newStep = 30; // 기본값
+            if (currentValue < 1825) newStep = 5;       // 5년 미만
+            else if (currentValue < 3650) newStep = 7;  // 10년 미만
+            else if (currentValue < 7300) newStep = 30; // 20년 미만
+            else if (currentValue < 10950) newStep = 60;// 30년 미만
+            else if (currentValue < 14600) newStep = 90;// 40년 미만
+            else newStep = 120; // 50년 이하
+            
+            slider.step = newStep;
+        }
+
+        function initializeApp() {
+            console.log("DOM 로드 완료. v8 앱 초기화 시작...");
+            
+            allParamIds.forEach(id => {
+                inputs[id] = document.getElementById(`param-${id}`);
+                values[id] = document.getElementById(`val-${id}`);
+            });
+
+            allParamIds.forEach(id => {
+                if(inputs[id]) {
+                    inputs[id].addEventListener('input', (event) => {
+                        const value = parseFloat(event.target.value);
+                        if (id === 'Sim_Days') {
+                            updateSimDaysStep(value);
+                        }
+                        updateSliderLabel(id, value);
+                        runFullSimulation(); 
+                    });
+                }
+            });
+            
+            document.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('svg');
+                    const isOpening = content.style.display !== 'block';
+                    document.querySelectorAll('.accordion-content').forEach(c => c.style.display = 'none');
+                    document.querySelectorAll('.accordion-button svg').forEach(i => i.style.transform = 'rotate(0deg)');
+                    if (isOpening) {
+                        content.style.display = 'block';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // 초기 실행
+            runFullSimulation();
+            console.log("앱 초기화 완료.");
+        }
+        
+    </script>
+</body>
+</html>
+
