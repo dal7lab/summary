@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>학습 성장 곡선 시뮬레이터 (v9 - 버그 수정)</title>
+    <!-- [수정] 타이틀 v10 -->
+    <title>학습 성장 곡선 시뮬레이터 (v10 - 용어 수정)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -35,7 +36,7 @@
             width: 100%; height: 8px; background: #374151;
             border-radius: 5px; outline: none;
         }
-        /* 시나리오 1 슬라이더 썸 */
+        /* 시나리오 A 슬라이더 썸 */
         input[type="range"].slider-scenario-1::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none;
             width: 20px; height: 20px; background: #F9A8D4; /* accent-pink-300 */
@@ -45,7 +46,7 @@
             width: 20px; height: 20px; background: #F9A8D4;
             border-radius: 50%; cursor: pointer; border: none;
         }
-        /* 시나리오 2 슬라이더 썸 */
+        /* 시나리오 B 슬라이더 썸 */
         input[type="range"].slider-scenario-2::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none;
             width: 20px; height: 20px; background: #2DD4BF; /* accent-teal-500 */
@@ -77,7 +78,7 @@
                 학습 성장 곡선 비교 시뮬레이터
             </h1>
             <p class="text-2xl md:text-3xl font-bold text-gray-100">
-                (Python 로직 기반 v9)
+                (Python 로직 기반 v10)
             </p>
         </header>
 
@@ -87,10 +88,10 @@
             <!-- 1. 컨트롤 패널 (L) -->
             <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 h-fit">
                 
-                <!-- 시나리오 1 -->
+                <!-- [용어 수정] 시나리오 A -->
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 pb-3 border-b border-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1zm-1 4a1 1 0 100 2h2a1 1 0 100-2H6zm3 0a1 1 0 100 2h2a1 1 0 100-2H9zm3 0a1 1 0 100 2h1a1 1 0 100-2h-1zm-1-4a1 1 0 100 2h2a1 1 0 100-2h-2z" clip-rule="evenodd" /></svg>
-                    시나리오 1 (현재)
+                    시나리오 A (현재)
                 </h2>
                 <div class="space-y-6">
                     <div>
@@ -116,10 +117,10 @@
                     </div>
                 </div>
 
-                <!-- 시나리오 2 -->
+                <!-- [용어 수정] 시나리오 B -->
                 <h2 class="text-2xl font-bold text-teal-300 mt-10 mb-6 pb-3 border-b border-gray-600">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 2a3 3 0 00-3 3v10a3 3 0 003 3h10a3 3 0 003-3V5a3 3 0 00-3-3H5zm2.5 4a.5.5 0 000 1h3a.5.5 0 000-1h-3zM8 9a.5.5 0 000 1h3a.5.5 0 000-1H8zM7 13.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
-                    시나리오 2 (개선)
+                    시나리오 B (개선)
                 </h2>
                  <div class="space-y-6">
                     <div>
@@ -174,8 +175,9 @@
                             <input type="range" id="param-B" min="0.001" max="0.05" value="0.01" step="0.001" class="w-full mt-2 slider-shared">
                         </div>
                         <div>
+                            <!-- [용어 수정] 연속 학습 가중치 -->
                             <label for="param-wc" class="flex justify-between items-center text-sm font-medium text-gray-300">
-                                <span>연속 보너스 가중치 (w_c)</span>
+                                <span>연속 학습 가중치 (w_c)</span>
                                 <span id="val-wc" class="font-bold text-white text-base">0.25</span>
                             </label>
                             <input type="range" id="param-wc" min="0" max="1" value="0.25" step="0.01" class="w-full mt-2 slider-shared">
@@ -225,16 +227,17 @@
                     </div>
                 </div>
 
-                <!-- 3. '시나리오 2'를 위한 AI 학습 도우미 활용법 -->
+                <!-- 3. '시나리오 B'를 위한 AI 학습 도우미 활용법 -->
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <!-- [용어 수정] 시나리오 B -->
                     <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21v-1m-4-4H7M17 17h-1" />
                         </svg>
-                        '시나리오 2'를 위한 AI 학습 도우미 활용법
+                        '시나리오 B'를 위한 AI 학습 도우미 활용법
                     </h2>
                     <div id="variable-ai-guide" class="text-gray-300 leading-relaxed space-y-6">
-                        <!-- JS로 동적 업데이트 (시나리오 2 기준) -->
+                        <!-- JS로 동적 업데이트 (시나리오 B 기준) -->
                     </div>
                 </div>
 
@@ -365,6 +368,10 @@
                     growthChart.data.datasets[1].data = data_B.ability_history;
                     growthChart.data.datasets[2].data = line_50;
                     growthChart.data.datasets[3].data = line_90;
+                    // [용어 수정] 차트 레이블
+                    growthChart.data.datasets[0].label = '시나리오 A (현재)';
+                    growthChart.data.datasets[1].label = '시나리오 B (개선)';
+                    
                     growthChart.options.scales.y.max = L; 
                     growthChart.options.scales.x.ticks.callback = function(value, index, values) {
                         return (index % labelStep === 0) ? `${data_A.days[index]}일` : null;
@@ -377,7 +384,8 @@
                             labels: data_A.days,
                             datasets: [
                                 {
-                                    label: '시나리오 1 (현재)',
+                                    // [용어 수정] 차트 레이블
+                                    label: '시나리오 A (현재)',
                                     data: data_A.ability_history,
                                     borderColor: '#F9A8D4', // Pink
                                     backgroundColor: '#F9A8D430',
@@ -386,7 +394,8 @@
                                     tension: 0.1
                                 },
                                 {
-                                    label: '시나리오 2 (개선)',
+                                    // [용어 수정] 차트 레이블
+                                    label: '시나리오 B (개선)',
                                     data: data_B.ability_history,
                                     borderColor: '#2DD4BF', // Teal
                                     backgroundColor: '#2DD4BF30',
@@ -474,14 +483,16 @@
 
             analysisText.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- [용어 수정] 시나리오 A -->
                     <div class="p-4 bg-gray-900 rounded-lg">
-                        <h4 class="text-lg font-semibold text-pink-300">시나리오 1 (현재)</h4>
+                        <h4 class="text-lg font-semibold text-pink-300">시나리오 A (현재)</h4>
                         <p class="mt-2"><strong>성장률 (k)</strong>: <span class="font-bold text-xl">${k_value_A.toFixed(4)}</span></p>
                         <p class="mt-1 text-sm"><strong>50% (A=${L_50.toFixed(0)}) 도달:</strong> ${day_50_A_text}</p>
                         <p class="mt-1 text-sm"><strong>90% (A=${L_90.toFixed(0)}) 도달:</strong> <span class="${day_90_A > 0 ? '' : 'text-red-400'}">${day_90_A_text}</span></p>
                     </div>
+                    <!-- [용어 수정] 시나리오 B -->
                     <div class="p-4 bg-gray-900 rounded-lg">
-                        <h4 class="text-lg font-semibold text-teal-300">시나리오 2 (개선)</h4>
+                        <h4 class="text-lg font-semibold text-teal-300">시나리오 B (개선)</h4>
                         <p class="mt-2"><strong>성장률 (k)</strong>: <span class="font-bold text-xl">${k_value_B.toFixed(4)}</span></p>
                         <p class="mt-1 text-sm"><strong>50% (A=${L_50.toFixed(0)}) 도달:</strong> ${day_50_B_text}</p>
                         <p class="mt-1 text-sm"><strong>90% (A=${L_90.toFixed(0)}) 도달:</strong> <span class="${day_90_B > 0 ? 'text-white' : 'text-red-400'}">${day_90_B_text}</span></p>
@@ -490,16 +501,10 @@
             `;
         }
 
-        /**
-         * [버그 수정] 상세 비교 컨설팅 보고서
-         * v8의 버그: function(data_A, data_B, params, k_value_A, k_value_B)
-         * v9의 수정: function(data_A, data_B, params_A, params_B, k_value_A, k_value_B)
-         */
         function updateComparativeReport(data_A, data_B, params_A, params_B, k_value_A, k_value_B) {
             const reportDiv = document.getElementById('comparative-consulting-report');
             if (!reportDiv) return;
 
-            // [버그 수정] 공통 파라미터는 params_A 또는 params_B에서 가져옴
             const { L, Sim_Days } = params_A; 
             
             const final_A = data_A.ability_history[data_A.ability_history.length - 1];
@@ -510,15 +515,15 @@
             const day_90_B = data_B.ability_history.findIndex(val => val >= L * 0.9);
 
             // 1. k값 비교
-            let k_analysis = `시나리오 2의 성장률(k=${k_value_B.toFixed(4)})은 1(${k_value_A.toFixed(4)}) 대비 <strong class="text-teal-300">${k_diff_percent.toFixed(0)}%</strong> 더 높습니다. 이것이 모든 차이를 만드는 핵심입니다.`;
+            // [용어 수정] 시나리오 B, A
+            let k_analysis = `시나리오 B의 성장률(k=${k_value_B.toFixed(4)})은 A(${k_value_A.toFixed(4)}) 대비 <strong class="text-teal-300">${k_diff_percent.toFixed(0)}%</strong> 더 높습니다. 이것이 모든 차이를 만드는 핵심입니다.`;
             if (k_value_B < k_value_A) {
-                 k_analysis = `시나리오 2의 성장률(k=${k_value_B.toFixed(4)})은 1(${k_value_A.toFixed(4)}) 대비 <strong class="text-red-400">${Math.abs(k_diff_percent).toFixed(0)}%</strong> 더 낮습니다. 개선안이 오히려 비효율적입니다.`;
+                 k_analysis = `시나리오 B의 성장률(k=${k_value_B.toFixed(4)})은 A(${k_value_A.toFixed(4)}) 대비 <strong class="text-red-400">${Math.abs(k_diff_percent).toFixed(0)}%</strong> 더 낮습니다. 개선안이 오히려 비효율적입니다.`;
             } else if (k_diff_percent < 10 && k_diff_percent > -10) {
-                 k_analysis = `시나리오 2의 성장률(k=${k_value_B.toFixed(4)})은 1(${k_value_A.toFixed(4)})과 <strong class="text-yellow-300">거의 차이가 없습니다.</strong> 개선안의 변수 값을 더 공격적으로 수정해보세요.`;
+                 k_analysis = `시나리오 B의 성장률(k=${k_value_B.toFixed(4)})은 A(${k_value_A.toFixed(4)})과 <strong class="text-yellow-300">거의 차이가 없습니다.</strong> 개선안의 변수 값을 더 공격적으로 수정해보세요.`;
             }
 
             // 2. 핵심 동인
-            // [버그 수정] params_A와 params_B의 속성을 직접 비교
             const diff_T = params_B.total_time - params_A.total_time;
             const diff_F = params_B.focus_level - params_A.focus_level;
             const diff_C = params_B.continuous_time - params_A.continuous_time;
@@ -533,23 +538,26 @@
             }
 
             // 3. 목표 달성 속도
+            // [용어 수정] 시나리오 A, B
             let goal_analysis = "";
             if (day_90_A > 0 && day_90_B > 0) {
                 goal_analysis = `전문가 수준(90%) 도달 속도가 <strong class="text-white">${day_90_A}일</strong>에서 <strong class="text-teal-300">${day_90_B}일</strong>로 <strong class="text-teal-300">${day_90_A - day_90_B}일</strong> 단축되었습니다.`;
             } else if (day_90_A <= 0 && day_90_B > 0) {
-                goal_analysis = `시나리오 1은 ${Sim_Days}일 내 90% 도달이 불가능했지만, 시나리오 2는 <strong class="text-teal-300">${day_90_B}일</strong> 만에 90% 도달에 성공했습니다. <strong class="text-teal-300">'불가능'이 '가능'으로 바뀌었습니다.</strong>`;
+                goal_analysis = `시나리오 A는 ${Sim_Days}일 내 90% 도달이 불가능했지만, 시나리오 B는 <strong class="text-teal-300">${day_90_B}일</strong> 만에 90% 도달에 성공했습니다. <strong class="text-teal-300">'불가능'이 '가능'으로 바뀌었습니다.</strong>`;
             } else if (day_90_A > 0 && day_90_B <= 0) {
-                goal_analysis = `오히려 시나리오 2에서 90% 도달이 <strong class="text-red-400">불가능</strong>해졌습니다. 시나리오 1의 전략을 유지해야 합니다.`;
+                goal_analysis = `오히려 시나리오 B에서 90% 도달이 <strong class="text-red-400">불가능</strong>해졌습니다. 시나리오 A의 전략을 유지해야 합니다.`;
             } else {
                 goal_analysis = `두 시나리오 모두 ${Sim_Days}일 내 90% 도달에 실패했습니다. 더 높은 k값 또는 더 긴 시뮬레이션 기간이 필요합니다.`;
             }
 
             // 4. 최종 성장도
-            let final_analysis = `${Sim_Days}일 후, 시나리오 2의 최종 능력치(<strong class="text-teal-300">${final_B.toFixed(0)}</strong>)는 1(<strong class="text-pink-300">${final_A.toFixed(0)}</strong>)보다 <strong class="text-white">${(final_B - final_A).toFixed(0)} 포인트</strong> 더 높습니다. 이 차이는 시간이 지날수록 기하급수적으로 벌어질 것입니다.`;
+            // [용어 수정] 시나리오 B, A
+            let final_analysis = `${Sim_Days}일 후, 시나리오 B의 최종 능력치(<strong class="text-teal-300">${final_B.toFixed(0)}</strong>)는 A(<strong class="text-pink-300">${final_A.toFixed(0)}</strong>)보다 <strong class="text-white">${(final_B - final_A).toFixed(0)} 포인트</strong> 더 높습니다. 이 차이는 시간이 지날수록 기하급수적으로 벌어질 것입니다.`;
             if (final_B < final_A) {
-                final_analysis = `${Sim_Days}일 후, 시나리오 2의 최종 능력치(<strong class="text-teal-300">${final_B.toFixed(0)}</strong>)는 1(<strong class="text-pink-300">${final_A.toFixed(0)}</strong>)보다 <strong class="text-red-400">${(final_A - final_B).toFixed(0)} 포인트</strong> 더 낮습니다.`;
+                final_analysis = `${Sim_Days}일 후, 시나리오 B의 최종 능력치(<strong class="text-teal-300">${final_B.toFixed(0)}</strong>)는 A(<strong class="text-pink-300">${final_A.toFixed(0)}</strong>)보다 <strong class="text-red-400">${(final_A - final_B).toFixed(0)} 포인트</strong> 더 낮습니다.`;
             }
 
+            // [용어 수정] 시나리오 B, A
             reportDiv.innerHTML = `
                 <div class="mt-4">
                     <h3 class="text-lg font-semibold text-white">1. 성장률(k) 비교</h3>
@@ -566,14 +574,11 @@
                 <div class="mt-4">
                     <h3 class="text-lg font-semibold text-white">4. 최종 능력치 및 전략 제언</h3>
                     <p>${final_analysis}</p>
-                    <p class="mt-2"><strong>[최종 제언]</strong>: ${k_diff_percent > 10 ? "시뮬레이션 결과가 명확하게 보여주듯, '시나리오 2'의 학습 습관을 즉시 도입하는 것이 장기적으로 막대한 이익을 가져옵니다. 아래의 AI 활용법을 참고하여 '시나리오 2'를 현실로 만드십시오." : "현재 '시나리오 2'의 설정이 '시나리오 1'보다 비효율적이거나 차이가 미미합니다. '개선' 시나리오의 T_d, F_p 값을 더 높게 설정하여 k값의 극적인 차이를 확인해보십시오."}</p>
+                    <p class="mt-2"><strong>[최종 제언]</strong>: ${k_diff_percent > 10 ? "시뮬레이션 결과가 명확하게 보여주듯, '시나리오 B'의 학습 습관을 즉시 도입하는 것이 장기적으로 막대한 이익을 가져옵니다. 아래의 AI 활용법을 참고하여 '시나리오 B'를 현실로 만드십시오." : "현재 '시나리오 B'의 설정이 '시나리오 A'보다 비효율적이거나 차이가 미미합니다. '개선' 시나리오의 T_d, F_p 값을 더 높게 설정하여 k값의 극적인 차이를 확인해보십시오."}</p>
                 </div>
             `;
         }
 
-        /**
-         * [보완] 변수 가이드 (시나리오 2 기준, w_c 추가)
-         */
         function updateVariableGuide(params_B, k_value_B) {
             const guideDiv = document.getElementById('variable-ai-guide');
             if (!guideDiv) return;
@@ -597,9 +602,9 @@
                     <h4 class="text-lg font-semibold text-white">4. 기본 학습 효율 (B) <span class="text-sm font-normal text-white">(현재: ${B.toFixed(3)})</span></h4>
                     <p class="text-sm mt-1"><strong>AI 활용법 (핵심):</strong> B값을 극대화하는 것이 AI 활용의 핵심입니다. AI에게 "내가 [주제]를 L=${L.toFixed(0)} 수준까지 배우려 해. 가장 효율적인(B가 높은) 학습 로드맵을 짜줘", "이 복잡한 개념을 '파인만 기법'으로 10살 아이도 이해하게 설명해줘", "관련된 '메타인지' 질문 5개만 해줘"라고 요청하여 학습 효율 자체를 극대화하십시오.</p>
                 </div>
-                <!-- [보완] 누락되었던 w_c 항목 추가 -->
                  <div class="p-4 bg-gray-900 rounded-lg">
-                    <h4 class="text-lg font-semibold text-white">5. 연속 보너스 가중치 (w_c) <span class="text-sm font-normal text-white">(현재: ${wc.toFixed(2)})</span></h4>
+                    <!-- [용어 수정] 연속 학습 가중치 -->
+                    <h4 class="text-lg font-semibold text-white">5. 연속 학습 가중치 (w_c) <span class="text-sm font-normal text-white">(현재: ${wc.toFixed(2)})</span></h4>
                     <p class="text-sm text-gray-400 mt-1">T_c(연속 시간)가 얼마나 큰 보너스를 줄지 결정하는 상수입니다. 이 값이 0이면 T_c는 아무 의미가 없습니다.</p>
                     <p class="text-sm mt-1"><strong>AI 활용법:</strong> AI에게 "나는 [창의적인 작업]을 하고 있어. T_c 보너스가 큰(w_c=0.5) 작업이니, 2시간 동안 방해받지 않도록 보조해줘"라고 선언하며 학습 환경을 설정할 수 있습니다.</p>
                 </div>
@@ -635,16 +640,11 @@
                 
                 updateChart(data_A, data_B);
                 updateAnalysis(data_A, data_B, params_shared, k_value_A, k_value_B);
-                
-                // [버그 수정] 올바른 파라미터로 호출
                 updateComparativeReport(data_A, data_B, params_A, params_B, k_value_A, k_value_B); 
-                
-                // [버그 수정] 이제 이 함수가 정상적으로 호출됨
                 updateVariableGuide(params_B, k_value_B); 
 
             } catch (error) {
                 console.error("시뮬레이션 실행 중 오류 발생:", error);
-                // 오류 발생 시 사용자에게 알릴 수 있는 UI 로직 추가 (옵션)
             }
         }
 
@@ -658,7 +658,7 @@
                     values[id].textContent = `${(value * 100).toFixed(0)} %`;
                 } else if (key === 'B') {
                     values[id].textContent = value.toFixed(3);
-                } else if (key === 'wc') {
+                } else if (key === 'wc') { // [용어 수정] 키는 'wc'로 동일
                     values[id].textContent = value.toFixed(2);
                 } else if (key === 'Sim_Days') {
                     values[id].textContent = `${value.toFixed(0)} 일`;
@@ -683,7 +683,8 @@
         }
 
         function initializeApp() {
-            console.log("DOM 로드 완료. v9 앱 초기화 시작...");
+            // [수정] v10
+            console.log("DOM 로드 완료. v10 앱 초기화 시작...");
             
             allParamIds.forEach(id => {
                 inputs[id] = document.getElementById(`param-${id}`);
@@ -723,10 +724,10 @@
 
             // 초기 실행
             runFullSimulation();
-            console.log("앱 초기화 완료. (v9)");
+            // [수정] v10
+            console.log("앱 초기화 완료. (v10)");
         }
         
     </script>
 </body>
 </html>
-
