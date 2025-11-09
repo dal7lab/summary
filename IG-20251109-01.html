@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>질문은 그 사람의 지문이다 (v3 - 1열 수정)</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* 1. 기본 및 다크 모드 설정 */
+        :root {
+            --bg-color: #0d1117;
+            --card-color: #161b22;
+            --border-color: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-color: #2f81f7;
+            --accent-glow: rgba(47, 129, 247, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        /* 2. 레이아웃 */
+        .container {
+            width: 100%;
+            max-width: 960px; /* 1열이므로 가독성을 위해 960px 유지 */
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 3. 헤더 (인트로) */
+        .hero {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 60px;
+        }
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+        .hero p:not(:last-child) {
+            margin-bottom: 8px;
+        }
+
+        /* 4. 섹션 및 카드 스타일 */
+        .content-section {
+            margin-bottom: 80px;
+        }
+
+        .content-section > h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+        }
+
+        .card-grid {
+            display: grid;
+            gap: 20px;
+            /* ★★★ 수정: 사용자의 요청대로 모든 그리드를 1열로 강제 ★★★ */
+            grid-template-columns: 1fr;
+        }
+
+        /* 2열, 3열, 미디어 쿼리 등 모든 복잡한 규칙 제거 */
+
+        .card {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            /* 1열이므로 최대 너비를 설정하여 너무 넓어지지 않게 함 (선택사항) */
+            /* max-width: 720px; */ /* <- 필요시 주석 해제 */
+            /* margin: 0 auto; */ /* <- 가운데 정렬 (필요시) */
+        }
+        
+        .card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .card p, .card li {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .card ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        .card ul li {
+            margin-bottom: 8px;
+        }
+
+        /* 5. 푸터 */
+        .footer {
+            text-align: center;
+            padding: 60px 20px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--card-color);
+        }
+        .footer p {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* 6. 스크롤 애니메이션 클래스 */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .scroll-animate.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 애니메이션 지연 (Staggering) */
+        /* 1열이므로 지연이 큰 의미가 없을 수 있으나 유지 */
+        .scroll-animate.delay-1 { transition-delay: 0.1s; }
+        .scroll-animate.delay-2 { transition-delay: 0.2s; }
+        .scroll-animate.delay-3 { transition-delay: 0.3s; }
+        .scroll-animate.delay-4 { transition-delay: 0.4s; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="hero scroll-animate visible">
+            <h1>질문은 그 사람의 지문이다</h1>
+            <p>사유의 빈곤은, 소리 내어 말하는 순간 증명된다.</p>
+            <p>질문은 관계의 척도이자, 지성의 지도다.</p>
+            <p>최고의 인재는, 정답이 아닌 최고의 질문을 가진 자다.</p>
+        </header>
+
+        <main>
+            <section class="content-section">
+                <h2 class="scroll-animate">1. 공허한 질문: 소음이 된 단어들</h2>
+                <div class="card-grid"> 
+                    <div class="card scroll-animate delay-1">
+                        <h3>(1) 사실(Fact)의 영역인가?</h3>
+                        <p>이것은 검색으로 10초 안에 해결될 '사실'의 영역인가?</p>
+                    </div>
+                    <div class="card scroll-animate delay-2">
+                        <h3>(2) 맥락(Context)을 담고 있는가?</h3>
+                        <p>이것은 대화의 흐름을 진전시킬 '맥락'을 담고 있는가?</p>
+                    </div>
+                    <div class="card scroll-animate delay-3">
+                        <h3>(3) 지적 태만은 아닌가?</h3>
+                        <p>이 질문은 나의 지적 탐구심을 드러내는가, 아니면 나의 지적 태만을 드러내는가?</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="scroll-animate">2. 질문의 척도: 사유의 4가지 차원</h2>
+                <div class="card-grid"> 
+                    <div class="card scroll-animate delay-1">
+                        <h3>(1) 지식의 깊이 (Depth of Knowledge)</h3>
+                        <p>피상적인 질문은 현상의 표피에 머무르지만, 깊이 있는 질문은 현상 이면의 작동 원리(Mechanism)를 파고든다.</p>
+                    </div>
+                    <div class="card scroll-animate delay-2">
+                        <h3>(2) 경험의 밀도 (Density of Experience)</h3>
+                        <p>"이론적으로는 A지만, 제 경험상 B였습니다. 이 간극의 핵심 변수는 무엇입니까?" 이처럼 체득된 '경험'에서 나온 질문은 무게가 다르다.</p>
+                    </div>
+                    <div class="card scroll-animate delay-3">
+                        <h3>(3) 태도의 방향 (Direction of Attitude)</h3>
+                        <p>질문은 상대를 향한 '덫'이 될 수도, '다리'가 될 수도 있다. 지적 겸손은 가장 깊은 지혜를 끌어내는 다리가 된다.</p>
+                    </div>
+                    <div class="card scroll-animate delay-4">
+                        <h3>(4) 사유의 고도 (Altitude of Thought)</h3>
+                        <ul>
+                            <li>'How'의 질문 (실무자)</li>
+                            <li>'Why'의 질문 (전략가)</li>
+                            <li>'What if'의 질문 (리더)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="scroll-animate">3. 질문의 연금술: 침묵을 벼리는 기술</h2>
+                <div class="card-grid">
+                    <div class="card scroll-animate delay-1">
+                        <h3>(1) 읽고 듣는 행위: 맥락의 축적</h3>
+                        <p>훌륭한 질문자는 '한 말'이 아니라, '하지 않은 말'과 그 말이 나온 '맥락'을 듣는다. 이는 내 안에 거대한 '맥락의 지도'를 구축한다.</p>
+                    </div>
+                    <div class="card scroll-animate delay-2">
+                        <h3>(2) 쓰는 행위: 사고의 구조화</h3>
+                        <p>글쓰기는 안개 같은 생각을 붙잡아 논리라는 뼈대를 세우는 치열한 '사고의 구조화' 작업이다. 퇴고를 거친 생각은 이미 '최종본'이다.</p>
+                    </div>
+                    <div class="card scroll-animate delay-3">
+                        <h3>(3) 적게 말하는 행위: 밀도의 응축</h3>
+                        <p>단단한 논리를 갖춘 사람은 침묵을 두려워하지 않는다. 그에게 침묵은 가장 밀도 높은 정보 수집의 시간이다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="scroll-animate">4. 면접실의 거울: 질문은 문화를 비춘다</h2>
+                <div class="card-grid">
+                    <div class="card scroll-animate delay-1">
+                        <h3>(1) '관성'의 질문 (Questions of Inertia)</h3>
+                        <p>"당신의 장단점은?"</p>
+                        <ul>
+                            <li>특징: 정해진 답 요구.</li>
+                            <li>문화: 관료주의, '순응적인 부품' 찾기.</li>
+                        </ul>
+                    </div>
+                    <div class="card scroll-animate delay-2">
+                        <h3>(2) '검증'의 질문 (Questions of Verification)</h3>
+                        <p>"우리 제품의 문제점은?"</p>
+                        <ul>
+                            <li>특징: 과거 성과 검증.</li>
+                            <li>문화: 성과 중심, 합리적이나 '과거'에 머무름.</li>
+                        </ul>
+                    </div>
+                    <div class="card scroll-animate delay-3">
+                        <h3>(3) '탐구'의 질문 (Questions of Exploration)</h3>
+                        <p>"이 문제를 어떻게 '재정의' 하시겠습니까?"</p>
+                        <ul>
+                            <li>특징: '접근 방식'과 '사고의 틀'을 봄.</li>
+                            <li>문화: 지적 겸손, '미래의 동료' 찾기.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="scroll-animate">5. 궁극의 식별법: 최고의 질문을 하는 자</h2>
+                <div class="card-grid">
+                    <div class="card scroll-animate delay-1">
+                        <h3>(1) '거래'의 질문 (Questions of Transaction)</h3>
+                        <p>"연봉 수준은?"</p>
+                        <ul>
+                            <li>그의 척도는 '보상'에 맞춰져 있다. 그는 '성장'이 아닌 '거래'를 하러 왔다.</li>
+                        </ul>
+                    </div>
+                    <div class="card scroll-animate delay-2">
+                        <h3>(2) '적응'의 질문 (Questions of Adaptation)</h3>
+                        <p>"입사 후 6개월간 성공 지표는?"</p>
+                        <ul>
+                            <li>좋은 질문이다. 그는 '모범생'으로서 조직에 빠르게 적응할 준비가 되어 있다.</li>
+                        </ul>
+                    </div>
+                    <div class="card scroll-animate delay-3">
+                        <h3>(3) '본질'의 질문 (Questions of Essence)</h3>
+                        <p>"두 지표가 상충되는데, 내부 철학은 무엇입니까?"</p>
+                        <ul>
+                            <li>그는 이미 '지원자'가 아니다. 이 판의 '경쟁'에 참여할 준비가 끝난 '미래의 파트너'다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+    </div><footer class="footer">
+        <p class="scroll-animate">
+            질문이 곧 경쟁력이다.
+            우리는 지금 어떤 질문을 던지고 있는가.
+            "오늘 무엇을 할까"라는 생존의 질문에 매몰되어 있는가,
+            아니면 "나는 왜 이 일을 하는가"라는 본질의 질문을 던지고 있는가.<br><br>
+            <strong>기억하라. 당신이 오늘 던진 그 질문이, 곧 당신이라는 존재의 지문(指紋)이다.</strong>
+        </p>
+    </footer>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const targets = document.querySelectorAll(".scroll-animate");
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                root: null,
+                rootMargin: "0px",
+                threshold: 0.1 // 10%만 보여도 애니메이션 실행
+            });
+
+            targets.forEach(target => {
+                observer.observe(target);
+            });
+        });
+    </script>
+
+</body>
+</html>
