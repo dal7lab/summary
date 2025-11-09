@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사랑의 미분 방정식(관계 궤적) 시뮬레이터 (v19 - Phase Plot)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts - Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- [신규] MathJax (수학식 렌더링) 설정 -->
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #F472B6, #EC4899, #D946EF); /* Pink to Fuchsia to Purple */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .accordion-content { display: none; overflow: hidden; }
+        /* [수정] 차트 컨테이너 높이 조정 */
+        .chart-container {
+            position: relative;
+            height: 50vh; /* 50vh */
+            width: 100%;
+            min-height: 400px;
+        }
+        .phase-container {
+            position: relative;
+            height: 50vh; /* 50vh */
+            width: 100%;
+            min-height: 400px;
+        }
+        .formula {
+            font-size: 1.1rem; color: #D1D5DB; background: #1F2937;
+            padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #4B5563;
+        }
+        input[type="range"] {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 8px; background: #374151;
+            border-radius: 5px; outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 20px; height: 20px; background: #EC4899;
+            border-radius: 50%; cursor: pointer; transition: background 0.2s;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px; height: 20px; background: #EC4899;
+            border-radius: 50%; cursor: pointer; border: none;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <div class="container mx-auto max-w-7xl px-4 py-16">
+
+        <!-- 헤더 -->
+        <header class="text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-black mb-6 gradient-text">
+                관계 궤적 시뮬레이터 (v19)
+            </h1>
+            <p class="text-2xl md:text-3xl font-bold text-gray-100">
+                0.002%의 비밀: Phase Plot으로 보는 관계의 운명
+            </p>
+        </header>
+
+        <!-- 시뮬레이션 메인 (그리드) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- 1. 컨트롤 패널 (L) -->
+            <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 h-fit">
+                <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.835 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.835 2.942-.734 2.106-2.106a1.532 1.532 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01.947-2.287c.835-1.372-.734-2.942-2.106-2.106A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                    운명 변수 조작
+                </h2>
+                
+                <div class="space-y-6">
+                    <!-- 초기 감정 -->
+                    <div>
+                        <label for="param-x0" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>영희(x) 초기 감정 ($x_0$)</span>
+                            <span id="val-x0" class="font-bold text-pink-400 text-base">1.0</span>
+                        </label>
+                        <input type="range" id="param-x0" min="-2" max="2" value="1.0" step="0.1" class="w-full mt-2">
+                    </div>
+                    <div>
+                        <label for="param-y0" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>철수(y) 초기 감정 ($y_0$)</span>
+                            <span id="val-y0" class="font-bold text-blue-400 text-base">0.5</span>
+                        </label>
+                        <input type="range" id="param-y0" min="-2" max="2" value="0.5" step="0.1" class="w-full mt-2" style="--thumb-color: #3B82F6;">
+                    </div>
+
+                    <!-- 상호작용 계수 -->
+                    <div class="pt-4 border-t border-gray-600">
+                        <label for="param-a" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>$a$ (영희 자기 영향)</span>
+                            <span id="val-a" class="font-bold text-white text-base">-0.1</span>
+                        </label>
+                        <input type="range" id="param-a" min="-1" max="1" value="-0.1" step="0.05" class="w-full mt-2">
+                    </div>
+                    <div>
+                        <label for="param-b" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>$b$ (철수 → 영희)</span>
+                            <span id="val-b" class="font-bold text-white text-base">0.8</span>
+                        </label>
+                        <input type="range" id="param-b" min="-1" max="1" value="0.8" step="0.05" class="w-full mt-2">
+                    </div>
+                    <div>
+                        <label for="param-e" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>$e$ (영희 → 철수)</span>
+                            <span id="val-e" class="font-bold text-white text-base">-0.6</span>
+                        </label>
+                        <input type="range" id="param-e" min="-1" max="1" value="-0.6" step="0.05" class="w-full mt-2">
+                    </div>
+                    <div>
+                        <label for="param-d" class="flex justify-between items-center text-sm font-medium text-gray-300">
+                            <span>$d$ (철수 자기 영향)</span>
+                            <span id="val-d" class="font-bold text-white text-base">-0.2</span>
+                        </label>
+                        <input type="range" id="param-d" min="-1" max="1" value="-0.2" step="0.05" class="w-full mt-2">
+                    </div>
+                </div>
+
+                <!-- [수정] v19 프리셋 (더 명확한 이름과 값) -->
+                <div class="mt-8 pt-6 border-t border-gray-600">
+                    <h3 class="text-lg font-semibold text-white mb-3">관계 궤적 프리셋</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="preset-stable-boring" class="w-full px-3 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition text-sm font-medium">안정적 권태기</button>
+                        <button id="preset-rollercoaster" class="w-full px-3 py-2 bg-pink-600 text-white rounded-lg shadow hover:bg-pink-700 transition text-sm font-medium">격정적 롤러코스터</button>
+                        <button id="preset-doomed" class="w-full px-3 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition text-sm font-medium">파국 (서로 증오)</button>
+                        <button id="preset-pushpull" class="w-full px-3 py-2 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 transition text-sm font-medium">영원한 줄다리기</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 그래프 및 해석 (R) -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- 차트 1: 시간-감정 차트 -->
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-4">📈 시간에 따른 감정 변화 (t=50)</h2>
+                    <div class="chart-container">
+                        <canvas id="timeSeriesChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- [신규] 차트 2: 궤적 (Phase Plot) 차트 -->
+                <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔮 0.002%의 비밀: 관계 궤적 (Phase Plot)</h2>
+                    <div class="phase-container">
+                        <canvas id="phasePlotChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- [신규] AI 관계 컨설팅 -->
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        AI 관계 컨설팅
+                    </h2>
+                    <div id="ai-consulting-report" class="text-lg text-gray-300 leading-relaxed space-y-3">
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
+                </div>
+
+                <!-- [수정] 기존 동적 분석 (전문가용) -->
+                <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15v4a1 1 0 001 1h12a1 1 0 001-1v-4a1 1 0 00-.293-.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
+                        전문가용 동적계 분석 (v19)
+                    </h2>
+                    <div id="interpretation-text" class="text-lg text-gray-300 leading-relaxed space-y-3">
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 시뮬레이션 원리 (아코디언) -->
+        <section class="mt-24">
+            <h2 class="text-4xl font-extrabold text-center mb-12 gradient-text">
+                시뮬레이션 작동 원리
+            </h2>
+            <div class="max-w-4xl mx-auto space-y-4">
+                
+                <!-- [수정] v19: MathJax 적용 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">1. 선형 미분 방정식</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            이 시뮬레이션은 두 사람의 감정 '변화율'($dx/dt, dy/dt$)이 두 사람의 '현재 감정'($x, y$)에 의해 결정된다고 가정하는 선형 미분 방정식 시스템을 기반으로 합니다. (외부 영향 $c, f$는 0으로 고정)
+                        </p>
+                        <div class="formula">
+                            $$ \frac{dx}{dt} = ax + by $$
+                            $$ \frac{dy}{dt} = ex + dy $$
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- [수정] v19: MathJax 적용 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">2. 4가지 핵심 변수의 의미</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            관계의 모든 운명은 4개의 상호작용 계수에 의해 결정됩니다.
+                        </p>
+                        <ul class="list-disc list-outside pl-6 mt-4 space-y-2">
+                            <li><strong>$a$ (영희 자기 영향):</strong> 영희가 자신의 감정에 미치는 영향. ($a < 0$: 감정이 식음, $a > 0$: 감정이 증폭)</li>
+                            <li><strong>$b$ (철수 → 영희):</strong> 철수의 감정이 영희에게 미치는 영향. ($b < 0$: 부정적, $b > 0$: 긍정적)</li>
+                             <li><strong>$e$ (영희 → 철수):</strong> 영희의 감정이 철수에게 미치는 영향. ($e < 0$: 부정적, $e > 0$: 긍정적)</li>
+                            <li><strong>$d$ (철수 자기 영향):</strong> 철수가 자신의 감정에 미치는 영향. ($d < 0$: 감정이 식음, $d > 0$: 감정이 증폭)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- [수정] v19: MathJax 적용 -->
+                <div class="accordion-item bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-6">
+                        <span class="text-xl font-semibold text-gray-100">3. 0.002%의 비밀: T-D 평면 분석</span>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-6 pb-6 text-lg">
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            전문가는 $a, b, d, e$를 직접 보지 않습니다. 이 값들을 조합한 두 개의 '진짜 변수', $T$(Trace)와 $D$(Determinant)를 봅니다.
+                        </p>
+                        <div class="formula">
+                            $$ T = a + d $$
+                            $$ D = ad - be $$
+                        </div>
+                         <p class="text-gray-300 leading-relaxed my-4">
+                           $T$는 관계의 '총 에너지'입니다. $T > 0$이면 발산(Unstable), $T < 0$이면 수렴(Stable)합니다. $D$는 관계의 '형태'입니다. $D < 0$이면 엇갈리는 궤도(Saddle)가 됩니다. 이 $T, D$ 값으로 '관계 궤적'의 최종 형태가 결정됩니다.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+    // [수정] v19: DOMContentLoaded로 래핑
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        let timeSeriesChart; // 차트 인스턴스 1
+        let phasePlotChart;  // [신규] 차트 인스턴스 2
+        
+        const timeSeriesCanvas = document.getElementById('timeSeriesChart')?.getContext('2d');
+        const phasePlotCanvas = document.getElementById('phasePlotChart')?.getContext('2d');
+        const interpretationText = document.getElementById('interpretation-text');
+        const aiConsultingReport = document.getElementById('ai-consulting-report'); // [신규]
+
+        if (!timeSeriesCanvas || !phasePlotCanvas) {
+            console.error("차트 캔버스를 찾을 수 없습니다.");
+            return;
+        }
+
+        // --- 시뮬레이션 로직 (v15와 동일) ---
+        function runSimulation(params, t_max = 50, dt = 0.05) {
+            let x = params.x0;
+            let y = params.y0;
+            const { a, b, e, d, c, f } = params;
+
+            const t_labels = [];
+            const x_history = [];
+            const y_history = [];
+
+            for (let t = 0; t <= t_max; t += dt) {
+                t_labels.push(t.toFixed(1));
+                x_history.push(x);
+                y_history.push(y);
+
+                const dx_dt = a * x + b * y + c;
+                const dy_dt = e * x + d * y + f;
+
+                x = x + dx_dt * dt;
+                y = y + dy_dt * dt;
+            }
+            return { t_labels, x_history, y_history };
+        }
+
+        // --- 차트 1: 시간-감정 차트 업데이트 ---
+        function updateTimeSeriesChart(data) {
+            if (timeSeriesChart) {
+                timeSeriesChart.data.labels = data.t_labels;
+                timeSeriesChart.data.datasets[0].data = data.x_history;
+                timeSeriesChart.data.datasets[1].data = data.y_history;
+                timeSeriesChart.update();
+            } else {
+                timeSeriesChart = new Chart(timeSeriesCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: data.t_labels,
+                        datasets: [
+                            {
+                                label: '영희 (x) 감정',
+                                data: data.x_history,
+                                borderColor: '#EC4899', // Pink
+                                backgroundColor: '#EC489930',
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.1
+                            },
+                            {
+                                label: '철수 (y) 감정',
+                                data: data.y_history,
+                                borderColor: '#3B82F6', // Blue
+                                backgroundColor: '#3B82F630',
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top', labels: { color: '#E5E7EB', font: { size: 14 } } },
+                            tooltip: { mode: 'index', intersect: false, callbacks: { title: (tooltipItems) => `Time: ${tooltipItems[0].label}s` } }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: '시간 (Time)', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } },
+                            y: { title: { display: true, text: '감정 수준 (Emotional Level)', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }
+                        },
+                        elements: { point: { radius: 0, hitRadius: 10, hoverRadius: 5 } }
+                    }
+                });
+            }
+        }
+        
+        // --- [신규] 차트 2: 궤적 (Phase Plot) 차트 업데이트 ---
+        function updatePhasePlotChart(data) {
+            // Phase plot은 (x, y) 좌표로만 구성됨
+            const phaseData = data.x_history.map((x, index) => ({ x: x, y: data.y_history[index] }));
+            
+            if (phasePlotChart) {
+                phasePlotChart.data.datasets[0].data = phaseData;
+                phasePlotChart.update();
+            } else {
+                phasePlotChart = new Chart(phasePlotCanvas, {
+                    type: 'scatter', // 산점도 (선으로 연결)
+                    data: {
+                        datasets: [
+                            {
+                                label: '관계 궤적 (영희 vs 철수)',
+                                data: phaseData,
+                                borderColor: '#A78BFA', // Purple
+                                borderWidth: 2.5,
+                                fill: false,
+                                tension: 0.1,
+                                showLine: true, // 선 연결
+                                pointRadius: 0 // 점 숨기기
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top', labels: { color: '#E5E7EB', font: { size: 14 } } },
+                            tooltip: { 
+                                mode: 'nearest', 
+                                intersect: false,
+                                callbacks: {
+                                    title: () => '감정 좌표',
+                                    label: (context) => `(영희: ${context.parsed.x.toFixed(2)}, 철수: ${context.parsed.y.toFixed(2)})`
+                                }
+                            }
+                        },
+                        scales: {
+                            // X축: 영희
+                            x: { 
+                                title: { display: true, text: '영희 (x) 감정', color: '#EC4899' }, 
+                                ticks: { color: '#9CA3AF' }, 
+                                grid: { color: '#374151' },
+                                grace: '10%' // 축 여유 공간
+                            },
+                            // Y축: 철수
+                            y: { 
+                                title: { display: true, text: '철수 (y) 감정', color: '#3B82F6' }, 
+                                ticks: { color: '#9CA3AF' }, 
+                                grid: { color: '#374151' },
+                                grace: '10%'
+                            }
+                        },
+                        elements: {
+                            point: { radius: 0, hitRadius: 10, hoverRadius: 5 }
+                        }
+                    }
+                });
+            }
+        }
+
+
+        /**
+         * [v19] AI 컨설팅 + 전문가 분석
+         */
+        function updateAnalysis(params) {
+            const { a, b, e, d } = params;
+            const T = a + d; // Trace
+            const D = a * d - b * e; // Determinant
+            const D_sqrt = T * T - 4 * D; // 판별식
+
+            let expertAnalysis = "";
+            let aiConsulting = "";
+            let relationshipType = "";
+
+            if (D < 0) {
+                // --- 1. Saddle Point ---
+                relationshipType = "엇갈리는 운명 (Saddle Point)";
+                expertAnalysis = `이 조합은 <strong>'${relationshipType}'</strong> 유형입니다. (D < 0)<br>궤적은 특정 지점(평형점)을 향해 갔다가, 다시 멀어지는 말 안장 모양입니다. 초기 조건($x_0, y_0$)에 극도로 민감하며, 사소한 감정 변화가 완전히 다른 결말(한 명은 긍정, 한 명은 부정)을 초래합니다.`;
+                aiConsulting = `
+                    <p class="font-bold text-lg text-yellow-300">${relationshipType}</p>
+                    <p><strong>진단:</strong> 두 사람의 관계는 '줄타기'와 같습니다. 현재는 아슬아슬하게 균형을 잡고 있지만, 한쪽으로 감정이 조금만 쏠리면 겉잡을 수 없이 멀어집니다.</p>
+                    <p><strong>처방:</strong> $D = ad-be < 0$은 두 사람의 상호작용($b, e$)이 너무 강하거나, 자기 영향($a, d$)과 부호가 반대일 때 발생합니다. 관계의 '안정성'($T=a+d$)을 높이는 것이 시급합니다. 서로에게 미치는 영향을 줄이거나, 각자의 감정($a, d$)이 안정(음수)되도록 노력해야 합니다.</p>`;
+            
+            } else { // D >= 0
+                if (T < -0.01) { // --- 2. Stable ---
+                    if (D_sqrt >= 0) {
+                        relationshipType = "안정적 권태기 (Stable Node)";
+                        expertAnalysis = `이 조합은 <strong>'${relationshipType}'</strong> 유형입니다. (T < 0, D > 0, 판별식 $\ge$ 0)<br>감정의 진동 없이, 두 사람의 감정은 시간이 지남에 따라 안정적인 0 (무관심)으로 점차 수렴합니다. 궤적은 평형점으로 직선적으로 빨려 들어갑니다.`;
+                        aiConsulting = `
+                            <p class="font-bold text-lg text-blue-300">${relationshipType}</p>
+                            <p><strong>진단:</strong> 가장 '안정적인' 관계입니다. ($T < 0$) 큰 싸움이나 갈등 없이 잔잔하게 흘러갑니다. 하지만, '안정'은 곧 '무관심'($x=0, y=0$)을 의미합니다. 궤적 차트에서 보듯이, 두 사람의 감정은 (0,0) 지점으로 수렴하고 있습니다.</p>
+                            <p><strong>처방:</strong> 현재 $T = a+d$ 값이 너무 낮습니다. 즉, 두 사람의 자기 영향($a, d$)이 너무 억제되어 있습니다. 관계에 새로운 '자극'($c, f$ 같은 외부 이벤트)을 주거나, 서로에 대한 긍정적 영향($b, e$)을 높여 $T$값을 0에 가깝게 높이려는 노력이 필요합니다.</p>`;
+                    
+                    } else {
+                        relationshipType = "안정적 커플 (Stable Spiral)";
+                        expertAnalysis = `이 조합은 <strong>'${relationshipType}'</strong> 유형입니다. (T < 0, D > 0, 판별식 < 0)<br>약간의 감정 기복(진동)을 겪으며, 두 사람의 감정은 결국 안정적인 0 (무관심)으로 수렴합니다. 궤적이 소용돌이를 그리며 중심으로 빨려 들어갑니다.`;
+                         aiConsulting = `
+                            <p class="font-bold text-lg text-blue-400">${relationshipType}</p>
+                            <p><strong>진단:</strong> '안정적 권태기'와 유사하게 (0,0)으로 수렴($T < 0$)하지만, 그 과정이 밋밋하지 않고 약간의 '진동'을 겪습니다. 서로 밀고 당기며 감정이 오르락내리락하지만, 결국 그 진폭이 줄어들며 안정 상태로 갑니다.</p>
+                            <p><strong>처방:</strong> 갈등을 두려워하지 마십시오. 현재의 '진동'은 관계를 건강하게 유지하는 동력입니다. 다만, 이 진동이 긍정적인 방향으로 가도록 상호 영향력($b, e$)을 조절하는 것이 중요합니다.</p>`;
+                    }
+                } else if (T > 0.01) { // --- 3. Unstable ---
+                    if (D_sqrt >= 0) {
+                        relationshipType = "파국 (Unstable Node)";
+                        expertAnalysis = `이 조합은 <strong>'${relationshipType}'</strong> 유형입니다. (T > 0, D > 0, 판별식 $\ge$ 0)<br>감정의 진동 없이, 두 사람의 감정은 서로를 증폭시키며 시간이 지남에 따라 긍정적(또는 부정적)으로 무한히 발산합니다. 궤적이 평형점에서 직선적으로 튕겨 나갑니다.`;
+                        aiConsulting = `
+                            <p class="font-bold text-lg text-red-500">${relationshipType}</p>
+                            <p><strong>진단:</strong> '열정'과 '증오'가 공존하는 관계입니다. 두 사람의 감정 에너지가 너무 높아($T > 0$), 서로를 만나면 감정이 무한히 증폭됩니다. 긍정적인 $x_0, y_0$에서 시작하면 끝없는 사랑으로, 부정적인 $x_0, y_0$에서 시작하면 끝없는 증오로 발산합니다.</p>
+                            <p><strong>처방:</strong> $T = a+d > 0$이 문제입니다. 각자의 '자기 증폭'($a, d$) 성향이 너무 강합니다. 감정을 스스로 식히는($a, d$를 음수로 만드는) '쿨다운'이 필요합니다. 서로에게 미치는 영향($b, e$)을 줄이는 것도 방법입니다.</p>`;
+                   
+                    } else {
+                        relationshipType = "격정적 롤러코스터 (Unstable Spiral)";
+                        expertAnalysis = `이 조합은 <strong>'${relationshipType}'</strong> 유형입니다. (T > 0, D > 0, 판별식 < 0)<br>두 사람의 감정은 격렬한 기복(진동)을 겪으며, 그 진폭이 점점 커지면서 극단적으로 발산합니다. 궤적이 중심에서 밖으로 풀려나가는 소용돌이 모양입니다.`;
+                        aiConsulting = `
+                            <p class="font-bold text-lg text-pink-500">${relationshipType}</p>
+                            <p><strong>진단:</strong> 가장 드라마틱한 관계입니다. ($T > 0$, 복소근) 사랑과 싸움을 격렬하게 반복하며, 그 진폭이 점점 커집니다. 오늘은 불같이 사랑하다가, 내일은 불같이 싸웁니다. 궤적 차트가 이 '롤러코스터'를 명확하게 보여줍니다.</p>
+                            <p><strong>처방:</strong> 이 관계는 '파국'보다 더 위험합니다. 감정 소모가 극심합니다. 관계를 유지하려면 $T = a+d$ 값을 0 미만으로 낮춰야 합니다. 각자 감정을 억제($a, d$를 음수로)하는 것이 유일한 해결책입니다.</p>`;
+                    }
+                } else { // --- 4. Center ---
+                    relationshipType = "영원한 줄다리기 (Center)";
+                    expertAnalysis = `이 조합은 <strong>'${relationshipType}'</strong> 유형입니다. (T ≈ 0, D > 0)<br>감정이 안정되거나 발산하지 않고, 초기 조건에 따라 일정한 주기를 그리며 영원히 진동합니다. 궤적은 닫힌 타원형을 그립니다.`;
+                    aiConsulting = `
+                        <p class="font-bold text-lg text-purple-400">${relationshipType}</p>
+                        <p><strong>진단:</strong> 고전적인 '로미오와 줄리엣' 모델입니다. 두 사람의 감정 에너지가 정확히 0($T \approx 0$)이 되어, 감정이 수렴하지도 발산하지도 않고 영원히 '줄다리기'를 합니다. 궤적 차트가 닫힌 원(혹은 타원)이 됩니다.</p>
+                        <p><strong>처방:</strong> 이 관계는 외부 충격($c, f$)에 매우 취약합니다. ($T$가 0이므로) 작은 스트레스에도 $T < 0$ (권태기)이 되거나 $T > 0$ (롤러코스터)가 되기 쉽습니다. 관계를 안정시키려면 $a, d$ 값을 약간 음수로 조절하여 '안정적 커플'로 이행하는 것이 좋습니다.</p>`;
+                }
+            }
+
+            expertAnalysis += `<p class="text-sm text-gray-400 mt-2">(Trace $T = ${T.toFixed(3)}$, Determinant $D = ${D.toFixed(3)}$)</p>`;
+            
+            interpretationText.innerHTML = expertAnalysis;
+            aiConsultingReport.innerHTML = aiConsulting;
+            
+            // [v19] 동적 렌더링 후 MathJax 재실행
+            if (window.MathJax) {
+                MathJax.typesetPromise([interpretationText, aiConsultingReport]).catch(function (err) {
+                    console.log('MathJax typeset error:', err);
+                });
+            }
+        }
+
+
+        // --- 컨트롤러 ---
+        const inputs = {
+            a: document.getElementById('param-a'),
+            b: document.getElementById('param-b'),
+            e: document.getElementById('param-e'),
+            d: document.getElementById('param-d'),
+            x0: document.getElementById('param-x0'),
+            y0: document.getElementById('param-y0'),
+        };
+
+        const values = {
+            a: document.getElementById('val-a'),
+            b: document.getElementById('val-b'),
+            e: document.getElementById('val-e'),
+            d: document.getElementById('val-d'),
+            x0: document.getElementById('val-x0'),
+            y0: document.getElementById('val-y0'),
+        };
+
+        // 슬라이더 값 표시 업데이트
+        for (const key in inputs) {
+            inputs[key].addEventListener('input', (event) => {
+                const value = parseFloat(event.target.value).toFixed(key.length > 2 ? 1 : 2);
+                values[key].textContent = value;
+                runFullSimulation(); // 슬라이더 조작 시 실시간으로 다시 실행
+            });
+        }
+        
+        // 현재 슬라이더 값으로 시뮬레이션 실행
+        function runFullSimulation() {
+            const params = {
+                a: parseFloat(inputs.a.value),
+                b: parseFloat(inputs.b.value),
+                e: parseFloat(inputs.e.value),
+                d: parseFloat(inputs.d.value),
+                x0: parseFloat(inputs.x0.value),
+                y0: parseFloat(inputs.y0.value),
+                c: 0, // 외부 요인 c, f는 0으로 고정
+                f: 0
+            };
+            
+            const data = runSimulation(params);
+            updateTimeSeriesChart(data);
+            updatePhasePlotChart(data); // [신규]
+            updateAnalysis(params); // [수정] v19 (컨설팅 포함)
+        }
+        
+        // [수정] v19: 프리셋 버튼 로직 (새로운 값)
+        function setParams(p) {
+            Object.keys(p).forEach(key => {
+                if(inputs[key]) {
+                    inputs[key].value = p[key];
+                    const value = p[key].toFixed(key.length > 2 ? 1 : 2);
+                    values[key].textContent = value;
+                }
+            });
+            runFullSimulation();
+        }
+
+        // T < 0, D > 0, T^2-4D > 0 (Stable Node)
+        document.getElementById('preset-stable-boring').addEventListener('click', () => {
+            setParams({ a: -0.5, b: 0.2, e: 0.2, d: -0.5, x0: 2.0, y0: 1.5 });
+        });
+        
+        // T > 0, D > 0, T^2-4D < 0 (Unstable Spiral)
+        document.getElementById('preset-rollercoaster').addEventListener('click', () => {
+            setParams({ a: 0.1, b: 0.8, e: -0.6, d: 0.1, x0: 0.5, y0: 0.5 });
+        });
+
+        // T > 0, D > 0, T^2-4D > 0 (Unstable Node)
+        document.getElementById('preset-doomed').addEventListener('click', () => {
+            setParams({ a: 0.4, b: 0.1, e: 0.1, d: 0.2, x0: -1.0, y0: -0.5 });
+        });
+        
+        // T ≈ 0, D > 0 (Center)
+        document.getElementById('preset-pushpull').addEventListener('click', () => {
+            setParams({ a: 0.0, b: -0.8, e: 0.5, d: 0.0, x0: 2.0, y0: 0.0 });
+        });
+
+
+        // --- 아코디언 스크립트 ---
+        document.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                const icon = button.querySelector('svg');
+                const isOpening = content.style.display !== 'block';
+                
+                // 모든 아코디언 닫기 (템플릿 스타일)
+                document.querySelectorAll('.accordion-content').forEach(c => {
+                    c.style.display = 'none';
+                    c.previousElementSibling.querySelector('svg').style.transform = 'rotate(0deg)';
+                });
+
+                if (isOpening) {
+                    content.style.display = 'block';
+                    icon.style.transform = 'rotate(180deg)';
+                    // [v19] MathJax 동적 렌더링 (아코디언 열릴 때)
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([content]).catch(function (err) {
+                            console.log('MathJax typeset error:', err);
+                        });
+                    }
+                }
+            });
+        });
+
+        // --- 초기 실행 ---
+        setParams({ a: 0.1, b: 0.8, e: -0.6, d: 0.1, x0: 0.5, y0: 0.5 }); // '롤러코스터'로 초기화
+
+    });
+    </script>
+</body>
+</html>
