@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>학습 습관과 성장 곡선 시뮬레이션</title>
+    <!-- [수정] 타이틀 변경 -->
+    <title>학습 습관과 성장 곡선 시뮬레이션 (수식 렌더링)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -12,6 +13,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- [신규] MathJax (수학식 렌더링) 설정 -->
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // 인라인 수식 $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']] // 디스플레이 수식 $$...$$
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+    
+    <!-- [신규] MathJax (수학식 렌더링) 라이브러리 로드 -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
@@ -55,10 +73,10 @@
         tbody tr:nth-child(even) {
             background-color: #1F2937; /* bg-gray-800 */
         }
-        /* 수식 스타일 */
+        /* [수정] 수식 스타일 (MathJax에 맞게 조정) */
         .formula {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.1rem;
+            /* font-family: 'Times New Roman', Times, serif; */ /* MathJax가 폰트 관리 */
+            font-size: 1.1rem; /* 기본 폰트 크기 조정 */
             color: #D1D5DB; /* text-gray-300 */
             background: #1F2937; /* bg-gray-800 */
             padding: 1rem;
@@ -249,12 +267,13 @@
                         <span class="text-xl font-semibold text-gray-100">1. k (학습 효율)가 모든 것을 결정합니다</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             모든 성장 곡선은 '일일 성장률(k)'이라는 단 하나의 값으로 결정됩니다. 이 값은 사용자의 학습 습관(시간, 몰입, 연속)을 통해 계산됩니다.
                         </p>
                         <div class="formula">
-                            $k_{scenario} = B \cdot (T_d \cdot F_p) \cdot (1 + w_c \cdot T_c)$
+                            $$ k_{scenario} = B \cdot (T_d \cdot F_p) \cdot (1 + w_c \cdot T_c) $$
                         </div>
                         <ul class="list-disc list-outside pl-6 mt-4 space-y-2">
                             <li>$k_{scenario}$: 일일 성장률 (그래프의 가파름)</li>
@@ -273,21 +292,21 @@
                         <span class="text-xl font-semibold text-gray-100">2. S-Curve의 두 얼굴: 연속형 vs 이산형</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             로지스틱 성장은 '완성된 모양'을 설명하는 연속형 함수와 '매일의 변화'를 계산하는 이산형 모델, 두 가지 방식으로 표현할 수 있습니다.
                         </p>
                         <h4 class="text-lg font-bold text-white mb-2">모델 1: 연속형 함수 (완성된 S-커브)</h4>
                         <div class="formula">
-                            $A(t) = \frac{L}{1 + e^{-k(t - t_0)}}$
+                            $$ A(t) = \frac{L}{1 + e^{-k(t - t_0)}} $$
                         </div>
                         <p class="text-gray-400 mt-2">수학적으로 완벽하고 '매끄러운' 곡선 자체를 설명합니다.</p>
                         
                         <h4 class="text-lg font-bold text-white mb-2 mt-6">모델 2: 이산형 재귀 함수 (시뮬레이터)</h4>
                         <div class="formula">
-                            $\Delta A(t) = k_{scenario} \times A(t-1) \times \left(1 - \frac{A(t-1)}{L}\right)$
-                            <br>
-                            $A(t) = A(t-1) + \Delta A(t)$
+                            $$ \Delta A(t) = k_{scenario} \times A(t-1) \times \left(1 - \frac{A(t-1)}{L}\right) $$
+                            $$ A(t) = A(t-1) + \Delta A(t) $$
                         </div>
                         <p class="text-gray-400 mt-2">
                             '오늘의 성장량($\Delta A$)'을 계산하여 '어제의 능력치($A(t-1)$)'에 더하는 방식입니다. 컴퓨터가 매일 점을 찍어 S-커브를 '그려내는' 원리이며, 이 인포그래픽이 사용하는 방식입니다.
@@ -301,15 +320,16 @@
                         <span class="text-xl font-semibold text-gray-100">3. 총괄 함수 A = f(x) 정의하기</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             $A$ (Ability)를 $f(x)$ ($x$ = 일차) 형태의 함수로 표현하면 다음과 같은 '재귀 함수'가 됩니다. $f(x)$를 알려면 $f(x-1)$을 알아야 합니다.
                         </p>
                         <div class="formula">
-$f(x) = \begin{cases}
+$$ f(x) = \begin{cases}
 A_0 & \text{if } x = 0 \\
 f(x-1) + \left[ k_{scenario} \cdot f(x-1) \cdot \left(1 - \frac{f(x-1)}{L}\right) \right] & \text{if } x \ge 1
-\end{cases}$
+\end{cases} $$
                         </div>
                         <p class="text-gray-400 mt-4">
                             $f(100)$을 알려면 $f(99)$가, $f(99)$를 알려면 $f(98)$이... 결국 $f(0)$에서부터 100번을 순서대로 계산해야만 답을 알 수 있습니다. 이것이 이 시뮬레이터가 하는 일입니다.
@@ -323,18 +343,19 @@ f(x-1) + \left[ k_{scenario} \cdot f(x-1) \cdot \left(1 - \frac{f(x-1)}{L}\right
                         <span class="text-xl font-semibold text-gray-100">4. (심화) 몰입도(I)와 인지 흐름 F(x, I)</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             더 복잡한 모델에서는 $k$값뿐만 아니라 몰입의 '깊이'와 '패턴' 자체를 모델링할 수 있습니다. 몰입도 $I$ ($0.0 \sim 1.0$)를 입력받아 내부 변수 $A$ (몰입 깊이)로 변환하는 함수를 사용할 수 있습니다.
                         </p>
                         <div class="formula">
-                            $A(I) = -I \cdot A_{scale}$
+                            $$ A(I) = -I \cdot A_{scale} $$
                         </div>
                         <p class="text-gray-300 leading-relaxed my-4">
                             이 $A(I)$ 값을 기반으로 인지 흐름 $F(x, I)$의 모든 하위 함수(상승 높이 $\alpha$, 하강 폭 $\sigma_{dip}$ 등)가 연쇄적으로 결정됩니다.
-                        </p>
+                        </G>
                         <div class="formula">
-                            $F(x, I) = \alpha(I) \cdot\tanh(\beta(I) \cdot (x -x_{peak}(I))) + A(I) \cdot e^{\frac{(x - x_{dip}(I))^2}{2(\sigma_{dip}(I))^2}}$
+                            $$ F(x, I) = \alpha(I) \cdot\tanh(\beta(I) \cdot (x -x_{peak}(I))) + A(I) \cdot e^{\frac{(x - x_{dip}(I))^2}{2(\sigma_{dip}(I))^2}} $$
                         </div>
                         <p class="text-gray-400 mt-4">
                             결국, 직관적인 '몰입도($I$)' 입력 하나로 곡선의 모든 복잡한 특성을 동시에 제어하는 고차원 모델을 설계할 수 있습니다.
@@ -390,9 +411,16 @@ f(x-1) + \left[ k_{scenario} \cdot f(x-1) \cdot \left(1 - \frac{f(x-1)}{L}\right
         }
 
         // --- 차트 생성 로직 ---
-        window.onload = function() {
-            const ctx1 = document.getElementById('chart1').getContext('2d');
-            const ctx2 = document.getElementById('chart2').getContext('2d');
+        // [수정] DOMContentLoaded 이벤트 리스너로 변경 (더 안정적)
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx1 = document.getElementById('chart1')?.getContext('2d');
+            const ctx2 = document.getElementById('chart2')?.getContext('2d');
+
+            // ctx가 없으면 실행 중단
+            if (!ctx1 || !ctx2) {
+                console.error("차트 캔버스를 찾을 수 없습니다.");
+                return;
+            }
 
             // --- 차트 1 데이터 생성: 철수의 3년 (1095일) ---
             const k_cheolsu = 0.0096;
@@ -528,24 +556,26 @@ f(x-1) + \left[ k_{scenario} \cdot f(x-1) \cdot \left(1 - \frac{f(x-1)}{L}\right
                 },
                 options: chartOptions('시뮬레이션 2: "MJ의 2년"', days2)
             });
-        };
 
-        // --- 아코디언 스크립트 ---
-        document.querySelectorAll('.accordion-button').forEach(button => {
-            button.addEventListener('click', () => {
-                const content = button.nextElementSibling;
-                const icon = button.querySelector('svg');
+            // --- 아코디언 스크립트 ---
+            document.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('svg');
 
-                if (content.style.display === 'block') {
-                    content.style.display = 'none';
-                    icon.style.transform = 'rotate(0deg)';
-                } else {
-                    content.style.display = 'block';
-                    icon.style.transform = 'rotate(180deg)';
-                }
+                    if (content.style.display === 'block') {
+                        content.style.display = 'none';
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.display = 'block';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
             });
-        });
-    })(); // <-- IIFE 래퍼 추가 끝
+
+        }); // <-- DOMContentLoaded 래퍼 끝
+    })(); // <-- IIFE 래퍼 끝
     </script>
 </body>
 </html>
+
