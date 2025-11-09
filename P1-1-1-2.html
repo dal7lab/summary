@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>업무 능력 성장 시뮬레이터 (v17 - 인지 부채 모델)</title>
+    <!-- [수정] v18 -->
+    <title> 누닥 인지 모델 업무 능력 성장 시뮬레이터 (V18)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -38,7 +39,6 @@
             -webkit-text-fill-color: transparent;
         }
         .accordion-content { display: none; overflow: hidden; }
-        /* [수정] 듀얼 매크로 차트를 위해 높이 조정 */
         .chart-container { position: relative; height: 45vh; width: 100%; min-height: 350px; }
         .micro-chart-container { position: relative; height: 40vh; width: 100%; min-height: 300px; }
         
@@ -93,7 +93,7 @@
                 업무 능력 성장 시뮬레이터
             </h1>
             <p class="text-2xl md:text-3xl font-bold text-gray-100">
-                (v17: 인지 부채 모델)
+                (v18: 인지 부채 모델)
             </p>
         </header>
 
@@ -144,7 +144,6 @@
                         </label>
                         <input type="range" id="param-stress_mgmt_1" min="0" max="1" value="0.5" step="0.01" class="w-full mt-2 slider-scenario-1">
                     </div>
-                    <!-- [신규] v17 -->
                      <div>
                         <label for="param-recovery_quality_1" class="flex justify-between items-center text-sm font-medium text-gray-300">
                             <span>회복의 질 (R_q)</span>
@@ -195,7 +194,6 @@
                         </label>
                         <input type="range" id="param-stress_mgmt_2" min="0" max="1" value="0.9" step="0.01" class="w-full mt-2 slider-scenario-2">
                     </div>
-                    <!-- [신규] v17 -->
                      <div>
                         <label for="param-recovery_quality_2" class="flex justify-between items-center text-sm font-medium text-gray-300">
                             <span>회복의 질 (R_q)</span>
@@ -288,7 +286,7 @@
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15v4a1 1 0 001 1h12a1 1 0 001-1v-4a1 1 0 00-.293-.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
-                        매크로 역량 성장 요약 (v17)
+                        매크로 역량 성장 요약 (v18)
                     </h2>
                     <div id="analysis-text" class="text-lg text-gray-300 leading-relaxed space-y-3">
                         <!-- JS로 동적 업데이트 -->
@@ -301,7 +299,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        상세 비교 컨설팅 보고서 (v17)
+                        상세 비교 컨설팅 보고서 (v18)
                     </h2>
                     <div id="comparative-consulting-report" class="text-base text-gray-300 leading-relaxed space-y-4">
                         <!-- JS로 동적 업데이트 -->
@@ -339,7 +337,7 @@
             </div>
         </div>
 
-        <!-- 시뮬레이션 작동 원리 (아코디언) -->
+        <!-- [수정] v18 - 섹션 제목 변경 -->
         <section class="mt-24">
             <h2 class="text-4xl font-extrabold text-center mb-12 gradient-text">
                 "업무 효율 및 능력 성장 시뮬레이터" 작동 원리 (v17)
@@ -425,69 +423,53 @@
     <script>
         document.addEventListener('DOMContentLoaded', initializeApp);
 
-        let macroChartA; // [신규] 역량
-        let macroChartB; // [신규] 인지 부채
+        let macroChartA; 
+        let macroChartB;
         let microChart;
         
         const inputs = {};
         const values = {};
         
-        // [수정] v17 변수 ID (recovery_quality 추가)
         const paramIds_1 = ['core_work_1', 'focus_level_1', 'deep_work_1', 'overtime_1', 'stress_mgmt_1', 'recovery_quality_1'];
         const paramIds_2 = ['core_work_2', 'focus_level_2', 'deep_work_2', 'overtime_2', 'stress_mgmt_2', 'recovery_quality_2'];
         const paramIds_shared = ['A0', 'L', 'B', 'wc', 'Sim_Days'];
         const allParamIds = [...paramIds_1, ...paramIds_2, ...paramIds_shared];
         
-        // [신규] v17 상수
-        const RECOVERY_BASE = 10.0; // R_q = 100%일 때 하루 10 회복
-        const STRAIN_TAX_RATE = 0.1; // P_eff = e^(-0.1 * Strain)
+        const RECOVERY_BASE = 10.0;
+        const STRAIN_TAX_RATE = 0.1;
 
         // --- 1. 시뮬레이션 핵심 로직 (매크로) ---
 
-        /**
-         * [v17] 일일 성과(k_base) 및 긴장도(Strain) 계산
-         */
         function calculateDailyMetrics(params) {
             const { core_work, focus_level, deep_work, overtime, stress_mgmt, recovery_quality, B, wc } = params;
             
-            // 1. k_base (잠재 성과)
             const effective_hours = core_work * focus_level;
             const deep_work_bonus = 1 + (wc * deep_work);
             const k_base = B * effective_hours * deep_work_bonus;
             
-            // 2. 일일 긴장도 및 회복량
             const daily_strain = (core_work + overtime) * (1.5 - stress_mgmt); 
             const daily_recovery = recovery_quality * RECOVERY_BASE;
             
             return { k_base, daily_strain, daily_recovery };
         }
 
-       /**
-         * [v17] 매크로 시뮬레이션 (A와 Strain 동시 추적)
-         */
         function runMacroSimulation_v17(metrics, params) {
             const { k_base, daily_strain, daily_recovery } = metrics;
             const { A0, L, Sim_Days } = params;
                 
             let ability_history = [A0];
-            let strain_history = [0]; // 인지 부채
-            let p_eff_history = [1.0]; // 업무 효율
-            let k_final_history = [k_base]; // 실제 성과
+            let strain_history = [0]; 
+            let p_eff_history = [1.0];
+            let k_final_history = [k_base];
             
             let current_ability = A0;
             let current_strain = 0;
 
             for (let day = 1; day <= Sim_Days; day++) {
-                // 1. 인지 부채 업데이트
                 current_strain = Math.max(0, current_strain + daily_strain - daily_recovery);
-                
-                // 2. 업무 효율 (P_eff) 계산 (세금)
                 const performance_efficiency = Math.exp(-STRAIN_TAX_RATE * current_strain);
-                
-                // 3. 최종 성과 k_final 계산
                 const k_final = k_base * performance_efficiency;
                 
-                // 4. 역량 성장 계산
                 let growth = 0;
                 if (current_ability > 0 && current_ability < L) {
                     const logistic_factor = current_ability * (1 - (current_ability / L));
@@ -496,7 +478,6 @@
                 current_ability += growth;
                 current_ability = Math.min(Math.max(current_ability, 0), L);
                 
-                // 5. 히스토리 저장
                 ability_history.push(current_ability);
                 strain_history.push(current_strain);
                 p_eff_history.push(performance_efficiency);
@@ -545,9 +526,6 @@
 
         // --- 3. UI 업데이트 함수 ---
         
-        /**
-         * [v17] 듀얼 매크로 차트 업데이트
-         */
         function updateMacroCharts(data_A, data_B) {
             const chartCanvasA = document.getElementById('macroChartA')?.getContext('2d');
             const chartCanvasB = document.getElementById('macroChartB')?.getContext('2d');
@@ -557,9 +535,8 @@
             const line_90 = new Array(data_A.ability_history.length).fill(L * 0.9);
             const Sim_Days = parseFloat(inputs.Sim_Days.value);
             const labelStep = Math.max(30, Math.ceil(Sim_Days / 12 / 30) * 30); 
-            const labels = Array.from({ length: Sim_Days + 1 }, (_, i) => i);
+            const labels = Array.from({ length: Math.floor(Sim_Days) + 1 }, (_, i) => i);
 
-            // 공통 X축 옵션
             const commonXAxis = {
                 title: { display: true, text: '시간 (일)', color: '#9CA3AF' },
                 ticks: {
@@ -573,7 +550,6 @@
                 grid: { color: '#374151' }
             };
             
-            // 공통 플러그인
             const commonPlugins = (titleCallback) => ({
                 legend: { position: 'top', labels: { color: '#E5E7EB', font: { size: 14 } } },
                 tooltip: { mode: 'index', intersect: false, callbacks: { 
@@ -612,7 +588,7 @@
                 }
                 
                 // 차트 B: 인지 부채
-                const max_strain = Math.max(...data_A.strain_history, ...data_B.strain_history) * 1.1 + 5; // Y축 최대값
+                const max_strain = Math.max(...data_A.strain_history, ...data_B.strain_history) * 1.1 + 5;
                 if (macroChartB) {
                     macroChartB.data.labels = labels;
                     macroChartB.data.datasets[0].data = data_A.strain_history;
@@ -711,10 +687,7 @@
 
         // --- 4. 리포트 업데이트 ---
 
-        /**
-         * [v17] k_results 객체를 받도록 수정
-         */
-        function updateAnalysis(data_A, data_B, params_shared, k_results_A, k_results_B) {
+        function updateAnalysis(data_A, data_B, params_shared, metrics_A, metrics_B) {
             const analysisText = document.getElementById('analysis-text');
             if (!analysisText) return;
             
@@ -726,7 +699,6 @@
             const day_90_B = data_B.ability_history.findIndex(val => val >= L_90);
             const day_90_B_text = (day_90_B > 0) ? `약 ${day_90_B}일` : `${Sim_Days}일 내 도달 못함`;
 
-            // [v17] 최종일 기준
             const final_k_A = data_A.k_final_history.at(-1);
             const final_eff_A = data_A.p_eff_history.at(-1);
             const final_strain_A = data_A.strain_history.at(-1);
@@ -744,21 +716,21 @@
                         <h4 class="text-lg font-semibold text-pink-300">시나리오 A (현재) - ${Sim_Days}일차</h4>
                         <p class="mt-2"><strong>최종 성과 (k)</strong>: <span class="font-bold text-xl">${final_k_A.toFixed(4)}</span></p>
                         <p class="mt-1 text-sm"><strong>현재 효율 (P_eff):</strong> ${eff_A_text} (부채: ${final_strain_A.toFixed(1)})</p>
-                        <p class="mt-1 text-sm"><strong>잠재 성과 (k_base):</strong> ${k_results_A.k_base.toFixed(4)}</p>
+                        <p class="mt-1 text-sm"><strong>잠재 성과 (k_base):</strong> ${metrics_A.k_base.toFixed(4)}</p>
                         <p class="mt-2 text-sm"><strong>90% (A=${L_90.toFixed(0)}) 도달:</strong> ${day_90_A_text}</p>
                     </div>
                     <div class="p-4 bg-gray-900 rounded-lg">
                         <h4 class="text-lg font-semibold text-teal-300">시나리오 B (개선) - ${Sim_Days}일차</h4>
                         <p class="mt-2"><strong>최종 성과 (k)</strong>: <span class="font-bold text-xl">${final_k_B.toFixed(4)}</span></p>
                          <p class="mt-1 text-sm"><strong>현재 효율 (P_eff):</strong> ${eff_B_text} (부채: ${final_strain_B.toFixed(1)})</p>
-                        <p class="mt-1 text-sm"><strong>잠재 성과 (k_base):</strong> ${k_results_B.k_base.toFixed(4)}</p>
+                        <p class="mt-1 text-sm"><strong>잠재 성과 (k_base):</strong> ${metrics_B.k_base.toFixed(4)}</p>
                         <p class="mt-2 text-sm"><strong>90% (A=${L_90.toFixed(0)}) 도달:</strong> ${day_90_B_text}</p>
                     </div>
                 </div>
             `;
         }
 
-        function updateComparativeReport(data_A, data_B, params_A, params_B, k_results_A, k_results_B) {
+        function updateComparativeReport(data_A, data_B, params_A, params_B, metrics_A, metrics_B) {
             const reportDiv = document.getElementById('comparative-consulting-report');
             if (!reportDiv) return;
 
@@ -773,9 +745,9 @@
             const final_eff_B = data_B.p_eff_history.at(-1);
             
             // 1. k_base (잠재력) 비교
-            let k_base_analysis = `시나리오 B의 잠재 성과(k_base=${k_results_B.k_base.toFixed(4)})는 A(${k_results_A.k_base.toFixed(4)}) 대비 <strong class="text-teal-300">${((k_results_B.k_base/k_results_A.k_base-1)*100).toFixed(0)}%</strong> 더 높습니다. 이는 더 많은 '핵심 업무'와 '몰입'의 결과입니다.`;
-            if (k_results_B.k_base < k_results_A.k_base) {
-                k_base_analysis = `시나리오 B의 잠재 성과(k_base)는 A보다 <strong class="text-red-400">낮습니다.</strong> 핵심 업무 시간과 몰입도를 점검하십시오.`;
+            let k_base_analysis = `시나리오 B의 잠재 성과($k_{base}=${metrics_B.k_base.toFixed(4)}$)는 A(${metrics_A.k_base.toFixed(4)}) 대비 <strong class="text-teal-300">${((metrics_B.k_base/metrics_A.k_base-1)*100).toFixed(0)}%</strong> 더 높습니다. 이는 더 많은 '핵심 업무'와 '몰입'의 결과입니다.`;
+            if (metrics_B.k_base < metrics_A.k_base) {
+                k_base_analysis = `시나리오 B의 잠재 성과($k_{base}$)는 A보다 <strong class="text-red-400">낮습니다.</strong> 핵심 업무 시간과 몰입도를 점검하십시오.`;
             }
 
             // 2. Strain (부채) 비교
@@ -785,7 +757,7 @@
             }
 
             // 3. k_final (최종 성과) 비교
-            let k_final_analysis = `그 결과, B의 최종 성과(k_final=${final_k_B.toFixed(4)})는 A(${final_k_A.toFixed(4)})보다 압도적으로 높습니다. 이는 <strong class="text-teal-300">높은 잠재력(k_base)과 완벽한 부채 관리(P_eff=100%)</strong>의 합작입니다.`;
+            let k_final_analysis = `그 결과, B의 최종 성과($k_{final}=${final_k_B.toFixed(4)}$)는 A(${final_k_A.toFixed(4)})보다 압도적으로 높습니다. 이는 <strong class="text-teal-300">높은 잠재력($k_{base}$)과 완벽한 부채 관리($P_{eff} \approx 100\%$)</strong>의 합작입니다.`;
             if (final_k_B < final_k_A && final_eff_B < 0.5) {
                 k_final_analysis = `시나리오 B는 높은 잠재력($k_{base}$)에도 불구하고, <strong class="text-red-500">누적된 인지 부채</strong>로 인해 효율($P_{eff}$)이 하락하여, 최종 성과(k_final)는 오히려 A보다 낮아졌습니다.`;
             }
@@ -796,6 +768,7 @@
                  final_ability = `따라서 ${Sim_Days}일 후, B의 최종 역량(<strong class="text-teal-300">${final_B.toFixed(0)}</strong>)은 A(<strong class="text-pink-300">${final_A.toFixed(0)}</strong>)보다 <strong class="text-red-400">뒤처졌습니다.</strong> '회복의 질(R_q)'을 즉시 점검해야 합니다.`;
             }
 
+            // [수정] v18: MathJax 렌더링을 위해 $...$ 사용
             reportDiv.innerHTML = `
                 <div class="mt-4">
                     <h3 class="text-lg font-semibold text-white">1. 잠재 성과 ($k_{base}$) 비교</h3>
@@ -814,6 +787,13 @@
                     <p>${final_ability}</p>
                 </div>
             `;
+            
+            // [수정] v18: MathJax에게 이 섹션을 다시 렌더링하라고 알림
+            if (window.MathJax) {
+                MathJax.typesetPromise([reportDiv]).catch(function (err) {
+                    console.log('MathJax typeset error:', err);
+                });
+            }
         }
         
         function updateMicroReport(params_A, params_B) {
@@ -846,14 +826,12 @@
         }
 
 
-        /**
-         * [v17] k_results_B를 인자로 받음
-         */
-        function updateVariableGuide(params_B, k_results_B) {
+        function updateVariableGuide(params_B, metrics_B) {
             const guideDiv = document.getElementById('variable-ai-guide');
-            if (!guideDiv || !k_results_B) return; // [v17] 가드 추가
+            if (!guideDiv || !metrics_B) return; // [v18] 가드 수정
 
             const { core_work, focus_level, deep_work, overtime, stress_mgmt, recovery_quality, B, wc, L } = params_B;
+            const { daily_strain } = metrics_B; // [v18]
 
             guideDiv.innerHTML = `
                 <div class="p-4 bg-gray-900 rounded-lg">
@@ -879,9 +857,8 @@
                  <div class="p-4 bg-gray-900 rounded-lg">
                     <h4 class="text-lg font-semibold text-yellow-300">5. 스트레스 대응 (M_s) <span class="text-sm font-normal text-white">(목표: ${(stress_mgmt * 100).toFixed(0)} %)</span></h4>
                     <p class="text-sm mt-1"><strong>영향:</strong> '일일 긴장도'가 발생하는 것을 <strong class="text-green-300">'방어'</strong>합니다. (긴장도 ∝ (1.5 - M_s))</p>
-                    <p class="text-sm mt-1"><strong>AI/Tools 활용법:</strong> AI 기반 명상/마음챙김 앱(예: Headspace, Calm)을 사용하십시오. AI에게 "오늘 나의 일일 긴장도(${k_results_B.daily_strain.toFixed(1)})가 높아. 긴장을 낮출 수 있는 10분 명상 세션을 추천해줘"라고 요청하십시오.</p>
+                    <p class="text-sm mt-1"><strong>AI/Tools 활용법:</strong> AI 기반 명상/마음챙김 앱(예: Headspace, Calm)을 사용하십시오. AI에게 "오늘 나의 일일 긴장도(${daily_strain.toFixed(1)})가 높아. 긴장을 낮출 수 있는 10분 명상 세션을 추천해줘"라고 요청하십시오.</p>
                 </div>
-                <!-- [신규] v17 -->
                 <div class="p-4 bg-gray-900 rounded-lg">
                     <h4 class="text-lg font-semibold text-green-300">6. 회복의 질 (R_q) <span class="text-sm font-normal text-white">(목표: ${(recovery_quality * 100).toFixed(0)} %)</span></h4>
                     <p class="text-sm mt-1"><strong>영향:</strong> <strong class="text-green-300">'인지 부채'를 '상환'</strong>하는 유일한 변수입니다. 이 값이 낮으면 부채가 계속 누적됩니다. (회복량 ∝ R_q)</p>
@@ -945,7 +922,7 @@
                 updateComparativeReport(data_Macro_A, data_Macro_B, params_A, params_B, metrics_A, metrics_B); 
                 updateMicroReport(params_A, params_B);
                 
-                // [v17] v15 버그 수정: metrics_B(k_results_B) 전달
+                // [v18] v17 버그 수정: metrics_B 전달
                 updateVariableGuide(params_B, metrics_B); 
                 
                 document.getElementById('macro-days').textContent = params_shared.Sim_Days.toFixed(0);
@@ -986,7 +963,7 @@
         }
 
         function initializeApp() {
-            console.log("DOM 로드 완료. v17 직무역량 앱 초기화 시작...");
+            console.log("DOM 로드 완료. v18 직무역량 앱 초기화 시작...");
             
             allParamIds.forEach(id => {
                 inputs[id] = document.getElementById(`param-${id}`);
@@ -1026,7 +1003,7 @@
 
             // 초기 실행
             runFullSimulation();
-            console.log("앱 초기화 완료. (v17)");
+            console.log("앱 초기화 완료. (v18)");
         }
         
     </script>
