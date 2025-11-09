@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>학습 성장 곡선 시뮬레이터 (v8 - 비교 분석)</title>
+    <title>학습 성장 곡선 시뮬레이터 (v9 - 버그 수정)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -77,7 +77,7 @@
                 학습 성장 곡선 비교 시뮬레이터
             </h1>
             <p class="text-2xl md:text-3xl font-bold text-gray-100">
-                (Python 로직 기반 v8)
+                (Python 로직 기반 v9)
             </p>
         </header>
 
@@ -87,7 +87,7 @@
             <!-- 1. 컨트롤 패널 (L) -->
             <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 h-fit">
                 
-                <!-- [수정] 시나리오 1 -->
+                <!-- 시나리오 1 -->
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 pb-3 border-b border-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1zm-1 4a1 1 0 100 2h2a1 1 0 100-2H6zm3 0a1 1 0 100 2h2a1 1 0 100-2H9zm3 0a1 1 0 100 2h1a1 1 0 100-2h-1zm-1-4a1 1 0 100 2h2a1 1 0 100-2h-2z" clip-rule="evenodd" /></svg>
                     시나리오 1 (현재)
@@ -116,7 +116,7 @@
                     </div>
                 </div>
 
-                <!-- [신규] 시나리오 2 -->
+                <!-- 시나리오 2 -->
                 <h2 class="text-2xl font-bold text-teal-300 mt-10 mb-6 pb-3 border-b border-gray-600">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 2a3 3 0 00-3 3v10a3 3 0 003 3h10a3 3 0 003-3V5a3 3 0 00-3-3H5zm2.5 4a.5.5 0 000 1h3a.5.5 0 000-1h-3zM8 9a.5.5 0 000 1h3a.5.5 0 000-1H8zM7 13.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
                     시나리오 2 (개선)
@@ -207,13 +207,12 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15v4a1 1 0 001 1h12a1 1 0 001-1v-4a1 1 0 00-.293-.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
                         시뮬레이션 결과 요약
                     </h2>
-                    <!-- [수정] analysis-text가 이제 2개 시나리오를 비교 -->
                     <div id="analysis-text" class="text-lg text-gray-300 leading-relaxed space-y-3">
                         <!-- JS로 동적 업데이트 -->
                     </div>
                 </div>
 
-                <!-- 2. [신규] 상세 비교 컨설팅 보고서 -->
+                <!-- 2. 상세 비교 컨설팅 보고서 -->
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -226,7 +225,7 @@
                     </div>
                 </div>
 
-                <!-- 3. [유지] 변수 상세 설명 및 AI 활용법 (시나리오 2 기준) -->
+                <!-- 3. '시나리오 2'를 위한 AI 학습 도우미 활용법 -->
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -313,7 +312,6 @@
         const inputs = {};
         const values = {};
         
-        // [수정] 파라미터 ID를 시나리오 1, 2, 공통으로 분리
         const paramIds_1 = ['total_time_1', 'focus_level_1', 'continuous_time_1'];
         const paramIds_2 = ['total_time_2', 'focus_level_2', 'continuous_time_2'];
         const paramIds_shared = ['A0', 'L', 'B', 'wc', 'Sim_Days'];
@@ -322,12 +320,10 @@
         // --- 1. 시뮬레이션 핵심 로직 ---
 
         function calculateKDaily(params) {
-            // params 객체는 'total_time', 'focus_level' 등 일반 키를 가짐
             const { total_time, focus_level, continuous_time, B, wc } = params;
             const effective_hours = total_time * focus_level;
             const continuity_bonus = 1 + (wc * continuous_time);
-            const k_value = B * effective_hours * continuity_bonus;
-            return k_value;
+            return B * effective_hours * continuity_bonus;
         }
 
         function runSimulation(params, k_scenario) {
@@ -364,7 +360,7 @@
 
             try {
                 if (growthChart) {
-                    growthChart.data.labels = data_A.days; // X축은 동일
+                    growthChart.data.labels = data_A.days;
                     growthChart.data.datasets[0].data = data_A.ability_history;
                     growthChart.data.datasets[1].data = data_B.ability_history;
                     growthChart.data.datasets[2].data = line_50;
@@ -458,24 +454,19 @@
             }
         }
 
-        /**
-         * [수정] 결과 요약 (두 시나리오 모두 표시)
-         */
-        function updateAnalysis(data_A, data_B, params, k_value_A, k_value_B) {
+        function updateAnalysis(data_A, data_B, params_shared, k_value_A, k_value_B) {
             const analysisText = document.getElementById('analysis-text');
             if (!analysisText) return;
             
-            const { L, Sim_Days } = params;
+            const { L, Sim_Days } = params_shared;
             const L_50 = L * 0.5;
             const L_90 = L * 0.9;
 
-            // 시나리오 1
             const day_50_A = data_A.ability_history.findIndex(val => val >= L_50);
             const day_90_A = data_A.ability_history.findIndex(val => val >= L_90);
             const day_50_A_text = (day_50_A > 0) ? `약 ${day_50_A}일` : `${Sim_Days}일 내 도달 못함`;
             const day_90_A_text = (day_90_A > 0) ? `약 ${day_90_A}일` : `${Sim_Days}일 내 도달 못함`;
 
-            // 시나리오 2
             const day_50_B = data_B.ability_history.findIndex(val => val >= L_50);
             const day_90_B = data_B.ability_history.findIndex(val => val >= L_90);
             const day_50_B_text = (day_50_B > 0) ? `약 ${day_50_B}일` : `${Sim_Days}일 내 도달 못함`;
@@ -483,14 +474,12 @@
 
             analysisText.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- 시나리오 1 요약 -->
                     <div class="p-4 bg-gray-900 rounded-lg">
                         <h4 class="text-lg font-semibold text-pink-300">시나리오 1 (현재)</h4>
                         <p class="mt-2"><strong>성장률 (k)</strong>: <span class="font-bold text-xl">${k_value_A.toFixed(4)}</span></p>
                         <p class="mt-1 text-sm"><strong>50% (A=${L_50.toFixed(0)}) 도달:</strong> ${day_50_A_text}</p>
                         <p class="mt-1 text-sm"><strong>90% (A=${L_90.toFixed(0)}) 도달:</strong> <span class="${day_90_A > 0 ? '' : 'text-red-400'}">${day_90_A_text}</span></p>
                     </div>
-                    <!-- 시나리오 2 요약 -->
                     <div class="p-4 bg-gray-900 rounded-lg">
                         <h4 class="text-lg font-semibold text-teal-300">시나리오 2 (개선)</h4>
                         <p class="mt-2"><strong>성장률 (k)</strong>: <span class="font-bold text-xl">${k_value_B.toFixed(4)}</span></p>
@@ -502,13 +491,17 @@
         }
 
         /**
-         * [신규] 상세 비교 컨설팅 보고서
+         * [버그 수정] 상세 비교 컨설팅 보고서
+         * v8의 버그: function(data_A, data_B, params, k_value_A, k_value_B)
+         * v9의 수정: function(data_A, data_B, params_A, params_B, k_value_A, k_value_B)
          */
-        function updateComparativeReport(data_A, data_B, params, k_value_A, k_value_B) {
+        function updateComparativeReport(data_A, data_B, params_A, params_B, k_value_A, k_value_B) {
             const reportDiv = document.getElementById('comparative-consulting-report');
             if (!reportDiv) return;
 
-            const { L, Sim_Days } = params;
+            // [버그 수정] 공통 파라미터는 params_A 또는 params_B에서 가져옴
+            const { L, Sim_Days } = params_A; 
+            
             const final_A = data_A.ability_history[data_A.ability_history.length - 1];
             const final_B = data_B.ability_history[data_B.ability_history.length - 1];
             const k_diff_percent = (k_value_A > 0) ? ((k_value_B / k_value_A) - 1) * 100 : (k_value_B > 0 ? 1000 : 0);
@@ -520,12 +513,16 @@
             let k_analysis = `시나리오 2의 성장률(k=${k_value_B.toFixed(4)})은 1(${k_value_A.toFixed(4)}) 대비 <strong class="text-teal-300">${k_diff_percent.toFixed(0)}%</strong> 더 높습니다. 이것이 모든 차이를 만드는 핵심입니다.`;
             if (k_value_B < k_value_A) {
                  k_analysis = `시나리오 2의 성장률(k=${k_value_B.toFixed(4)})은 1(${k_value_A.toFixed(4)}) 대비 <strong class="text-red-400">${Math.abs(k_diff_percent).toFixed(0)}%</strong> 더 낮습니다. 개선안이 오히려 비효율적입니다.`;
+            } else if (k_diff_percent < 10 && k_diff_percent > -10) {
+                 k_analysis = `시나리오 2의 성장률(k=${k_value_B.toFixed(4)})은 1(${k_value_A.toFixed(4)})과 <strong class="text-yellow-300">거의 차이가 없습니다.</strong> 개선안의 변수 값을 더 공격적으로 수정해보세요.`;
             }
 
             // 2. 핵심 동인
-            const diff_T = params.total_time_2 - params.total_time_1;
-            const diff_F = params.focus_level_2 - params.focus_level_1;
-            const diff_C = params.continuous_time_2 - params.continuous_time_1;
+            // [버그 수정] params_A와 params_B의 속성을 직접 비교
+            const diff_T = params_B.total_time - params_A.total_time;
+            const diff_F = params_B.focus_level - params_A.focus_level;
+            const diff_C = params_B.continuous_time - params_A.continuous_time;
+            
             let driver_analysis = "";
             if (k_diff_percent > 10) {
                  driver_analysis = `이 성과를 이끈 핵심 동인은 <strong class="text-white">${Math.abs(diff_T).toFixed(1)}시간 증가한 총 학습 시간</strong>과 <strong class="text-white">${(Math.abs(diff_F)*100).toFixed(0)}%p 증가한 몰입도</strong>입니다. '양'과 '질' 모두를 잡았습니다.`;
@@ -575,13 +572,13 @@
         }
 
         /**
-         * [수정] 변수 가이드 (시나리오 2 기준)
+         * [보완] 변수 가이드 (시나리오 2 기준, w_c 추가)
          */
-        function updateVariableGuide(params, k_value) {
+        function updateVariableGuide(params_B, k_value_B) {
             const guideDiv = document.getElementById('variable-ai-guide');
             if (!guideDiv) return;
 
-            const { total_time, focus_level, continuous_time, B, wc, L } = params; // params = params_B
+            const { total_time, focus_level, continuous_time, B, wc, L } = params_B;
 
             guideDiv.innerHTML = `
                 <div class="p-4 bg-gray-900 rounded-lg">
@@ -600,55 +597,60 @@
                     <h4 class="text-lg font-semibold text-white">4. 기본 학습 효율 (B) <span class="text-sm font-normal text-white">(현재: ${B.toFixed(3)})</span></h4>
                     <p class="text-sm mt-1"><strong>AI 활용법 (핵심):</strong> B값을 극대화하는 것이 AI 활용의 핵심입니다. AI에게 "내가 [주제]를 L=${L.toFixed(0)} 수준까지 배우려 해. 가장 효율적인(B가 높은) 학습 로드맵을 짜줘", "이 복잡한 개념을 '파인만 기법'으로 10살 아이도 이해하게 설명해줘", "관련된 '메타인지' 질문 5개만 해줘"라고 요청하여 학습 효율 자체를 극대화하십시오.</p>
                 </div>
+                <!-- [보완] 누락되었던 w_c 항목 추가 -->
+                 <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="text-lg font-semibold text-white">5. 연속 보너스 가중치 (w_c) <span class="text-sm font-normal text-white">(현재: ${wc.toFixed(2)})</span></h4>
+                    <p class="text-sm text-gray-400 mt-1">T_c(연속 시간)가 얼마나 큰 보너스를 줄지 결정하는 상수입니다. 이 값이 0이면 T_c는 아무 의미가 없습니다.</p>
+                    <p class="text-sm mt-1"><strong>AI 활용법:</strong> AI에게 "나는 [창의적인 작업]을 하고 있어. T_c 보너스가 큰(w_c=0.5) 작업이니, 2시간 동안 방해받지 않도록 보조해줘"라고 선언하며 학습 환경을 설정할 수 있습니다.</p>
+                </div>
             `;
         }
         
         // --- 3. 유틸리티 및 메인 실행 ---
 
-        /**
-         * [수정] 메인 실행 함수
-         */
         function runFullSimulation() {
-            // 1. 공통 파라미터 읽기
-            const params_shared = {};
-            paramIds_shared.forEach(id => {
-                params_shared[id] = parseFloat(inputs[id].value);
-            });
+            try {
+                const params_shared = {};
+                paramIds_shared.forEach(id => {
+                    params_shared[id] = parseFloat(inputs[id].value);
+                });
 
-            // 2. 시나리오 1 파라미터 객체 생성
-            const params_A = { ...params_shared };
-            paramIds_1.forEach(id => {
-                const genericKey = id.replace('_1', ''); // 'total_time_1' -> 'total_time'
-                params_A[genericKey] = parseFloat(inputs[id].value);
-            });
+                const params_A = { ...params_shared };
+                paramIds_1.forEach(id => {
+                    const genericKey = id.replace('_1', '');
+                    params_A[genericKey] = parseFloat(inputs[id].value);
+                });
 
-            // 3. 시나리오 2 파라미터 객체 생성
-            const params_B = { ...params_shared };
-            paramIds_2.forEach(id => {
-                const genericKey = id.replace('_2', ''); // 'total_time_2' -> 'total_time'
-                params_B[genericKey] = parseFloat(inputs[id].value);
-            });
+                const params_B = { ...params_shared };
+                paramIds_2.forEach(id => {
+                    const genericKey = id.replace('_2', '');
+                    params_B[genericKey] = parseFloat(inputs[id].value);
+                });
 
-            // 4. 각 시나리오별 k값 및 시뮬레이션 실행
-            const k_value_A = calculateKDaily(params_A);
-            const data_A = runSimulation(params_A, k_value_A);
-            
-            const k_value_B = calculateKDaily(params_B);
-            const data_B = runSimulation(params_B, k_value_B); // Sim_Days가 같으므로 X축 길이는 동일
-            
-            // 5. 모든 UI 섹션 업데이트
-            updateChart(data_A, data_B);
-            updateAnalysis(data_A, data_B, params_shared, k_value_A, k_value_B);
-            updateComparativeReport(data_A, data_B, params_A, params_B, k_value_A, k_value_B); // params_A/B 전달
-            updateVariableGuide(params_B, k_value_B); // 시나리오 2(개선) 기준
+                const k_value_A = calculateKDaily(params_A);
+                const data_A = runSimulation(params_A, k_value_A);
+                
+                const k_value_B = calculateKDaily(params_B);
+                const data_B = runSimulation(params_B, k_value_B);
+                
+                updateChart(data_A, data_B);
+                updateAnalysis(data_A, data_B, params_shared, k_value_A, k_value_B);
+                
+                // [버그 수정] 올바른 파라미터로 호출
+                updateComparativeReport(data_A, data_B, params_A, params_B, k_value_A, k_value_B); 
+                
+                // [버그 수정] 이제 이 함수가 정상적으로 호출됨
+                updateVariableGuide(params_B, k_value_B); 
+
+            } catch (error) {
+                console.error("시뮬레이션 실행 중 오류 발생:", error);
+                // 오류 발생 시 사용자에게 알릴 수 있는 UI 로직 추가 (옵션)
+            }
         }
 
-        /**
-         * [수정] 슬라이더 레이블 업데이트 (id 기준)
-         */
         function updateSliderLabel(id, value) {
             if (values[id]) {
-                const key = id.replace(/_1|_2$/, ''); // 'total_time_1' -> 'total_time'
+                const key = id.replace(/_1|_2$/, ''); 
                 
                 if (key === 'total_time' || key === 'continuous_time') {
                     values[id].textContent = `${value.toFixed(1)} 시간`;
@@ -670,23 +672,26 @@
             const slider = inputs.Sim_Days;
             if (!slider) return;
 
-            let newStep = 30; // 기본값
-            if (currentValue < 1825) newStep = 5;       // 5년 미만
-            else if (currentValue < 3650) newStep = 7;  // 10년 미만
-            else if (currentValue < 7300) newStep = 30; // 20년 미만
-            else if (currentValue < 10950) newStep = 60;// 30년 미만
-            else if (currentValue < 14600) newStep = 90;// 40년 미만
-            else newStep = 120; // 50년 이하
-            
+            let newStep = 30;
+            if (currentValue < 1825) newStep = 5;       
+            else if (currentValue < 3650) newStep = 7;  
+            else if (currentValue < 7300) newStep = 30; 
+            else if (currentValue < 10950) newStep = 60;
+            else if (currentValue < 14600) newStep = 90;
+            else newStep = 120; 
             slider.step = newStep;
         }
 
         function initializeApp() {
-            console.log("DOM 로드 완료. v8 앱 초기화 시작...");
+            console.log("DOM 로드 완료. v9 앱 초기화 시작...");
             
             allParamIds.forEach(id => {
                 inputs[id] = document.getElementById(`param-${id}`);
                 values[id] = document.getElementById(`val-${id}`);
+                
+                if (!inputs[id] || !values[id]) {
+                    console.warn(`DOM 요소를 찾을 수 없습니다: param-${id} 또는 val-${id}`);
+                }
             });
 
             allParamIds.forEach(id => {
@@ -718,7 +723,7 @@
 
             // 초기 실행
             runFullSimulation();
-            console.log("앱 초기화 완료.");
+            console.log("앱 초기화 완료. (v9)");
         }
         
     </script>
