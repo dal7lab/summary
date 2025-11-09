@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- [수정] 타이틀 v10 -->
-    <title>학습 성장 곡선 시뮬레이터 (v10 - 용어 수정)</title>
+    <!-- [수정] 타이틀 v11 -->
+    <title>학습 성장 곡선 시뮬레이터 (v11 - 수식 렌더링)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -13,6 +13,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- [신규] MathJax (수학식 렌더링) 설정 -->
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']], // 인라인 수식 $...$
+        displayMath: [['$$', '$$'], ['\\[', '\\]']] // 디스플레이 수식 $$...$$
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+    
+    <!-- [신규] MathJax (수학식 렌더링) 라이브러리 로드 -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
@@ -27,8 +44,8 @@
         .accordion-content { display: none; overflow: hidden; }
         .chart-container { position: relative; height: 60vh; width: 100%; min-height: 450px; }
         .formula {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.25rem; color: #D1D5DB; background: #1F2937;
+            font-size: 1.1rem; /* MathJax가 렌더링하므로 기본 폰트 크기 조정 */
+            color: #D1D5DB; background: #1F2937;
             padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #4B5563;
         }
         input[type="range"] {
@@ -78,7 +95,7 @@
                 학습 성장 곡선 비교 시뮬레이터
             </h1>
             <p class="text-2xl md:text-3xl font-bold text-gray-100">
-                (Python 로직 기반 v10)
+                (Python 로직 기반 v11)
             </p>
         </header>
 
@@ -88,7 +105,7 @@
             <!-- 1. 컨트롤 패널 (L) -->
             <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 h-fit">
                 
-                <!-- [용어 수정] 시나리오 A -->
+                <!-- 시나리오 A -->
                 <h2 class="text-2xl font-bold text-pink-300 mb-6 pb-3 border-b border-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1zm-1 4a1 1 0 100 2h2a1 1 0 100-2H6zm3 0a1 1 0 100 2h2a1 1 0 100-2H9zm3 0a1 1 0 100 2h1a1 1 0 100-2h-1zm-1-4a1 1 0 100 2h2a1 1 0 100-2h-2z" clip-rule="evenodd" /></svg>
                     시나리오 A (현재)
@@ -117,7 +134,7 @@
                     </div>
                 </div>
 
-                <!-- [용어 수정] 시나리오 B -->
+                <!-- 시나리오 B -->
                 <h2 class="text-2xl font-bold text-teal-300 mt-10 mb-6 pb-3 border-b border-gray-600">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 2a3 3 0 00-3 3v10a3 3 0 003 3h10a3 3 0 003-3V5a3 3 0 00-3-3H5zm2.5 4a.5.5 0 000 1h3a.5.5 0 000-1h-3zM8 9a.5.5 0 000 1h3a.5.5 0 000-1H8zM7 13.5a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z" clip-rule="evenodd" /></svg>
                     시나리오 B (개선)
@@ -175,7 +192,6 @@
                             <input type="range" id="param-B" min="0.001" max="0.05" value="0.01" step="0.001" class="w-full mt-2 slider-shared">
                         </div>
                         <div>
-                            <!-- [용어 수정] 연속 학습 가중치 -->
                             <label for="param-wc" class="flex justify-between items-center text-sm font-medium text-gray-300">
                                 <span>연속 학습 가중치 (w_c)</span>
                                 <span id="val-wc" class="font-bold text-white text-base">0.25</span>
@@ -229,7 +245,6 @@
 
                 <!-- 3. '시나리오 B'를 위한 AI 학습 도우미 활용법 -->
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
-                    <!-- [용어 수정] 시나리오 B -->
                     <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M12 21v-1m-4-4H7M17 17h-1" />
@@ -257,16 +272,15 @@
                         <span class="text-xl font-semibold text-gray-100">1. 일일 성장률 (k) 계산</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             매일의 '성장률(k)'은 총 학습 시간, 몰입도, 연속 학습 시간을 기반으로 계산됩니다.
                         </p>
                         <div class="formula">
-                            $E_{eff} = T_d \cdot F_p$ (유효 학습 시간)
-                            <br>
-                            $C_{bonus} = 1 + (w_c \cdot T_c)$ (연속 학습 보너스)
-                            <br>
-                            $k = B \cdot E_{eff} \cdot C_{bonus}$
+                            $$ E_{eff} = T_d \cdot F_p \quad (\text{유효 학습 시간}) $$
+                            $$ C_{bonus} = 1 + (w_c \cdot T_c) \quad (\text{연속 학습 보너스}) $$
+                            $$ k = B \cdot E_{eff} \cdot C_{bonus} $$
                         </div>
                     </div>
                 </div>
@@ -277,12 +291,13 @@
                         <span class="text-xl font-semibold text-gray-100">2. 로지스틱 성장 모델 (이산형)</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             일일 '능력치 변화량($\Delta A$)'은 어제의 능력치($A_{t-1}$)와 성장 한계($L$)에 의해 결정됩니다.
                         </p>
                         <div class="formula">
-                            $\Delta A = k \cdot A_{t-1} \cdot (1 - \frac{A_{t-1}}{L})$
+                           $$ \Delta A = k \cdot A_{t-1} \cdot \left(1 - \frac{A_{t-1}}{L}\right) $$
                         </div>
                     </div>
                 </div>
@@ -293,12 +308,13 @@
                         <span class="text-xl font-semibold text-gray-100">3. 시뮬레이션 루프</span>
                         <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
+                    <!-- [수정] MathJax (LaTeX) 문법으로 변경 -->
                     <div class="accordion-content px-6 pb-6 text-lg">
                         <p class="text-gray-300 leading-relaxed mb-4">
                             시뮬레이션은 $Sim\_Days$ (예: 365일) 동안 매일 다음 계산을 반복합니다.
                         </p>
                         <div class="formula">
-                            $A_t = A_{t-1} + \Delta A$
+                            $$ A_t = A_{t-1} + \Delta A $$
                         </div>
                     </div>
                 </div>
@@ -368,7 +384,6 @@
                     growthChart.data.datasets[1].data = data_B.ability_history;
                     growthChart.data.datasets[2].data = line_50;
                     growthChart.data.datasets[3].data = line_90;
-                    // [용어 수정] 차트 레이블
                     growthChart.data.datasets[0].label = '시나리오 A (현재)';
                     growthChart.data.datasets[1].label = '시나리오 B (개선)';
                     
@@ -384,7 +399,6 @@
                             labels: data_A.days,
                             datasets: [
                                 {
-                                    // [용어 수정] 차트 레이블
                                     label: '시나리오 A (현재)',
                                     data: data_A.ability_history,
                                     borderColor: '#F9A8D4', // Pink
@@ -394,7 +408,6 @@
                                     tension: 0.1
                                 },
                                 {
-                                    // [용어 수정] 차트 레이블
                                     label: '시나리오 B (개선)',
                                     data: data_B.ability_history,
                                     borderColor: '#2DD4BF', // Teal
@@ -483,14 +496,12 @@
 
             analysisText.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- [용어 수정] 시나리오 A -->
                     <div class="p-4 bg-gray-900 rounded-lg">
                         <h4 class="text-lg font-semibold text-pink-300">시나리오 A (현재)</h4>
                         <p class="mt-2"><strong>성장률 (k)</strong>: <span class="font-bold text-xl">${k_value_A.toFixed(4)}</span></p>
                         <p class="mt-1 text-sm"><strong>50% (A=${L_50.toFixed(0)}) 도달:</strong> ${day_50_A_text}</p>
                         <p class="mt-1 text-sm"><strong>90% (A=${L_90.toFixed(0)}) 도달:</strong> <span class="${day_90_A > 0 ? '' : 'text-red-400'}">${day_90_A_text}</span></p>
                     </div>
-                    <!-- [용어 수정] 시나리오 B -->
                     <div class="p-4 bg-gray-900 rounded-lg">
                         <h4 class="text-lg font-semibold text-teal-300">시나리오 B (개선)</h4>
                         <p class="mt-2"><strong>성장률 (k)</strong>: <span class="font-bold text-xl">${k_value_B.toFixed(4)}</span></p>
@@ -514,8 +525,6 @@
             const day_90_A = data_A.ability_history.findIndex(val => val >= L * 0.9);
             const day_90_B = data_B.ability_history.findIndex(val => val >= L * 0.9);
 
-            // 1. k값 비교
-            // [용어 수정] 시나리오 B, A
             let k_analysis = `시나리오 B의 성장률(k=${k_value_B.toFixed(4)})은 A(${k_value_A.toFixed(4)}) 대비 <strong class="text-teal-300">${k_diff_percent.toFixed(0)}%</strong> 더 높습니다. 이것이 모든 차이를 만드는 핵심입니다.`;
             if (k_value_B < k_value_A) {
                  k_analysis = `시나리오 B의 성장률(k=${k_value_B.toFixed(4)})은 A(${k_value_A.toFixed(4)}) 대비 <strong class="text-red-400">${Math.abs(k_diff_percent).toFixed(0)}%</strong> 더 낮습니다. 개선안이 오히려 비효율적입니다.`;
@@ -523,7 +532,6 @@
                  k_analysis = `시나리오 B의 성장률(k=${k_value_B.toFixed(4)})은 A(${k_value_A.toFixed(4)})과 <strong class="text-yellow-300">거의 차이가 없습니다.</strong> 개선안의 변수 값을 더 공격적으로 수정해보세요.`;
             }
 
-            // 2. 핵심 동인
             const diff_T = params_B.total_time - params_A.total_time;
             const diff_F = params_B.focus_level - params_A.focus_level;
             const diff_C = params_B.continuous_time - params_A.continuous_time;
@@ -537,8 +545,6 @@
                 driver_analysis = "두 시나리오 간의 k값 차이가 미미합니다. 더 극적인 변화를 위해 변수 값을 조정해보세요.";
             }
 
-            // 3. 목표 달성 속도
-            // [용어 수정] 시나리오 A, B
             let goal_analysis = "";
             if (day_90_A > 0 && day_90_B > 0) {
                 goal_analysis = `전문가 수준(90%) 도달 속도가 <strong class="text-white">${day_90_A}일</strong>에서 <strong class="text-teal-300">${day_90_B}일</strong>로 <strong class="text-teal-300">${day_90_A - day_90_B}일</strong> 단축되었습니다.`;
@@ -550,14 +556,11 @@
                 goal_analysis = `두 시나리오 모두 ${Sim_Days}일 내 90% 도달에 실패했습니다. 더 높은 k값 또는 더 긴 시뮬레이션 기간이 필요합니다.`;
             }
 
-            // 4. 최종 성장도
-            // [용어 수정] 시나리오 B, A
             let final_analysis = `${Sim_Days}일 후, 시나리오 B의 최종 능력치(<strong class="text-teal-300">${final_B.toFixed(0)}</strong>)는 A(<strong class="text-pink-300">${final_A.toFixed(0)}</strong>)보다 <strong class="text-white">${(final_B - final_A).toFixed(0)} 포인트</strong> 더 높습니다. 이 차이는 시간이 지날수록 기하급수적으로 벌어질 것입니다.`;
             if (final_B < final_A) {
                 final_analysis = `${Sim_Days}일 후, 시나리오 B의 최종 능력치(<strong class="text-teal-300">${final_B.toFixed(0)}</strong>)는 A(<strong class="text-pink-300">${final_A.toFixed(0)}</strong>)보다 <strong class="text-red-400">${(final_A - final_B).toFixed(0)} 포인트</strong> 더 낮습니다.`;
             }
 
-            // [용어 수정] 시나리오 B, A
             reportDiv.innerHTML = `
                 <div class="mt-4">
                     <h3 class="text-lg font-semibold text-white">1. 성장률(k) 비교</h3>
@@ -603,7 +606,6 @@
                     <p class="text-sm mt-1"><strong>AI 활용법 (핵심):</strong> B값을 극대화하는 것이 AI 활용의 핵심입니다. AI에게 "내가 [주제]를 L=${L.toFixed(0)} 수준까지 배우려 해. 가장 효율적인(B가 높은) 학습 로드맵을 짜줘", "이 복잡한 개념을 '파인만 기법'으로 10살 아이도 이해하게 설명해줘", "관련된 '메타인지' 질문 5개만 해줘"라고 요청하여 학습 효율 자체를 극대화하십시오.</p>
                 </div>
                  <div class="p-4 bg-gray-900 rounded-lg">
-                    <!-- [용어 수정] 연속 학습 가중치 -->
                     <h4 class="text-lg font-semibold text-white">5. 연속 학습 가중치 (w_c) <span class="text-sm font-normal text-white">(현재: ${wc.toFixed(2)})</span></h4>
                     <p class="text-sm text-gray-400 mt-1">T_c(연속 시간)가 얼마나 큰 보너스를 줄지 결정하는 상수입니다. 이 값이 0이면 T_c는 아무 의미가 없습니다.</p>
                     <p class="text-sm mt-1"><strong>AI 활용법:</strong> AI에게 "나는 [창의적인 작업]을 하고 있어. T_c 보너스가 큰(w_c=0.5) 작업이니, 2시간 동안 방해받지 않도록 보조해줘"라고 선언하며 학습 환경을 설정할 수 있습니다.</p>
@@ -658,7 +660,7 @@
                     values[id].textContent = `${(value * 100).toFixed(0)} %`;
                 } else if (key === 'B') {
                     values[id].textContent = value.toFixed(3);
-                } else if (key === 'wc') { // [용어 수정] 키는 'wc'로 동일
+                } else if (key === 'wc') {
                     values[id].textContent = value.toFixed(2);
                 } else if (key === 'Sim_Days') {
                     values[id].textContent = `${value.toFixed(0)} 일`;
@@ -683,8 +685,8 @@
         }
 
         function initializeApp() {
-            // [수정] v10
-            console.log("DOM 로드 완료. v10 앱 초기화 시작...");
+            // [수정] v11
+            console.log("DOM 로드 완료. v11 앱 초기화 시작...");
             
             allParamIds.forEach(id => {
                 inputs[id] = document.getElementById(`param-${id}`);
@@ -724,10 +726,11 @@
 
             // 초기 실행
             runFullSimulation();
-            // [수정] v10
-            console.log("앱 초기화 완료. (v10)");
+            // [수정] v11
+            console.log("앱 초기화 완료. (v11)");
         }
         
     </script>
 </body>
 </html>
+
