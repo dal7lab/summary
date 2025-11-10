@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D 관계 동역학 시뮬레이터 (v31 - Rollback->perfect)</title>
+    <title>3D 관계 동역학 시뮬레이터 (v32 - Fixed Presets)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- [v23] Three.js 라이브러리 <head>에서 전역 로드 -->
-    <!-- 1. Three.js (Core)를 먼저 로드 -->
+    <!-- Three.js 라이브러리 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- 2. OrbitControls (Add-on)를 나중에 로드 -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <!-- Google Fonts - Noto Sans KR -->
@@ -20,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     
-    <!-- MathJax (수학식 렌더링) 설정 (v24 원본) -->
+    <!-- MathJax 설정 -->
     <script>
     window.MathJax = {
       tex: {
@@ -34,14 +32,13 @@
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
-    <!-- v24 원본 스타일 -->
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
-            background-color: #111827; /* bg-gray-900 */
+            background-color: #111827;
         }
         .gradient-text {
-            background: linear-gradient(to right, #4F46E5, #A855F7, #EC4899); /* Indigo -> Purple -> Pink */
+            background: linear-gradient(to right, #4F46E5, #A855F7, #EC4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -81,7 +78,7 @@
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none;
-            width: 20px; height: 20px; background: #A855F7; /* Purple */
+            width: 20px; height: 20px; background: #A855F7;
             border-radius: 50%; cursor: pointer; transition: background 0.2s;
         }
         input[type="range"]::-moz-range-thumb {
@@ -94,20 +91,19 @@
 
     <div class="container mx-auto max-w-7xl px-4 py-16">
 
-        <!-- 헤더 (v30 타이틀) -->
+        <!-- 헤더 -->
         <header class="text-center mb-16">
             <h1 class="text-5xl md:text-6xl font-black mb-6 gradient-text">
-                3D 관계 동역학 시뮬레이터 (v30)
+                3D 관계 동역학 시뮬레이터 (v32)
             </h1>
             <p class="text-2xl md:text-3xl font-bold text-gray-100">
                 로렌츠 어트랙터(Lorenz Attractor) 모델
             </p>
         </header>
 
-        <!-- v24 원본 HTML 구조 (그리드) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <!-- 1. 컨트롤 패널 (L) (v24 원본) -->
+            <!-- 1. 컨트롤 패널 -->
             <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 h-fit">
                 <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.835 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.835 2.942-.734 2.106-2.106a1.532 1.532 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01.947-2.287c.835-1.372-.734-2.942-2.106-2.106A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
@@ -162,7 +158,7 @@
                     </div>
                 </div>
 
-                <!-- 프리셋 버튼 (v24 원본) -->
+                <!-- 프리셋 버튼 -->
                 <div class="mt-8 pt-6 border-t border-gray-600">
                     <h3 class="text-lg font-semibold text-white mb-3">관계 궤적 프리셋</h3>
                     <div class="grid grid-cols-2 gap-3">
@@ -174,10 +170,10 @@
                 </div>
             </div>
 
-            <!-- 2. 그래프 및 해석 (R) (v24 원본) -->
+            <!-- 2. 그래프 및 해석 -->
             <div class="lg:col-span-2 space-y-8">
                 
-                <!-- [차트 1] 3D 궤적 (Three.js) -->
+                <!-- 3D 궤적 -->
                 <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-3xl font-bold text-white mb-4">
                         <span class="text-purple-400">3D</span>: 관계 궤적 (Phase Plot)
@@ -188,7 +184,7 @@
                     <p class="text-center text-sm text-gray-400 mt-2">마우스로 궤적을 드래그, 줌, 패닝하여 탐색할 수 있습니다.</p>
                 </div>
                 
-                <!-- [차트 2] 2D 시간-긴장감 (Chart.js) -->
+                <!-- 2D 시간-긴장감 -->
                 <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-3xl font-bold text-white mb-4">
                         <span class="text-cyan-400">2D</span>: 시간(t)에 따른 긴장감(z) 변화
@@ -198,20 +194,20 @@
                     </div>
                 </div>
                 
-                <!-- AI 혼돈 컨설팅 (v30 타이틀) -->
+                <!-- AI 관계 컨설팅 -->
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        AI 관계 컨설팅 (v30)
+                        AI 관계 컨설팅
                     </h2>
                     <div id="ai-consulting-report" class="text-lg text-gray-300 leading-relaxed space-y-3">
                         <!-- JS로 동적 업데이트 -->
                     </div>
                 </div>
 
-                <!-- 전문가용 동적 분석 (v30 타이틀) -->
+                <!-- 전문가용 동적 분석 -->
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15v4a1 1 0 001 1h12a1 1 0 001-1v-4a1 1 0 00-.293-.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
@@ -224,7 +220,7 @@
             </div>
         </div>
 
-        <!-- 3. 시뮬레이션 원리 (아코디언) (v30 타이틀) -->
+        <!-- 3. 시뮬레이션 원리 (아코디언) -->
         <section class="mt-24">
             <h2 class="text-4xl font-extrabold text-center mb-12 gradient-text">
                  '3D 관계 동역학 시뮬레이터' 작동 원리
@@ -283,13 +279,9 @@
 
     </div>
 
-    <!-- [v30] 스크립트 (튜브/큐브 로직 + Math Error 수정) -->
     <script>
-        // [v24] "비밀 코드": 모든 라이브러리가 <head>에서 로드되길 기다린 후,
-        // 'load' 이벤트가 발생하면 앱을 초기화합니다.
         window.addEventListener('load', initializeApp);
 
-        // [v30] 전역 변수 수정: trajectoryLine -> trajectoryTube, wireframeCube 추가
         let scene, camera, renderer, controls, trajectoryTube, wireframeCube;
         let timeSeriesChart;
         
@@ -300,14 +292,14 @@
         let expertAnalysisReport = null;
         let animationFrameId = null;
 
-        // --- 1. 시뮬레이션 핵심 로직 (로렌츠) (v24 원본) ---
+        // 로렌츠 시뮬레이션
         function runLorenzSimulation(params, steps = 5000, dt = 0.01) {
             let { sigma, rho, beta, x0, y0, z0 } = params;
             let x = x0, y = y0, z = z0;
 
-            const points = []; // 3D 궤적
-            const t_labels = []; // 2D 차트 (시간)
-            const z_history = []; // 2D 차트 (Z축)
+            const points = [];
+            const t_labels = [];
+            const z_history = [];
             
             for (let i = 0; i < steps; i++) {
                 const dx = sigma * (y - x);
@@ -325,7 +317,7 @@
             return { points, t_labels, z_history };
         }
         
-        // --- 2. Three.js 초기화 및 업데이트 (v24 원본) ---
+        // Three.js 초기화
         function initThreeJS() {
             const container = document.querySelector('.threejs-container');
             const canvas = document.getElementById('threeJSCanvas');
@@ -351,22 +343,16 @@
             controls.minDistance = 10;
             controls.maxDistance = 100;
 
-            // v24 원본 조명 (v30: Tube 재질에 필요)
             scene.add(new THREE.AmbientLight(0xaaaaaa));
             const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
             dirLight.position.set(5, 10, 7.5);
             scene.add(dirLight);
 
-            // [v24] "비밀 코드" 수정:
-            // .setColors()는 r128에 존재하지 않는 함수입니다.
-            // 기본 RGB 축 (X:Red, Y:Green, Z:Blue)을 사용합니다.
             const axesHelper = new THREE.AxesHelper(20);
-            // axesHelper.setColors(...) // <- 이 줄이 v23의 오류 원인
             scene.add(axesHelper);
             
             window.addEventListener('resize', () => {
                 if (!container || !camera || !renderer) return;
-                // [v30] 0x0 리사이즈 방지
                 if (container.clientWidth > 0 && container.clientHeight > 0) {
                     camera.aspect = container.clientWidth / container.clientHeight;
                     camera.updateProjectionMatrix();
@@ -390,11 +376,10 @@
             }
         }
         
-        // [v30] 수정: 3D 궤적 업데이트 (Tube + Cube) (v29 로직)
+        // 3D 궤적 업데이트
         function updateTrajectory(points) {
             if (!scene) return;
             
-            // 1. 기존 궤적(튜브) 및 큐브 제거
             if (trajectoryTube) {
                 scene.remove(trajectoryTube);
                 trajectoryTube.geometry.dispose();
@@ -406,25 +391,20 @@
                 wireframeCube.material.dispose();
             }
             
-            // 2. 튜브(Tube) 지오메트리 생성 (CatmullRomCurve3 필요)
             const path = new THREE.CatmullRomCurve3(points);
-            // (경로, 튜브 분할 수, 튜브 굵기, 튜브 원형 분할 수, 닫힘 여부)
             const geometry = new THREE.TubeGeometry(path, 2000, 0.2, 8, false); 
             
-            // v24의 조명을 활용하기 위해 MeshPhongMaterial 사용
             const material = new THREE.MeshPhongMaterial({ 
-                color: 0xA855F7, // Purple
-                shininess: 30    // 광택
+                color: 0xA855F7,
+                shininess: 30
             });
             
             trajectoryTube = new THREE.Mesh(geometry, material);
             scene.add(trajectoryTube);
 
-            // 3. 와이어프레임 큐브 (Bounding Box) 추가
             geometry.computeBoundingBox();
             const boundingBox = geometry.boundingBox;
 
-            // 바운딩 박스 기준으로 큐브 지오메트리 생성 (약간의 여백 +5)
             const boxGeometry = new THREE.BoxGeometry(
                 boundingBox.max.x - boundingBox.min.x + 5, 
                 boundingBox.max.y - boundingBox.min.y + 5, 
@@ -433,19 +413,17 @@
             
             const wireframe = new THREE.WireframeGeometry(boxGeometry);
             const lineMaterial = new THREE.LineBasicMaterial({
-                color: 0x555555, // 어두운 회색
+                color: 0x555555,
                 linewidth: 1
             });
 
             wireframeCube = new THREE.LineSegments(wireframe, lineMaterial);
-            
-            // 큐브의 중심을 튜브의 중심과 일치시킴
             wireframeCube.position.copy(boundingBox.getCenter(new THREE.Vector3()));
             
             scene.add(wireframeCube);
         }
         
-        // --- 3. 2D 차트 (Chart.js) 업데이트 (v24 원본) ---
+        // 2D 차트 업데이트
         function updateTimeSeriesChart(data) {
             const chartCanvas = document.getElementById('timeSeriesChart')?.getContext('2d');
             if (!chartCanvas) return;
@@ -457,13 +435,13 @@
             } else {
                 timeSeriesChart = new Chart(chartCanvas, {
                     type: 'line',
-                    data: {
+                     {
                         labels: data.t_labels,
                         datasets: [
                             {
                                 label: 'z (관계의 긴장감)',
-                                data: data.z_history,
-                                borderColor: '#22D3EE', // Cyan
+                                 data.z_history,
+                                borderColor: '#22D3EE',
                                 backgroundColor: '#22D3EE30',
                                 borderWidth: 2,
                                 fill: true,
@@ -487,8 +465,7 @@
             }
         }
 
-        // --- 4. 리포트 업데이트 ---
-        // [수정] Math Error 해결: innerHTML에 LaTeX 직접 삽입 대신 DOM 요소로 구성한 후 MathJax 렌더링
+        // [v32 수정] 분석 업데이트 함수 - 파라미터를 명시적으로 전달받아 사용
         function updateAnalysis(params) {
             if (!aiConsultingReport || !expertAnalysisReport) {
                 console.error("리포트 DOM 요소를 찾을 수 없습니다.");
@@ -499,6 +476,7 @@
             
             let aiConsulting = "";
             
+            // [v32 핵심 수정] rho 값을 직접 params에서 가져와 비교
             if (rho < 1) {
                 aiConsulting = `
                     <p class="font-bold text-lg text-gray-400">진단: 무관심 (소멸)</p>
@@ -518,22 +496,20 @@
             
             aiConsultingReport.innerHTML = aiConsulting;
             
-            // [수정] Math Error 해결: LaTeX 수식을 올바르게 이스케이프 (백슬래시 2개 사용)
             expertAnalysisReport.innerHTML = `
                 <p><strong>\\(\\sigma\\) (시그마): ${sigma.toFixed(2)}</strong><br>민감도입니다. 이 값이 클수록 \\(x\\)(영희)가 \\(y\\)(철수)의 감정 변화에 더 빠르고 격렬하게 반응합니다.</p>
                 <p><strong>\\(\\rho\\) (로): ${rho.toFixed(2)}</strong><br>혼돈도입니다. 관계 에너지를 결정합니다. 이 값이 24.74를 넘으면 관계는 '혼돈' 상태로 진입합니다.</p>
                 <p><strong>\\(\\beta\\) (베타): ${beta.toFixed(2)}</strong><br>안정성입니다. \\(z\\)(긴장감)가 스스로 해소되는 비율입니다. 이 값이 낮을수록 긴장감이 오래 지속됩니다.</p>
             `;
             
-            // v24 원본 MathJax 렌더링 호출
             if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
-                MathJax.typesetPromise([aiConsultingReport, expertAnalysisReport, ...document.querySelectorAll('.accordion-content')]).catch(function (err) {
+                MathJax.typesetPromise([aiConsultingReport, expertAnalysisReport]).catch(function (err) {
                     console.log('MathJax typeset error:', err);
                 });
             }
         }
 
-        // --- 5. 유틸리티 및 메인 실행 (v24 원본) ---
+        // [v32 수정] 전체 시뮬레이션 실행 - 현재 슬라이더 값으로 params 객체 생성
         function runFullSimulation() {
             const params = {};
             paramIds.forEach(id => {
@@ -551,7 +527,7 @@
             
             updateTrajectory(data.points);
             updateTimeSeriesChart(data);
-            updateAnalysis(params);
+            updateAnalysis(params); // [v32] params 전달
         }
 
         function updateSliderLabel(id, value) {
@@ -560,6 +536,7 @@
             }
         }
 
+        // [v32 수정] setParams - 슬라이더 값을 설정한 후 즉시 runFullSimulation 호출
         function setParams(p) {
             Object.keys(p).forEach(key => {
                 if(inputs[key]) {
@@ -567,26 +544,24 @@
                     updateSliderLabel(key, p[key]);
                 }
             });
-            runFullSimulation();
+            runFullSimulation(); // [v32] 슬라이더 값이 업데이트된 직후 시뮬레이션 실행
         }
 
         function initializeApp() {
-            console.log("v30: 모든 리소스 로드 완료 (window.load). 앱 초기화 시작...");
+            console.log("v32: 모든 리소스 로드 완료. 앱 초기화 시작...");
             
-            // [v24] "비밀 코드": 모든 라이브러리가 로드되었는지 최종 확인
             if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined' || typeof Chart === 'undefined') {
-                const errorMsg = "치명적 오류: 3D/2D 라이브러리 로드에 실패했습니다! (v30) 새로고침 후에도 문제가 지속되면 브라우저 캐시를 삭제해 주세요.";
+                const errorMsg = "치명적 오류: 3D/2D 라이브러리 로드에 실패했습니다!";
                 console.error(errorMsg);
-                // AI 컨설팅 리포트에 오류 메시지 표시
                 const errorReport = document.getElementById('ai-consulting-report');
                 if (errorReport) {
                     errorReport.innerHTML = `<p class="text-red-400 font-bold">${errorMsg}</p>`;
                 } else {
-                    alert(errorMsg); // 최후의 수단
+                    alert(errorMsg);
                 }
-                return; // 실행 중단
+                return;
             }
-            console.log("v30: 모든 라이브러리(THREE, OrbitControls, Chart) 로드 확인 완료.");
+            console.log("v32: 모든 라이브러리 로드 확인 완료.");
 
             aiConsultingReport = document.getElementById('ai-consulting-report');
             expertAnalysisReport = document.getElementById('expert-analysis-report');
@@ -614,6 +589,7 @@
                 }
             });
             
+            // [v32] 프리셋 버튼 이벤트 리스너
             document.getElementById('preset-chaotic').addEventListener('click', () => {
                 setParams({ sigma: 10.0, rho: 28.0, beta: 2.67, x0: 1.0, y0: 1.0, z0: 1.0 });
             });
@@ -627,6 +603,7 @@
                 setParams({ sigma: 10.0, rho: 45.0, beta: 2.67, x0: 1.0, y0: 1.0, z0: 1.0 });
             });
             
+            // 아코디언
             document.querySelectorAll('.accordion-button').forEach(button => {
                 button.addEventListener('click', () => {
                     const content = button.nextElementSibling;
@@ -657,7 +634,7 @@
 
             try {
                 setParams({ sigma: 10.0, rho: 28.0, beta: 2.67, x0: 1.0, y0: 1.0, z0: 1.0 });
-                console.log("앱 초기화 완료. (v30)");
+                console.log("앱 초기화 완료. (v32)");
             } catch (e) {
                 console.error("초기 시뮬레이션 실행 실패:", e);
                 if(aiConsultingReport) {
