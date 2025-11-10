@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>하루 1시간 혼자 공부가 사교육 3배 효과...학습 효율의 비밀</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Noto Sans KR 폰트 적용 */
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 매거진 스타일의 큰 제목 */
+        h1 {
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: -0.05em;
+            font-feature-settings: 'kern' on;
+        }
+
+        /* 섹션 제목 (파이프 |) */
+        .section-title {
+            font-size: 1.75rem; /* 28px */
+            font-weight: 700;
+            color: #1a202c; /* text-gray-900 */
+            border-bottom: 2px solid #e2e8f0; /* border-gray-200 */
+            padding-bottom: 0.5rem; /* 8px */
+            margin-bottom: 1.5rem; /* 24px */
+        }
+
+        /* 매거진 본문 첫 글자 드롭캡 스타일 */
+        .content-paragraph::first-letter {
+            float: left;
+            font-size: 4rem; /* 64px */
+            font-weight: 900;
+            line-height: 0.8;
+            margin-right: 0.5rem; /* 8px */
+            margin-top: 0.25rem; /* 4px */
+            color: #2563eb; /* text-blue-600 */
+        }
+
+        /* 인터랙티브 탭 버튼 스타일 */
+        .tab-button {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-button.active {
+            border-bottom-color: #2563eb; /* border-blue-600 */
+            color: #1d4ed8; /* text-blue-700 */
+            font-weight: 700;
+        }
+
+        /* 인터랙티브 콘텐츠 패널 */
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Q&A 아코디언 (details, summary) 스타일 */
+        details > summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 1rem 0.5rem;
+            border-bottom: 1px solid #e2e8f0; /* border-gray-200 */
+            font-weight: 500;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+        details > summary:hover {
+            background-color: #f7fafc; /* bg-gray-50 */
+        }
+        details > summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            font-weight: 300;
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.2s ease;
+        }
+        details[open] > summary::after {
+            transform: translateY(-50%) rotate(45deg);
+        }
+        details > div {
+            padding: 1.5rem 1rem;
+            background-color: #f7fafc; /* bg-gray-50 */
+            border-bottom: 1px solid #e2e8f0; /* border-gray-200 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- 전체 컨테이너 -->
+    <div class="container mx-auto max-w-5xl my-12 md:my-24 p-6 bg-white shadow-xl rounded-lg">
+
+        <!-- 헤더 섹션 -->
+        <header class="mb-12">
+            <h1 class="text-4xl md:text-6xl text-center text-gray-900 mb-6">
+                하루 1시간 혼자 공부가 사교육 3배 효과...<br class="hidden md:block">학습 효율의 비밀
+            </h1>
+            <ul class="text-center text-gray-500 text-sm md:text-base list-inside list-none space-y-1">
+                <li>・ 한국직업능력개발원 10년 추적 연구가 밝힌 자기주도학습의 위력</li>
+                <li>・ 간격 반복과 능동 회상, 신경가소성이 만드는 장기 기억의 조건</li>
+                <li>・ 포모도로에서 파인만 기법까지, 검증된 학습 전략 17가지의 실체</li>
+            </ul>
+        </header>
+
+        <!-- 본문 시작 -->
+        <article class="space-y-16">
+
+            <!-- 섹션 1: 서론 및 핵심 데이터 -->
+            <section>
+                <p class="text-lg md:text-xl text-gray-700 leading-relaxed md:leading-loose mb-8 md:text-center content-paragraph">
+                    공부에는 돈보다 방법이 중요하다. 한국직업능력개발원이 2004년부터 6,000명을 10년간 추적한 결과는 명확하다. 자기주도학습 시간이 하루 1시간 늘 때마다 수능 백분위 점수가 5.3점 상승한 반면, 사교육은 같은 시간 투자로 1.8점만 올랐다. 자기주도학습이 사교육보다 3배 효과적이라는 뜻이다. 더 놀라운 건 이후다. 혼자 공부하는 습관이 든 학생은 대학 학점이 높았고(하루 1시간당 백분위 1.8 상승), 취업 후에도 평균 4% 더 많은 실질임금을 받았다. 사교육은 대학 학점에 거의 영향을 주지 못했다. 시간이 아니라 방식이 학습 효율을 결정한다는 증거다.<sup>[1][2]</sup>
+                </p>
+            </section>
+            
+            <!-- 섹션 2: 자기주도학습 vs 사교육 (인터랙티브 차트 1) -->
+            <section>
+                <h2 class="section-title">| 자기주도학습, 사교육보다 3배 효과적인 이유</h2>
+                <div class="mb-6 p-4 bg-gray-100 rounded-lg">
+                    <p class="text-center text-sm md:text-base text-gray-600 mb-4">
+                        한국교육고용패널(KEEP) 10년 추적 데이터가 보여주는 학습 방식의 효과. <br>
+                        <strong>아래 버튼을 클릭해 비교 지표를 변경해 보세요.</strong>
+                    </p>
+                    <div id="sdl-chart-buttons" class="flex justify-center space-x-2 md:space-x-4">
+                        <button data-metric="sat" class="tab-button px-4 py-2 rounded-t-lg text-sm md:text-base active">수능 백분위 점수</button>
+                        <button data-metric="gpa" class="tab-button px-4 py-2 rounded-t-lg text-sm md:text-base">대학 학점</button>
+                        <button data-metric="income" class="tab-button px-4 py-2 rounded-t-lg text-sm md:text-base">취업 후 실질임금</button>
+                    </div>
+                </div>
+                
+                <!-- 차트 캔버스 -->
+                <div class="w-full h-64 md:h-80">
+                    <canvas id="sdlChart"></canvas>
+                </div>
+
+                <div class="mt-8 text-gray-700 leading-relaxed space-y-4 md:columns-2 md:gap-8">
+                    <p>한국교육고용패널(Korea Education & Employment Panel, KEEP)은 중학교 3학년부터 고등학교 3학년까지 매년 6,000명의 표본을 선정해 최대 10년간 교육환경, 성적, 취업을 추적하는 대규모 조사다. 2010년 김희삼 교수 연구팀이 이 데이터를 분석한 결과, 자기주도학습은 단순히 비용 대비 효율이 좋은 수준을 넘어 중장기적 성과에서 압도적 우위를 보였다.<sup>[2][1]</sup></p>
+                    <p>사교육이 효과가 없다는 건 아니다. 다만 '가성비(cost-performance ratio)', 즉 투입 비용 대비 효율로 봤을 때 자기주도학습이 월등하다는 것이다. 무엇보다 자기주도학습은 돈이 들지 않는다. 자기주도학습을 많이 한 학생들은 대학 진학과 취업에서도 더 우수한 실적을 보였다. 이는 학습 효율이 단기 성적뿐 아니라 평생에 걸친 능력 개발의 기반이 된다는 것을 증명한다.<sup>[1]</sup></p>
+                    <p>자기주도학습은 메타인지(metacognition) 능력을 향상시킨다. 학습 전략을 스스로 설계하면서 '무엇을 모르는지 아는' 능력, 즉 자기 인식이 발달한다. 공부 효율이 높아지면 공부시간이 줄고 휴식 시간을 조절할 수 있다. 자기관리 능력도 강화된다. 시간 관리, 목표 설정, 계획 수립 등이 일상 전반으로 확장된다.<sup>[3][4]</sup></p>
+                </div>
+            </section>
+
+            <!-- 섹션 3: 간격 반복 학습 (인터랙티브 차트 2) -->
+            <section>
+                <h2 class="section-title">| 간격 반복 학습, 에빙하우스 이후 140년의 검증</h2>
+                <div class="mb-6 p-4 bg-gray-100 rounded-lg">
+                    <p class="text-center text-sm md:text-base text-gray-600 mb-4">
+                        망각 곡선(forgetting curve)과 학습 전략별 장기 기억 효율. <br>
+                        <strong>아래 버튼을 클릭해 학습 방식을 변경해 보세요.</strong>
+                    </p>
+                    <div id="curve-chart-buttons" class="flex justify-center space-x-2 md:space-x-4">
+                        <button data-type="cram" class="tab-button px-4 py-2 rounded-t-lg text-sm md:text-base active">벼락치기 (Cramming)</button>
+                        <button data-type="spaced" class="tab-button px-4 py-2 rounded-t-lg text-sm md:text-base">간격 반복 (Spaced Repetition)</button>
+                    </div>
+                </div>
+
+                <!-- 차트 캔버스 -->
+                <div class="w-full h-64 md:h-80">
+                    <canvas id="forgettingCurveChart"></canvas>
+                </div>
+
+                <div class="mt-8 text-gray-700 leading-relaxed space-y-4 md:columns-2 md:gap-8">
+                    <p>간격 반복 학습(spaced repetition)은 1880년대 독일 심리학자 헤르만 에빙하우스(Hermann Ebbinghaus)가 처음 고안한 방법으로, 학습된 정보를 복습하는 간격을 점차 늘려 기억력을 향상시킨다. 망각 곡선을 극복하기 위해 설계된 이 기법은 140년이 넘는 세월 동안 수많은 실험으로 효과가 입증됐다.<sup>[5][6]</sup></p>
+                    <p>매번 복습할 때마다 해당 정보가 머릿속에 남는 기간이 길어진다. 복습 간격을 점진적으로 늘리면 오랜 기간 많은 정보를 효율적으로 저장할 수 있다. 능동적 회상(active recall)을 반복하면 단순 몰입 학습보다 기억이 더 오래 유지된다. 2007년 미국 연구팀이 학습효과를 분석한 결과, 한 가지 내용에 많은 시간을 투자해 반복학습을 하는 것은 단기적으로는 효과가 있지만 장기적으로는 효과가 없었다. 반면 학습내용을 동일하게 주고 다양한 간격(5분~6개월)을 두고 반복해서 공부하게 했더니 간격이 길수록 장기적인 효과가 나타났다.<sup>[7][5]</sup></p>
+                    <p>1주 뒤 치른 시험에서는 10차례 읽은 그룹이 더 좋은 성적을 보였지만, 4주 후에는 성적이 비슷해졌다. 학습양이 많고 장기적인 학습일수록 간격 학습이 효과적이다. 2013년 Bui 등의 연구에 따르면 작업 기억 능력이 높은 참가자들이 간격 반복 학습을 통해 더 큰 효과를 보였으며, 특히 어려운 과제에서 더 나은 성과를 나타냈다.<sup>[8][6][7]</sup></p>
+                    <p>간격 반복을 꾸준히 하면 머리에서 금세 사라지던 정보가 완전히 '내 것'이 된다. 오랜 시간이 지나도 쉽게 떠올릴 수 있는 진짜 장기 기억이 만들어진다. 단순 암기만이 아니라 다양한 아이디어나 기술 습득에도 간격 반복의 힘을 활용할 수 있다. 기억력 향상을 통해 창의적이고 비판적으로 사고할 기반이 다져진다.<sup>[5]</sup></p>
+                </div>
+            </section>
+
+            <!-- 섹션 4: 파인만 기법 (인터랙티브 탭) -->
+            <section>
+                <h2 class="section-title">| 파인만 기법, 12살 어린이에게 설명할 수 있는가</h2>
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    파인만 기법(Feynman Technique)은 노벨 물리학상 수상자 리처드 파인만(Richard Feynman)이 개발한 학습 방법으로, 복잡한 개념을 빠르고 깊이 있게 이해하는 데 도움을 준다. 네 가지 핵심 단계로 구성된다.<sup>[9][10]</sup>
+                    <strong>아래 탭을 클릭해 각 단계를 확인해 보세요.</strong>
+                </p>
+
+                <div class="feynman-tabs">
+                    <!-- 탭 버튼 -->
+                    <div class="flex border-b border-gray-200">
+                        <button data-tab="1" class="tab-button flex-1 py-3 text-sm md:text-lg active">1단계: 개념 선택</button>
+                        <button data-tab="2" class="tab-button flex-1 py-3 text-sm md:text-lg">2단계: 쉽게 설명하기</button>
+                        <button data-tab="3" class="tab-button flex-1 py-3 text-sm md:text-lg">3단계: 검토 및 보완</button>
+                        <button data-tab="4" class="tab-button flex-1 py-3 text-sm md:text-lg">4단계: 다시 설명하기</button>
+                    </div>
+                    
+                    <!-- 탭 콘텐츠 -->
+                    <div class="py-6 px-2">
+                        <div data-pane="1" class="tab-pane active">
+                            <h3 class="font-bold text-xl text-blue-700 mb-3">1. 개념 정리 및 지식 적기</h3>
+                            <p class="text-gray-700">종이 한 장을 가지고 지금 공부하고 있는 개념의 이름을 맨 위에 쓴다. 그리고 그 개념에 대해 자신이 알고 있는 모든 지식을 적어본다.</p>
+                        </div>
+                        <div data-pane="2" class="tab-pane">
+                            <h3 class="font-bold text-xl text-blue-700 mb-3">2. 12살 어린이에게 설명하듯 쓰기 (핵심)</h3>
+                            <p class="text-gray-700">이 단계가 핵심이다. 전문 용어나 복잡한 표현을 사용하지 않고, 누구나 이해할 수 있도록 풀어 쓰는 과정에서 자신이 진짜 이해했는지가 드러난다.</p>
+                        </div>
+                        <div data-pane="3" class="tab-pane">
+                            <h3 class="font-bold text-xl text-blue-700 mb-3">3. 검토 및 부족한 부분 재학습</h3>
+                            <p class="text-gray-700">설명이 막히거나 애매한 부분이 있다면 그곳이 바로 이해가 부족한 지점이다. 교과서나 자료를 다시 찾아보며 부족한 부분을 공부하고 다듬는다.</p>
+                        </div>
+                        <div data-pane="4" class="tab-pane">
+                            <h3 class="font-bold text-xl text-blue-700 mb-3">4. 다른 사람에게 설명하고 기록하기</h3>
+                            <p class="text-gray-700">완성된 설명을 다른 사람에게 (혹은 자신에게) 소리 내어 설명하며 이해도를 시험하고 기록한다. 설명하는 과정 자체가 강력한 학습이다.</p>
+                        </div>
+                    </div>
+                </div>
+                 <p class="mt-4 text-gray-700 leading-relaxed">
+                    2025년 학습 전략 연구는 파인만 기법을 사용하는 학생들이 더 나은 기억 연결을 구축하며, 이는 복잡한 주제를 더 쉽게 이해하고 기억할 수 있게 만든다고 보고했다. 파인만 기법은 학습의 본질, 즉 '아는 것'과 '설명할 수 있는 것'의 차이를 분명히 한다.<sup>[11][9]</sup>
+                 </p>
+            </section>
+
+            <!-- 섹션 5: 신경가소성 -->
+            <section>
+                <h2 class="section-title">| 신경가소성, 뇌는 학습할 때마다 물리적으로 변한다</h2>
+                <div class="md:columns-2 md:gap-8 text-gray-700 leading-relaxed space-y-4">
+                    <p class="content-paragraph">신경가소성(neuroplasticity)은 뇌가 경험에 따라 구조와 기능을 변화시키는 능력이다. 우리가 새로운 것을 배우고 기억을 형성하며, 심지어 뇌 손상으로부터 회복할 수 있는 이유가 바로 이 능력 덕분이다. 신경가소성의 주요 특징은 시냅스 가소성(뉴런 간 연결 강도의 변화), 신경 발생(새로운 뉴런의 생성), 축삭 발아(뉴런의 새로운 연결 형성), 기능적 재구성(뇌 영역의 기능 변화)이다.<sup>[12]</sup></p>
+                    <p>학습은 뇌에서 다음과 같은 변화를 통해 이루어진다. 시냅스 강화는 자주 사용되는 신경 연결이 강화되는 것이다. 새로운 시냅스 형성은 새로운 연결이 만들어지는 것이다. 뉴런 활성화 패턴 변화는 특정 자극에 대한 뉴런의 반응이 변화하는 것이다. 뇌 구조의 변화는 반복적인 학습으로 뇌의 특정 영역이 확장될 수 있다는 것이다.<sup>[12]</sup></p>
+                    <p>신경과학 연구에 따르면 효과적인 학습을 위해서는 뉴런 간의 연결을 활성화하고 강화하는 학습 방법이 필요하다. 반복 학습이 중요한데, 동일한 내용을 여러 번 학습하면 뉴런 간의 연결이 더욱 강해져 장기 기억으로 저장될 가능성이 높아진다. 신경과학 연구는 반복이 신경 연결을 강화하고 기억력을 향상시킨다는 것을 확인했다. 또 다른 전략은 간격 학습으로, 정보를 한 번에 모두 채우는 대신 학습을 더 짧고 간격을 둔 세션으로 나누는 것이다.<sup>[13][14]</sup></p>
+                    <p>반복 학습을 통해 정보를 반복적으로 복습하면 관련 시냅스 연결이 강화된다. 다중 감각 학습, 즉 여러 감각을 동시에 사용하는 학습은 더 많은 신경 연결을 형성한다. 정서적 연관이 있는 기억은 더 강하게 형성되며, 편도체가 이 과정에 관여한다. 새로운 학습은 가소성의 핵심 개념이며 뇌는 새로운 환경을 적절히 이용하여 새롭게 학습한다. 상호작용 활동 형태의 새로운 학습이 뇌의 가소성에 효과적이고 전전두엽 피질(prefrontal cortex, PFC) 활동을 증가시킨다.<sup>[15][12]</sup></p>
+                </div>
+            </section>
+
+            <!-- 섹션 6: 학습몰입 -->
+            <section>
+                <h2 class="section-title">| 학습몰입, 자기효능감과 학습 전이의 매개변수</h2>
+                <div class="md:columns-2 md:gap-8 text-gray-700 leading-relaxed space-y-4">
+                    <p class="content-paragraph">성인대학생을 대상으로 한 연구는 디지털 리터러시와 학습몰입이 학습 전이에 미치는 영향을 확인했다. 학습 전이(transfer of learning)는 학습한 내용을 실제 상황에 적용하는 능력을 의미한다. 온라인 수업에서 간호대학생의 학습몰입에 영향을 미치는 요인을 분석한 연구는 학습 실재감, 학업적 자기효능감, 강의 흥미가 학습 몰입에 유의미한 영향을 미친다는 것을 밝혔다.<sup>[16][17]</sup></p>
+                    <p>학습 실재감(learning presence)은 학습자가 온라인 환경에서 실제로 학습하고 있다고 느끼는 정도를 말한다. 학업적 자기효능감(academic self-efficacy)은 자신이 학업 과제를 성공적으로 수행할 수 있다는 믿음이다. 강의 흥미는 학습 내용 자체에 대한 호기심과 관심이다. 이 세 가지가 결합되면 학습몰입이 극대화된다.<sup>[17]</sup></p>
+                    <p>자기주도학습은 자기효능감을 증가시킨다. 목표를 성취하고 문제를 해결하는 경험은 학습자의 자신감을 향상시키고 긍정적인 학습태도를 유도한다. 자기주도학습은 학습자가 주체적으로 문제를 해결하는 능력을 키우는 데 도움을 준다. 문제를 스스로 파악하고 해결책을 찾아내는 과정을 통해 문제해결 능력이 향상된다.<sup>[3]</sup></p>
+                </div>
+            </section>
+            
+            <!-- 섹션 7: 17가지 학습 전략 (인터랙티브 탭) -->
+            <section>
+                <h2 class="section-title">| 2025년 실제 효과 있는 17가지 학습 전략</h2>
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    2025년 학습 전략 연구는 다양한 입증된 방법들을 제시했다. 이 전략들은 기억력을 최대화하고, 비판적 사고를 강화하며, 참여를 증가시킨다.<sup>[11]</sup>
+                    <strong>주요 목적에 따라 분류된 전략들을 탭으로 확인해 보세요.</strong>
+                </p>
+
+                <div class="strategy-tabs">
+                    <!-- 탭 버튼 -->
+                    <div class="flex border-b border-gray-200">
+                        <button data-tab="memory" class="tab-button flex-1 py-3 text-sm md:text-lg active">기억력 최대화</button>
+                        <button data-tab="thinking" class="tab-button flex-1 py-3 text-sm md:text-lg">비판적 사고 강화</button>
+                        <button data-tab="engagement" class="tab-button flex-1 py-3 text-sm md:text-lg">참여도 증가</button>
+                    </div>
+                    
+                    <!-- 탭 콘텐츠 -->
+                    <div class="py-6 px-2">
+                        <div data-pane="memory" class="tab-pane active space-y-3">
+                            <h3 class="font-bold text-xl text-blue-700 mb-3">기억력 최대화 전략</h3>
+                            <p class="font-medium">・ 적극적 기억 호출 (Active Recall): 답을 보지 않고 기억해내려 노력하는 것.</p>
+                            <p class="font-medium">・ 간격 반복 (Spaced Repetition): 복습 주기를 점차 늘려 장기 기억으로 전환.</p>
+                            <p class="text-gray-600">이 기술들은 정보를 장기 기억으로 옮기는 데 도움을 주며, 더 나은 기억 연결을 구축한다.</p>
+                        </div>
+                        <div data-pane="thinking" class="tab-pane space-y-3">
+                            <h3 class="font-bold text-xl text-blue-700 mb-3">비판적 사고 강화 전략</h3>
+                            <p class="font-medium">・ 마인드 맵핑 (Mind Mapping): 시각적 학습자에게 15% 더 많은 정보를 기억하게 함.</p>
+                            <p class="font-medium">・ 심도 있는 이해 (Feynman Technique): 개념을 설명하여 지식을 확고히 함.</p>
+                            <p class="font-medium">・ 활동적 학습 (Active Learning): 학습 프로세스에 적극적으로 참여.</p>
+                            <p class="text-gray-600">구조화된 학습 방법은 문제 해결 및 분석 능력을 향상시킨다.</p>
+                        </div>
+                        <div data-pane="engagement" class="tab-pane space-y-3">
+                            <h3 class="font-bold text-xl text-blue-700 mb-3">참여도 증가 전략</h3>
+                            <p class="font-medium">・ 협업 (Collaboration): 의사소통과 팀워크 촉진 (94% 높은 참여율).</p>
+                            <p class="font-medium">・ 개인화된 학습 (Personalized Learning): 개별적인 속도를 허용.</p>
+                            <p class="font-medium">・ 적응 학습 (Adaptive Learning): 학습자 수준에 맞춰 난이도 조절.</p>
+                            <p class="text-gray-600">상호작용 방법은 학생들의 참여를 강화하고 사회적 기술을 개발한다.</p>
+                        </div>
+                    </div>
+                </div>
+                 <p class="mt-4 text-gray-700 leading-relaxed md:columns-2 md:gap-8 space-y-4">
+                    각 학습 스타일에 맞는 다양한 전략이 존재한다. 간격 반복, 능동 회상, 파인만 기법을 사용하는 학생들은 더 나은 기억 연결을 구축한다. 이는 복잡한 주제를 더 쉽게 이해하고 기억할 수 있게 만든다. 학습 전략의 핵심은 단순히 많이 공부하는 것이 아니라, 뇌의 작동 원리에 맞춰 효율적으로 공부하는 것이다.<sup>[11]</sup>
+                 </p>
+            </section>
+
+            <!-- 섹션 8: 포모도로 기법 -->
+            <section>
+                <h2 class="section-title">| 포모도로 기법, 25분의 심리학</h2>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-1 space-y-4 text-gray-700 leading-relaxed">
+                        <p class="content-paragraph">포모도로 기법(Pomodoro Technique)은 25분 집중 작업 후 5분 휴식을 반복하는 구조로, 집중과 휴식을 번갈아 활용하여 학습자가 피로를 방지하고 동기를 강화하며 깊은 몰입 상태에 진입하도록 돕는다. 구조화된 간격은 멀티태스킹을 배제하고 집중의 깊이를 높이며, 곧 휴식이 있다는 확신은 수행 불안을 줄인다.<sup>[18]</sup></p>
+                        <p>많은 학자와 연구자들이 포모도로 기법을 통해 생산성, 집중력이 크게 향상되고 피로도가 감소했다고 보고한다. 포모도로 기법이 미루는 습관을 없애고 집중력을 향상시키는 데 효과적이라는 가설도 제시됐다. 25분이라는 짧은 시간 제한은 학습자에게 '지금 당장 시작해야 한다'는 심리적 압박을 가하면서도, '25분만 참으면 된다'는 안도감을 동시에 준다.<sup>[19][20]</sup></p>
+                        <p>신경과학의 발전을 통해 우리는 어떤 학습 방법이 뇌 활동을 촉진하고 기억력과 집중력을 높이는지에 대한 구체적인 데이터를 확보할 수 있다. 학생이 학습 중 집중력이 떨어지는 순간을 감지하면 학습 환경을 변경하거나 짧은 휴식을 권장하는 방식으로 최적의 학습 상태를 유지하도록 돕는 것이다. 감정과 학습의 관계를 고려하여 학습자가 스트레스를 받으면 이완 훈련을 제안하거나 동기부여를 높이는 방식으로 학습을 지속할 수 있도록 유도할 수 있다.<sup>[14]</sup></p>
+                    </div>
+                    <div class="flex-shrink-0 w-full md:w-1/3 flex flex-col items-center justify-center bg-gray-100 p-8 rounded-lg">
+                        <div class="text-center">
+                            <span class="text-5xl md:text-6xl font-bold text-blue-600">25</span>
+                            <span class="text-xl md:text-2xl font-medium text-blue-800">분</span>
+                            <p class="text-gray-700 mt-2 font-medium">집중</p>
+                        </div>
+                        <div class="text-4xl font-light text-gray-400 my-4">
+                            +
+                        </div>
+                        <div class="text-center">
+                            <span class="text-5xl md:text-6xl font-bold text-green-600">5</span>
+                            <span class="text-xl md:text-2xl font-medium text-green-800">분</span>
+                            <p class="text-gray-700 mt-2 font-medium">휴식</p>
+                        </div>
+                        <p class="mt-6 text-xs text-gray-500 text-center">이 사이클을 4번 반복 후<br>15-30분의 긴 휴식</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 섹션 9: 결론 -->
+            <section class="mt-16 mb-12">
+                <div class="bg-gray-900 text-white p-8 md:p-12 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4">💡 의사 결정을 위한 인사이트!</h3>
+                    <p class="text-lg text-gray-300 leading-relaxed">
+                        학습 효율은 투입 시간이 아니라 방법으로 결정된다. 한국직업능력개발원 10년 추적 연구는 자기주도학습이 사교육보다 3배 효과적이며 중장기 성과에서도 우월하다고 증명했다. 간격 반복 학습은 140년간 검증된 장기 기억 형성 전략이고, 파인만 기법은 이해의 깊이를 시험하는 도구다. 신경가소성은 학습이 뇌의 물리적 변화를 동반한다는 사실을 보여준다. 교육 전략은 시간 투입에서 방법 설계로 전환돼야 한다.
+                    </p>
+                </div>
+            </section>
+
+            <!-- 섹션 10: Q&A (아코디언) -->
+            <section>
+                <h2 class="section-title text-center text-3xl border-none">?! 인사이트 포커스 Q&A 10선</h2>
+                <div class="space-y-2">
+                    <details>
+                        <summary>Q1. 자기주도학습이 사교육보다 3배 효과적이라는 근거는 무엇인가요?</summary>
+                        <div>
+                            <p>한국직업능력개발원(Korea Research Institute for Vocational Education and Training, KRIVET)이 2004년부터 시작한 한국교육고용패널은 중학교 3학년부터 고등학교 3학년까지 매년 6,000명의 표본을 선정해 최대 10년간 교육환경, 성적, 취업을 추적하는 대규모 조사입니다. 2010년 김희삼 교수 연구팀이 이 데이터를 분석한 결과, 자기주도학습 시간이 하루 1시간 늘 때마다 수능 백분위 점수가 5.3점 상승한 반면, 사교육은 같은 시간 투자로 1.8점만 올랐습니다. 약 3배 차이입니다. 더 중요한 건 중장기 성과입니다. 자기주도학습을 많이 한 학생들은 대학 학점이 높았고(하루 1시간당 백분위 1.8 상승), 취업 후에도 평균 4% 더 많은 실질임금을 받았습니다. 사교육은 대학 학점에 긍정적 영향이 거의 없었습니다. 이는 학습 효율이 단기 성적뿐 아니라 평생 능력 개발의 기반이 된다는 증거입니다. 가성비로 봤을 때 자기주도학습이 월등하며, 무엇보다 비용이 들지 않습니다.<sup>[2][1]</sup></p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Q2. 간격 반복 학습은 어떻게 작동하나요?</summary>
+                        <div>
+                            <p>간격 반복 학습은 1880년대 독일 심리학자 헤르만 에빙하우스가 처음 고안한 방법으로, 학습된 정보를 복습하는 간격을 점차 늘려 기억력을 향상시킵니다. 망각 곡선을 극복하기 위해 설계됐으며, 140년이 넘는 세월 동안 수많은 실험으로 효과가 입증됐습니다. 매번 복습할 때마다 해당 정보가 머릿속에 남는 기간이 길어집니다. 복습 간격을 점진적으로 늘리면 오랜 기간 많은 정보를 효율적으로 저장할 수 있습니다. 능동적 회상을 반복하면 단순 몰입 학습보다 기억이 더 오래 유지됩니다. 2007년 미국 연구팀 분석 결과, 한 가지 내용에 많은 시간을 투자해 반복학습을 하는 것은 단기적으로는 효과가 있지만 장기적으로는 효과가 없었습니다. 반면 다양한 간격(5분~6개월)을 두고 반복해서 공부하게 했더니 간격이 길수록 장기적인 효과가 나타났습니다. 1주 뒤 시험에서는 10차례 읽은 그룹이 더 좋았지만, 4주 후에는 성적이 비슷해졌습니다. 간격 반복을 꾸준히 하면 정보가 완전히 '내 것'이 됩니다.<sup>[6][7][5]</sup></p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Q3. 파인만 기법의 핵심은 무엇인가요?</summary>
+                        <div>
+                            <p>파인만 기법은 노벨 물리학상 수상자 리처드 파인만이 개발한 학습 방법으로, 복잡한 개념을 빠르고 깊이 있게 이해하는 데 도움을 줍니다. 네 가지 핵심 단계로 구성됩니다. 첫째, 선택한 개념을 정리하고 자신의 지식을 적습니다. 종이 한 장을 가지고 지금 공부하고 있는 개념의 이름을 맨 위에 씁니다. 둘째, 12살 어린이에게 쉽게 설명하듯이 간단히 써봅니다. 이 단계가 핵심입니다. 전문 용어나 복잡한 표현을 사용하지 않고, 누구나 이해할 수 있도록 풀어 쓰는 과정에서 자신이 진짜 이해했는지가 드러납니다. 셋째, 내용을 검토하고 부족한 부분을 다시 공부하며 다듬습니다. 설명이 막히거나 애매한 부분이 있다면 그곳이 바로 이해가 부족한 지점입니다. 넷째, 다른 사람에게 설명하며 이해도를 시험하고 기록합니다. 설명하는 과정 자체가 학습입니다. 2025년 연구는 파인만 기법을 사용하는 학생들이 더 나은 기억 연결을 구축하며, 복잡한 주제를 더 쉽게 이해하고 기억할 수 있게 만든다고 보고했습니다.<sup>[10][9][11]</sup></p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Q4. 신경가소성이 학습과 어떤 관련이 있나요?</summary>
+                        <div>
+                            <p>신경가소성은 뇌가 경험에 따라 구조와 기능을 변화시키는 능력입니다. 우리가 새로운 것을 배우고 기억을 형성하며, 심지어 뇌 손상으로부터 회복할 수 있는 이유가 바로 이 능력 덕분입니다. 신경가소성의 주요 특징은 시냅스 가소성(뉴런 간 연결 강도의 변화), 신경 발생(새로운 뉴런의 생성), 축삭 발아(뉴런의 새로운 연결 형성), 기능적 재구성(뇌 영역의 기능 변화)입니다. 학습은 뇌에서 시냅스 강화, 새로운 시냅스 형성, 뉴런 활성화 패턴 변화, 뇌 구조의 변화를 통해 이루어집니다. 반복 학습을 통해 정보를 반복적으로 복습하면 관련 시냅스 연결이 강화됩니다. 다중 감각 학습은 더 많은 신경 연결을 형성합니다. 정서적 연관이 있는 기억은 더 강하게 형성되며, 편도체가 이 과정에 관여합니다. 신경과학 연구에 따르면 동일한 내용을 여러 번 학습하면 뉴런 간의 연결이 더욱 강해져 장기 기억으로 저장될 가능성이 높아집니다. 학습은 뇌의 물리적 변화를 동반합니다.<sup>[14][12]</sup></p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Q5. 학습몰입에 영향을 미치는 요인은 무엇인가요?</summary>
+                        <div>
+                            <p>온라인 수업에서 간호대학생의 학습몰입에 영향을 미치는 요인을 분석한 연구는 학습 실재감, 학업적 자기효능감, 강의 흥미가 학습 몰입에 유의미한 영향을 미친다는 것을 밝혔습니다. 학습 실재감은 학습자가 온라인 환경에서 실제로 학습하고 있다고 느끼는 정도를 말합니다. 학업적 자기효능감은 자신이 학업 과제를 성공적으로 수행할 수 있다는 믿음입니다. 강의 흥미는 학습 내용 자체에 대한 호기심과 관심입니다. 이 세 가지가 결합되면 학습몰입이 극대화됩니다. 성인대학생을 대상으로 한 연구는 디지털 리터러시와 학습몰입이 학습 전이에 미치는 영향을 확인했습니다. 학습 전이는 학습한 내용을 실제 상황에 적용하는 능력을 의미합니다. 자기주도학습은 자기효능감을 증가시킵니다. 목표를 성취하고 문제를 해결하는 경험은 학습자의 자신감을 향상시키고 긍정적인 학습태도를 유도합니다. 학습몰입은 학습의 질을 결정하는 핵심 변수입니다.<sup>[16][17][3]</sup></p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Q6. 포모도로 기법은 왜 효과적인가요?</summary>
+                        <div>
+                            <p>포모도로 기법은 25분 집중 작업 후 5분 휴식을 반복하는 구조로, 집중과 휴식을 번갈아 활용하여 학습자가 피로를 방지하고 동기를 강화하며 깊은 몰입 상태에 진입하도록 돕습니다. 구조화된 간격은 멀티태스킹을 배제하고 집중의 깊이를 높이며, 곧 휴식이 있다는 확신은 수행 불안을 줄입니다. 많은 학자와 연구자들이 포모도로 기법을 통해 생산성, 집중력이 크게 향상되고 피로도가 감소했다고 보고합니다. 포모도로 기법이 미루는 습관을 없애고 집중력을 향상시키는 데 효과적이라는 가설도 제시됐습니다. 25분이라는 짧은 시간 제한은 학습자에게 '지금 당장 시작해야 한다'는 심리적 압박을 가하면서도, '25분만 참으면 된다'는 안도감을 동시에 줍니다. 신경과학 연구는 학생이 학습 중 집중력이 떨어지는 순간을 감지하면 학습 환경을 변경하거나 짧은 휴식을 권장하는 방식으로 최적의 학습 상태를 유지하도록 돕는 것이 효과적이라고 밝혔습니다. 포모도로 기법은 뇌의 작동 원리에 맞춘 전략입니다.<sup>[20][18][19][14]</sup></p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Q7. 자기주도학습이 메타인지를 향상시키는 이유는 무엇인가요?</summary>
+                        <div>
+                            <p>자기주도학습은 메타인지 능력을 향상시킵니다. 메타인지는 '무엇을 모르는지 아는' 능력, 즉 자기 인식을 말합니다. 학습 전략을 스스로 설계하면서 이 능력이 발달합니다. 공부 효율이 높아지면 공부시간이 줄고 휴식 시간을 조절할 수 있습니다. 자기관리 능력도 강화됩니다. 시간 관리, 목표 설정, 계획 수립 등이 일상 전반으로 확장됩니다. 자기주도학습은 학습자가 주체적으로 문제를 해결하는 능력을 키우는 데 도움을 줍니다. 문제를 스스로 파악하고 해결책을 찾아내는 과정을 통해 문제해결 능력이 향상됩니다. 자기주도학습을 통해 목표를 성취하고 문제를 해결하는 경험은 학습자의 자신감을 향상시키고 긍정적인 학습태도를 유도합니다. 메타인지는 학습의 효율성을 극대화하는 상위 인지 능력입니다. 자기주도학습은 이를 훈련하는 가장 효과적인 방법입니다.<sup>[4][3]</sup></p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Q8. 2025년 가장 효과적인 학습 전략은 무엇인가요?</summary>
+                        <div>
+                            <p>2025년 학습 전략 연구는 마인드 맵핑, 적극적 기억 호출, 간격 반복, 적응 학습 등 17가지 입증된 방법을 제시했습니다. 이 전략들은 기억력을 최대화하고, 비판적 사고를 강화하며, 참여를 증가시킵니다. 능동적 기억 회상과 간격 반복 같은 기술은 정보를 장기 기억으로 옮기는 데 도움을 줍니다. 구조화된 학습 방법은 문제 해결 및 분석 능력을 향상시킵니다. 마인드맵은 시각적 학습자에게 15% 더 많은 정보를 기억할 수 있도록 돕습니다. 상호작용 방법은 학생들 참여를 더욱 강화하여 94%의 높은 참여율을 가집니다. 활동적 학습은 학생들이 학습 프로세스에 적극적으로 참여하게 만듭니다. 협업은 의사소통과 팀워크를 촉진합니다. 심도 있는 이해는 개념을 설명하여 지식을 확고히 합니다. 개인화된 학습은 개별적인 속도를 허용합니다. 각 학습 스타일에 맞는 다양한 전략이 존재하며, 간격 반복, 능동 회상, 파인만 기법을 사용하는 학생들은 더 나은 기억 연결을 구축합니다.<sup>[11]</sup></p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Q9. 장기 기억 형성을 위한 가장 효과적인 방법은 무엇인가요?</summary>
+                        <div>
+                            <p>간격 반복 학습과 능동적 회상의 조합이 가장 효과적입니다. 간격 반복을 꾸준히 하면 머리에서 금세 사라지던 정보가 완전히 '내 것'이 됩니다. 오랜 시간이 지나도 쉽게 떠올릴 수 있는 진짜 장기 기억이 만들어집니다. 능동적 회상을 반복하면 단순 몰입 학습보다 기억이 더 오래 유지됩니다. 2007년 미국 연구팀 분석 결과, 학습내용을 동일하게 주고 다양한 간격(5분~6개월)을 두고 반복해서 공부하게 했더니 간격이 길수록 장기적인 효과가 나타났습니다. 학습양이 많고 장기적인 학습일수록 간격 학습이 효과적입니다. 2013년 Bui 등의 연구에 따르면 작업 기억 능력이 높은 참가자들이 간격 반복 학습을 통해 더 큰 효과를 보였으며, 특히 어려운 과제에서 더 나은 성과를 나타냈습니다. 신경과학 연구에 따르면 동일한 내용을 여러 번 학습하면 뉴런 간의 연결이 더욱 강해져 장기 기억으로 저장될 가능성이 높아집니다. 반복 학습을 통해 정보를 반복적으로 복습하면 관련 시냅스 연결이 강화됩니다.<sup>[8][7][6][14][5]</sup></p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Q10. 학습 효율을 극대화하기 위해 지금 당장 실천할 수 있는 것은 무엇인가요?</summary>
+                        <div>
+                            <p>첫째, 오늘부터 자기주도학습 시간을 하루 1시간 확보하세요. 한국교육고용패널 분석 결과, 자기주도학습 시간이 하루 1시간 늘 때마다 수능 백분위 점수가 5.3점 상승했습니다. 둘째, 포모도로 기법을 적용하세요. 25분 집중 작업 후 5분 휴식을 반복하는 구조로 시작합니다. 스마트폰 타이머를 설정하고, 25분 동안은 그 어떤 방해도 차단합니다. 셋째, 간격 반복 학습을 실천하세요. 한 번에 모든 내용을 암기하려 하지 말고, 복습 간격을 점진적으로 늘려가며 반복합니다. 넷째, 파인만 기법을 활용하세요. 배운 내용을 12살 어린이에게 설명하듯이 간단히 써보는 연습을 합니다. 다섯째, 학습 내용을 다른 사람에게 설명해보세요. 설명하는 과정 자체가 학습입니다. 여섯째, 메타인지를 훈련하세요. 공부 후 '무엇을 알게 됐고, 무엇을 모르는지'를 정리합니다. 이 여섯 가지를 오늘부터 실천하면 학습 효율은 즉시 향상됩니다.<sup>[4][6][18][1][5]</sup></p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- 푸터 -->
+            <footer class="mt-16 pt-8 border-t border-gray-200">
+                <p class="text-center text-sm text-gray-400">
+                    Interactive Infographic by Gemini. All text content provided by user.
+                </p>
+                <p class="text-center text-xs text-gray-400 mt-2">
+                    THE END
+                </p>
+            </footer>
+
+        </article>
+    </div>
+
+    <!-- JavaScript 로직 -->
+    <script>
+        window.onload = function() {
+            let sdlChartInstance;
+            let curveChartInstance;
+
+            // --- 차트 1: 자기주도학습(SDL) vs 사교육 ---
+            const sdlCtx = document.getElementById('sdlChart').getContext('2d');
+            const sdlChartData = {
+                sat: {
+                    labels: ['자기주도학습', '사교육'],
+                    data: [5.3, 1.8],
+                    title: '하루 1시간 투자 대비 수능 백분위 점수 상승',
+                    unit: '점'
+                },
+                gpa: {
+                    labels: ['자기주도학습', '사교육'],
+                    data: [1.8, 0], // '거의 영향 없음'을 0으로 표현
+                    title: '하루 1시간 투자 대비 대학 학점 백분위 상승',
+                    unit: '점'
+                },
+                income: {
+                    labels: ['자기주도학습', '사교육'],
+                    data: [4, 0], // '거의 영향 없음'을 0으로 표현
+                    title: '자기주도학습 습관에 따른 취업 후 실질임금 상승',
+                    unit: '%'
+                }
+            };
+
+            function createSdlChart(metric) {
+                const data = sdlChartData[metric];
+                if (sdlChartInstance) {
+                    sdlChartInstance.destroy();
+                }
+                sdlChartInstance = new Chart(sdlCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: data.unit,
+                            data: data.data,
+                            backgroundColor: [
+                                'rgba(37, 99, 235, 0.7)', // text-blue-600
+                                'rgba(107, 114, 128, 0.7)' // text-gray-500
+                            ],
+                            borderColor: [
+                                'rgba(37, 99, 235, 1)',
+                                'rgba(107, 114, 128, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: data.title,
+                                font: { size: 16, family: "'Noto Sans KR', sans-serif" }
+                            },
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + ' ' + data.unit;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // --- 차트 2: 망각 곡선 ---
+            const curveCtx = document.getElementById('forgettingCurveChart').getContext('2d');
+            const curveLabels = ['1일차', '3일차', '7일차', '14일차', '30일차'];
+            
+            curveChartInstance = new Chart(curveCtx, {
+                type: 'line',
+                data: {
+                    labels: curveLabels,
+                    datasets: [
+                        {
+                            label: '벼락치기 (Cramming)',
+                            data: [100, 40, 20, 10, 5],
+                            borderColor: 'rgba(239, 68, 68, 1)', // text-red-500
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.1,
+                            hidden: false
+                        },
+                        {
+                            label: '간격 반복 (Spaced Repetition)',
+                            data: [100, 95, 90, 88, 85],
+                            borderColor: 'rgba(37, 99, 235, 1)', // text-blue-600
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            hidden: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '학습 방식에 따른 기억 유지율 (%)',
+                            font: { size: 16, family: "'Noto Sans KR', sans-serif" }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' %';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // --- 탭 시스템 공통 로직 ---
+            function setupTabs(tabContainerSelector) {
+                const tabContainer = document.querySelector(tabContainerSelector);
+                if (!tabContainer) return;
+                
+                const tabButtons = tabContainer.querySelectorAll('.tab-button');
+                const tabPanes = tabContainer.querySelectorAll('.tab-pane');
+
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tabId = button.dataset.tab;
+
+                        // 모든 버튼 비활성화
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        // 클릭된 버튼 활성화
+                        button.classList.add('active');
+
+                        // 모든 패널 숨기기
+                        tabPanes.forEach(pane => pane.classList.remove('active'));
+                        // 해당 패널 보이기
+                        tabContainer.querySelector(`.tab-pane[data-pane="${tabId}"]`).classList.add('active');
+                    });
+                });
+            }
+
+            // --- 이벤트 리스너 바인딩 ---
+
+            // 차트 1 (SDL) 버튼
+            const sdlButtons = document.getElementById('sdl-chart-buttons');
+            sdlButtons.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const metric = e.target.dataset.metric;
+                    // 버튼 활성 상태 변경
+                    sdlButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    // 차트 업데이트
+                    createSdlChart(metric);
+                }
+            });
+
+            // 차트 2 (Curve) 버튼
+            const curveButtons = document.getElementById('curve-chart-buttons');
+            curveButtons.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const type = e.target.dataset.type;
+                    // 버튼 활성 상태 변경
+                    curveButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    // 차트 데이터셋 가시성 변경
+                    if (type === 'cram') {
+                        curveChartInstance.data.datasets[0].hidden = false;
+                        curveChartInstance.data.datasets[1].hidden = true;
+                    } else {
+                        curveChartInstance.data.datasets[0].hidden = true;
+                        curveChartInstance.data.datasets[1].hidden = false;
+                    }
+                    curveChartInstance.update();
+                }
+            });
+
+            // 탭 시스템 초기화
+            setupTabs('.feynman-tabs');
+            setupTabs('.strategy-tabs');
+            
+            // --- 초기 차트 생성 ---
+            createSdlChart('sat'); // 기본값으로 '수능' 차트 로드
+            
+            // 차트 2 기본값 설정
+            curveChartInstance.data.datasets[0].hidden = false;
+            curveChartInstance.data.datasets[1].hidden = true;
+            curveChartInstance.update();
+        };
+    </script>
+
+</body>
+</html>
+
