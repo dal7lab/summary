@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D 관계 동역학 시뮬레이터 (v32 - Fixed Presets)</title>
+    <title>3D 관계 동역학 시뮬레이터 (v33 by P - Complete Fix)</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- Three.js 라이브러리 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
+    <!-- Google Fonts - Noto Sans KR -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     
+    <!-- MathJax 설정 -->
     <script>
     window.MathJax = {
       tex: {
@@ -63,22 +68,41 @@
         }
         
         .formula {
-            font-size: 1.1rem; color: #D1D5DB; background: #1F2937;
-            padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #4B5563;
+            font-size: 1.1rem; 
+            color: #D1D5DB; 
+            background: #1F2937;
+            padding: 1.5rem; 
+            border-radius: 0.5rem; 
+            overflow-x: auto; 
+            border: 1px solid #4B5563;
         }
+        
         input[type="range"] {
-            -webkit-appearance: none; appearance: none;
-            width: 100%; height: 8px; background: #374151;
-            border-radius: 5px; outline: none;
+            -webkit-appearance: none; 
+            appearance: none;
+            width: 100%; 
+            height: 8px; 
+            background: #374151;
+            border-radius: 5px; 
+            outline: none;
         }
         input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none;
-            width: 20px; height: 20px; background: #A855F7;
-            border-radius: 50%; cursor: pointer; transition: background 0.2s;
+            -webkit-appearance: none; 
+            appearance: none;
+            width: 20px; 
+            height: 20px; 
+            background: #A855F7;
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: background 0.2s;
         }
         input[type="range"]::-moz-range-thumb {
-            width: 20px; height: 20px; background: #A855F7;
-            border-radius: 50%; cursor: pointer; border: none;
+            width: 20px; 
+            height: 20px; 
+            background: #A855F7;
+            border-radius: 50%; 
+            cursor: pointer; 
+            border: none;
         }
     </style>
 </head>
@@ -86,9 +110,10 @@
 
     <div class="container mx-auto max-w-7xl px-4 py-16">
 
+        <!-- 헤더 -->
         <header class="text-center mb-16">
             <h1 class="text-5xl md:text-6xl font-black mb-6 gradient-text">
-                3D 관계 동역학 시뮬레이터 (v32)
+                3D 관계 동역학 시뮬레이터 (v33)
             </h1>
             <p class="text-2xl md:text-3xl font-bold text-gray-100">
                 로렌츠 어트랙터(Lorenz Attractor) 모델
@@ -97,6 +122,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
+            <!-- 1. 컨트롤 패널 -->
             <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700 h-fit">
                 <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.835 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.835 2.942-.734 2.106-2.106a1.532 1.532 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01.947-2.287c.835-1.372-.734-2.942-2.106-2.106A1.532 1.532 0 0111.49 3.17zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
@@ -104,6 +130,7 @@
                 </h2>
                 
                 <div class="space-y-6">
+                    <!-- 로렌츠 변수 -->
                     <div>
                         <label for="param-rho" class="flex justify-between items-center text-sm font-medium text-gray-300">
                             <span>$\rho$ (로): 관계의 혼돈도</span>
@@ -126,6 +153,7 @@
                         <input type="range" id="param-beta" min="0.1" max="5" value="2.6667" step="0.01" class="w-full mt-2">
                     </div>
 
+                    <!-- 초기 감정 -->
                     <div class="pt-4 border-t border-gray-600">
                         <label for="param-x0" class="flex justify-between items-center text-sm font-medium text-gray-300">
                             <span>$x_0$ (영희 초기 감정)</span>
@@ -149,6 +177,7 @@
                     </div>
                 </div>
 
+                <!-- 프리셋 버튼 -->
                 <div class="mt-8 pt-6 border-t border-gray-600">
                     <h3 class="text-lg font-semibold text-white mb-3">관계 궤적 프리셋</h3>
                     <div class="grid grid-cols-2 gap-3">
@@ -160,8 +189,10 @@
                 </div>
             </div>
 
+            <!-- 2. 그래프 및 해석 -->
             <div class="lg:col-span-2 space-y-8">
                 
+                <!-- 3D 궤적 -->
                 <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-3xl font-bold text-white mb-4">
                         <span class="text-purple-400">3D</span>: 관계 궤적 (Phase Plot)
@@ -172,6 +203,7 @@
                     <p class="text-center text-sm text-gray-400 mt-2">마우스로 궤적을 드래그, 줌, 패닝하여 탐색할 수 있습니다.</p>
                 </div>
                 
+                <!-- 2D 시간-긴장감 -->
                 <div class="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-3xl font-bold text-white mb-4">
                         <span class="text-cyan-400">2D</span>: 시간(t)에 따른 긴장감(z) 변화
@@ -181,6 +213,7 @@
                     </div>
                 </div>
                 
+                <!-- AI 관계 컨설팅 -->
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -189,20 +222,24 @@
                         AI 관계 컨설팅
                     </h2>
                     <div id="ai-consulting-report" class="text-lg text-gray-300 leading-relaxed space-y-3">
-                        </div>
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
                 </div>
 
+                <!-- 전문가용 동적 분석 -->
                 <div class="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-700">
                     <h2 class="text-2xl font-bold text-white mb-6 pb-3 border-b border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15v4a1 1 0 001 1h12a1 1 0 001-1v-4a1 1 0 00-.293-.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
                         전문가용 동적계 분석
                     </h2>
                     <div id="expert-analysis-report" class="text-lg text-gray-300 leading-relaxed space-y-3">
-                        </div>
+                        <!-- JS로 동적 업데이트 -->
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- 3. 시뮬레이션 원리 (아코디언) -->
         <section class="mt-24">
             <h2 class="text-4xl font-extrabold text-center mb-12 gradient-text">
                  '3D 관계 동역학 시뮬레이터' 작동 원리
@@ -274,7 +311,6 @@
         let expertAnalysisReport = null;
         let animationFrameId = null;
 
-        // 로렌츠 시뮬레이션
         function runLorenzSimulation(params, steps = 5000, dt = 0.01) {
             let { sigma, rho, beta, x0, y0, z0 } = params;
             let x = x0, y = y0, z = z0;
@@ -299,7 +335,6 @@
             return { points, t_labels, z_history };
         }
         
-        // Three.js 초기화
         function initThreeJS() {
             const container = document.querySelector('.threejs-container');
             const canvas = document.getElementById('threeJSCanvas');
@@ -358,7 +393,6 @@
             }
         }
         
-        // 3D 궤적 업데이트
         function updateTrajectory(points) {
             if (!scene) return;
             
@@ -405,7 +439,6 @@
             scene.add(wireframeCube);
         }
         
-        // 2D 차트 업데이트 (★★★ 수정된 함수 ★★★)
         function updateTimeSeriesChart(data) {
             const chartCanvas = document.getElementById('timeSeriesChart')?.getContext('2d');
             if (!chartCanvas) return;
@@ -417,14 +450,12 @@
             } else {
                 timeSeriesChart = new Chart(chartCanvas, {
                     type: 'line',
-                    // [수정 1] 'data:' 속성 추가
-                    data: {
+                     {
                         labels: data.t_labels,
                         datasets: [
                             {
                                 label: 'z (관계의 긴장감)',
-                                // [수정 2] 'data:' 키 추가
-                                data: data.z_history,
+                                 data.z_history,
                                 borderColor: '#22D3EE',
                                 backgroundColor: '#22D3EE30',
                                 borderWidth: 2,
@@ -432,24 +463,67 @@
                                 tension: 0.1
                             }
                         ]
-                    }, // [수정 1] data 객체 닫기
+                    },
                     options: {
-                        responsive: true, maintainAspectRatio: false,
+                        responsive: true, 
+                        maintainAspectRatio: false,
                         plugins: {
-                            legend: { position: 'top', labels: { color: '#E5E7EB', font: { size: 14 } } },
-                            tooltip: { mode: 'index', intersect: false, callbacks: { title: (items) => `Time: ${items[0].label}s` } }
+                            legend: { 
+                                position: 'top', 
+                                labels: { 
+                                    color: '#E5E7EB', 
+                                    font: { size: 14 } 
+                                } 
+                            },
+                            tooltip: { 
+                                mode: 'index', 
+                                intersect: false, 
+                                callbacks: { 
+                                    title: (items) => `Time: ${items[0].label}s` 
+                                } 
+                            }
                         },
                         scales: {
-                            x: { title: { display: true, text: '시간 (Time)', color: '#9CA3AF' }, ticks: { color: '#9CA3AF', maxTicksLimit: 10 }, grid: { color: '#374151' } },
-                            y: { title: { display: true, text: 'Z축 (긴장감)', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }
+                            x: { 
+                                title: { 
+                                    display: true, 
+                                    text: '시간 (Time)', 
+                                    color: '#9CA3AF' 
+                                }, 
+                                ticks: { 
+                                    color: '#9CA3AF', 
+                                    maxTicksLimit: 10 
+                                }, 
+                                grid: { 
+                                    color: '#374151' 
+                                } 
+                            },
+                            y: { 
+                                title: { 
+                                    display: true, 
+                                    text: 'Z축 (긴장감)', 
+                                    color: '#9CA3AF' 
+                                }, 
+                                ticks: { 
+                                    color: '#9CA3AF' 
+                                }, 
+                                grid: { 
+                                    color: '#374151' 
+                                } 
+                            }
                         },
-                        elements: { point: { radius: 0, hitRadius: 10, hoverRadius: 5 } }
+                        elements: { 
+                            point: { 
+                                radius: 0, 
+                                hitRadius: 10, 
+                                hoverRadius: 5 
+                            } 
+                        }
                     }
                 });
             }
         }
 
-        // [v32 수정] 분석 업데이트 함수 - 파라미터를 명시적으로 전달받아 사용
         function updateAnalysis(params) {
             if (!aiConsultingReport || !expertAnalysisReport) {
                 console.error("리포트 DOM 요소를 찾을 수 없습니다.");
@@ -460,7 +534,6 @@
             
             let aiConsulting = "";
             
-            // [v32 핵심 수정] rho 값을 직접 params에서 가져와 비교
             if (rho < 1) {
                 aiConsulting = `
                     <p class="font-bold text-lg text-gray-400">진단: 무관심 (소멸)</p>
@@ -493,7 +566,6 @@
             }
         }
 
-        // [v32 수정] 전체 시뮬레이션 실행 - 현재 슬라이더 값으로 params 객체 생성
         function runFullSimulation() {
             const params = {};
             paramIds.forEach(id => {
@@ -511,7 +583,7 @@
             
             updateTrajectory(data.points);
             updateTimeSeriesChart(data);
-            updateAnalysis(params); // [v32] params 전달
+            updateAnalysis(params);
         }
 
         function updateSliderLabel(id, value) {
@@ -520,7 +592,6 @@
             }
         }
 
-        // [v32 수정] setParams - 슬라이더 값을 설정한 후 즉시 runFullSimulation 호출
         function setParams(p) {
             Object.keys(p).forEach(key => {
                 if(inputs[key]) {
@@ -528,14 +599,14 @@
                     updateSliderLabel(key, p[key]);
                 }
             });
-            runFullSimulation(); // [v32] 슬라이더 값이 업데이트된 직후 시뮬레이션 실행
+            runFullSimulation();
         }
 
         function initializeApp() {
-            console.log("v32: 모든 리소스 로드 완료. 앱 초기화 시작...");
+            console.log("v33: 모든 리소스 로드 완료. 앱 초기화 시작...");
             
             if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined' || typeof Chart === 'undefined') {
-                const errorMsg = "치명적 오류: 3D/2D 라이브러리 로드에 실패했습니다!";
+                const errorMsg = "치명적 오류: 3D/2D 라이브러리 로드에 실패했습니다! (v33)";
                 console.error(errorMsg);
                 const errorReport = document.getElementById('ai-consulting-report');
                 if (errorReport) {
@@ -545,7 +616,7 @@
                 }
                 return;
             }
-            console.log("v32: 모든 라이브러리 로드 확인 완료.");
+            console.log("v33: 모든 라이브러리 로드 확인 완료.");
 
             aiConsultingReport = document.getElementById('ai-consulting-report');
             expertAnalysisReport = document.getElementById('expert-analysis-report');
@@ -573,7 +644,6 @@
                 }
             });
             
-            // [v32] 프리셋 버튼 이벤트 리스너
             document.getElementById('preset-chaotic').addEventListener('click', () => {
                 setParams({ sigma: 10.0, rho: 28.0, beta: 2.67, x0: 1.0, y0: 1.0, z0: 1.0 });
             });
@@ -587,7 +657,6 @@
                 setParams({ sigma: 10.0, rho: 45.0, beta: 2.67, x0: 1.0, y0: 1.0, z0: 1.0 });
             });
             
-            // 아코디언
             document.querySelectorAll('.accordion-button').forEach(button => {
                 button.addEventListener('click', () => {
                     const content = button.nextElementSibling;
@@ -618,7 +687,7 @@
 
             try {
                 setParams({ sigma: 10.0, rho: 28.0, beta: 2.67, x0: 1.0, y0: 1.0, z0: 1.0 });
-                console.log("앱 초기화 완료. (v32)");
+                console.log("앱 초기화 완료. (v33)");
             } catch (e) {
                 console.error("초기 시뮬레이션 실행 실패:", e);
                 if(aiConsultingReport) {
